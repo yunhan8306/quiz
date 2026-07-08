@@ -21,6 +21,10 @@ const state = {
 
 const STATUS_LABEL = { none: '안 풂', correct: '맞음', partial: '애매함', wrong: '틀림' };
 
+/* 진행기록 저장 키 — init()에서 퀴즈별로 확정 (아래 LEGACY_KEY 참고) */
+const LEGACY_KEY = 'quiz-progress';
+let STORAGE_KEY = LEGACY_KEY;
+
 /* 우선순위 = 평가 4축 가중합 (RULES.md 참고) */
 const EVAL_WEIGHTS = { frequency: 0.40, centrality: 0.25, practicality: 0.20, discrimination: 0.15 };
 const EVAL_LABEL = { frequency: '출제빈도', centrality: '중심성', practicality: '실무', discrimination: '변별력' };
@@ -50,14 +54,17 @@ init();
 
 async function init() {
   try {
-    const [manifest, gData] = await Promise.all([
+    const [manifest, gData, config] = await Promise.all([
       fetch('data/sections.json').then((r) => r.json()),
       fetch('data/glossary.json').then((r) => r.json()),
+      fetch('quiz.config.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({})),
     ]);
     state.sections = await Promise.all(
       manifest.sections.map((id) => fetch('data/sections/' + id + '.json').then((r) => r.json()))
     );
     state.glossary = gData.terms;
+    // 퀴즈별 저장 키 — 같은 사이트(origin)에 여러 퀴즈가 있어도 진행기록이 섞이지 않도록
+    STORAGE_KEY = LEGACY_KEY + ':' + ((config && config.name) || location.pathname);
   } catch (e) {
     app.innerHTML = '<p class="error">데이터를 불러오지 못했습니다. <code>python3 server.py</code>로 실행했는지 확인하세요.</p>';
     return;
@@ -69,8 +76,7 @@ async function init() {
     state.progress = await r.json();
   } catch (e) {
     state.serverOk = false;
-    try { state.progress = JSON.parse(localStorage.getItem('quiz-progress') || '{}'); }
-    catch (_) { state.progress = {}; }
+    state.progress = loadLocalProgress();
   }
   updateServerBadge();
 
@@ -117,8 +123,23 @@ function updateServerBadge() {
 
 let saveTimer = null;
 
+/* 신규 키를 읽되, 없으면 레거시 단일 키(quiz-progress)를 1회 이전해 기존 기록 보존 */
+function loadLocalProgress() {
+  let raw = localStorage.getItem(STORAGE_KEY);
+  if (raw == null && STORAGE_KEY !== LEGACY_KEY) {
+    const legacy = localStorage.getItem(LEGACY_KEY);
+    if (legacy != null) {
+      localStorage.setItem(STORAGE_KEY, legacy);
+      localStorage.removeItem(LEGACY_KEY);
+      raw = legacy;
+    }
+  }
+  try { return JSON.parse(raw || '{}'); }
+  catch (_) { return {}; }
+}
+
 function saveProgress() {
-  localStorage.setItem('quiz-progress', JSON.stringify(state.progress));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.progress));
   if (!state.serverOk) return;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
