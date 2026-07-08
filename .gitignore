@@ -2,4 +2,4 @@
 .DS_Store
 
 # 학습 진행 기록 (로컬 전용 — 브라우저 localStorage로도 저장됨)
-data/progress.json
+*/data/progress.json
