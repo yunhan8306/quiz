@@ -1,0 +1,430 @@
+{
+  "id": "kotlin-advanced",
+  "title": "Kotlin 심화 & 컴파일러",
+  "description": "inline/reified, 제네릭 변성, K2 컴파일러, KMP, value class, kotlinx",
+  "questions": [
+    {
+      "id": "ktadv-001",
+      "type": "choice",
+      "difficulty": 1,
+      "coverage": "core",
+      "eval": {
+        "frequency": 4,
+        "centrality": 4,
+        "practicality": 3,
+        "discrimination": 2
+      },
+      "question": "고차 함수에 `inline` 키워드를 붙이면 컴파일 결과에 나타나는 주된 효과는 무엇인가?",
+      "choices": [
+        "JVM의 JIT 컴파일러가 이 함수를 런타임에 우선적으로 기계어로 컴파일하도록 힌트가 남는다",
+        "컴파일러가 전달된 람다를 싱글톤 객체로 캐싱해 매 호출마다 같은 인스턴스를 재사용하게 된다",
+        "함수 본문과 전달된 람다의 본문이 호출 지점에 복사되어, 람다용 Function 객체 생성과 가상 호출이 사라진다",
+        "함수가 static 메서드로 변환되어 인스턴스 생성 없이 정적 호출로 실행된다"
+      ],
+      "correctIndex": 2,
+      "explanation": "**inline 함수**는 순수하게 **Kotlin 컴파일 시점**의 변환이다. 컴파일러가 함수 본문과 함수형 파라미터로 전달된 **람다 본문을 호출 지점에 그대로 복사**하기 때문에:\n\n- 람다마다 만들어지던 `Function` 객체 **할당이 사라지고**, `invoke()` 가상 호출도 제거된다\n- 람다 본문이 호출자의 프레임 안에서 실행되므로 **비지역 반환(non-local return)** 이 가능해진다\n- 타입 인자를 치환할 수 있어 **reified 타입 파라미터**의 전제 조건이 된다\n\n대신 호출 지점마다 바이트코드가 복사되므로 **코드 크기가 커진다.** 그래서 람다를 받지 않는 큰 함수를 inline으로 만드는 것은 이득이 거의 없고 IDE 경고가 뜬다.\n\n오답 정리: ①은 JVM JIT의 인라이닝과 혼동한 것으로, Kotlin의 `inline`은 런타임 힌트가 아니라 컴파일 타임 바이트코드 변환이다. ②처럼 아무것도 캡처하지 않는 람다가 싱글톤으로 캐싱되는 것은 inline과 무관하게 컴파일러가 하는 별개의 최적화다. ④ static 변환은 최상위 함수의 일반적인 컴파일 방식이지 inline의 효과가 아니다.",
+      "keywords": [
+        "inline-function"
+      ],
+      "related": [
+        "ktadv-002",
+        "ktadv-005"
+      ]
+    },
+    {
+      "id": "ktadv-002",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 4,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 3
+      },
+      "question": "제네릭 함수에서 `reified` 타입 파라미터를 쓰려면 함수가 반드시 `inline`이어야 한다. 그 이유로 옳은 것은?",
+      "choices": [
+        "인라인 함수는 본문이 호출 지점에 복사되므로, 컴파일 시점에 타입 파라미터를 호출부의 실제 타입 인자로 치환할 수 있기 때문",
+        "인라인 함수만 런타임 리플렉션 API에 접근할 수 있어 제네릭 타입 정보를 조회할 수 있기 때문",
+        "인라인 함수는 타입 소거를 거치지 않고 제네릭 시그니처를 바이트코드에 그대로 유지하기 때문",
+        "인라인 함수는 타입 인자별로 특수화된 함수 복사본을 클래스 파일에 미리 생성해 두기 때문"
+      ],
+      "correctIndex": 0,
+      "explanation": "JVM에서 제네릭은 **타입 소거(type erasure)** 를 거치므로 일반 함수는 런타임에 `T`가 무엇인지 알 수 없다. 그런데 **inline 함수**는 본문이 **호출 지점에 복사**되므로, 복사되는 순간 컴파일러가 `T`를 그 호출부의 실제 타입(예: `String`)으로 **문자 그대로 치환**할 수 있다. `reified`는 이 치환을 요청하는 키워드다.\n\n덕분에 다음이 가능해진다:\n```kotlin\ninline fun <reified T> Bundle.getParcelableCompat(key: String): T? { ... }\n// obj is T, T::class, T::class.java 모두 사용 가능\n```\n`Class<T>`를 인자로 끌고 다닐 필요가 없어져 `Gson.fromJson<User>(json)` 같은 API가 만들어진다. 단, 본문 복사가 전제이므로 **Java에서는 reified inline 함수를 호출할 수 없다.**\n\n오답 정리: ②는 인과가 틀렸다 — 리플렉션 접근 권한의 문제가 아니라 컴파일 타임 치환의 문제다. ③ 제네릭 시그니처 메타데이터는 일반 함수에도 남지만 그것으로 런타임 인스턴스의 타입 인자를 알 수는 없다. ④는 C++ 템플릿식 특수화로, Kotlin은 타입별 함수 사본을 만들지 않고 호출 지점마다 인라인할 뿐이다.",
+      "keywords": [
+        "reified-type-parameter",
+        "inline-function"
+      ],
+      "related": [
+        "ktadv-001",
+        "ktadv-003"
+      ]
+    },
+    {
+      "id": "ktadv-003",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 4,
+        "centrality": 4,
+        "practicality": 2,
+        "discrimination": 4
+      },
+      "question": "`interface Source<out T>`처럼 타입 파라미터에 `out` 변성을 선언했을 때의 효과로 옳은 것은?",
+      "choices": [
+        "T를 소비자(파라미터) 위치에서만 쓸 수 있고, `Source<Any>`를 `Source<String>`이 필요한 자리에 넘길 수 있다",
+        "T를 생산자(반환) 위치에서만 쓸 수 있고, `Source<String>`을 `Source<Any>`가 필요한 자리에 넘길 수 있다",
+        "타입 파라미터가 불변(invariant)으로 고정되어 타입 인자가 정확히 일치할 때만 대입이 허용된다",
+        "런타임 타입 검사가 가능해져 `obj is Source<String>` 같은 검사가 허용된다"
+      ],
+      "correctIndex": 1,
+      "explanation": "**제네릭 변성(variance)** 은 타입 인자의 하위 타입 관계가 제네릭 타입 전체로 전파되는 방향을 정한다.\n\n- **`out T` (공변, covariant)**: T를 **반환 위치(생산자)** 에서만 쓸 수 있다. 그 대가로 `String`이 `Any`의 하위 타입이면 `Source<String>`도 `Source<Any>`의 하위 타입이 된다. 대표 예가 `List<out E>` — 읽기 전용이라 안전하게 공변이 가능하고, 그래서 `List<String>`을 `List<Any>`로 받을 수 있다.\n- **`in T` (반공변, contravariant)**: T를 **파라미터 위치(소비자)** 에서만 쓸 수 있고, 관계가 반대로 뒤집힌다. `Comparable<in T>`가 대표 예다.\n\n\"**P**roducer는 **out**, **C**onsumer는 **in**\" (PECS에 해당)으로 기억하면 된다. Kotlin은 클래스 선언에 붙이는 **선언 지점 변성**과, 사용처에서 `Source<out Any>`처럼 붙이는 **타입 프로젝션(사용 지점 변성)** 을 모두 지원한다.\n\n오답 정리: ①은 `in`(반공변)의 설명이다. ③ 불변은 변성 키워드를 붙이지 않았을 때의 기본 동작이다. ④ 변성은 컴파일 타임 규칙일 뿐이며, 타입 소거 때문에 런타임 타입 인자 검사는 여전히 불가능하다 — 그건 reified의 영역이다.",
+      "keywords": [
+        "generic-variance"
+      ],
+      "related": [
+        "ktadv-002"
+      ]
+    },
+    {
+      "id": "ktadv-004",
+      "type": "choice",
+      "difficulty": 1,
+      "coverage": "core",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 2
+      },
+      "question": "Kotlin Multiplatform의 `expect`/`actual` 메커니즘 동작으로 옳은 것은?",
+      "choices": [
+        "expect 선언은 인터페이스로 컴파일되고, 런타임에 각 플랫폼의 구현이 리플렉션으로 주입된다",
+        "actual 구현은 androidMain에만 작성하면 되고, 나머지 타겟은 expect에 정의된 기본 구현을 사용한다",
+        "expect/actual은 클래스에만 적용할 수 있어 함수나 프로퍼티는 인터페이스로 추상화해야 한다",
+        "commonMain의 expect 선언마다 각 타겟(소스셋)이 대응하는 actual 구현을 제공해야 하며, 누락되면 컴파일 에러가 발생한다"
+      ],
+      "correctIndex": 3,
+      "explanation": "**expect/actual**은 KMP에서 공통 코드가 플랫폼별 API를 사용하기 위한 **컴파일 타임 메커니즘**이다. `commonMain`에 `expect fun currentTimeMillis(): Long`처럼 시그니처만 선언하면, 컴파일 대상이 되는 **모든 타겟의 소스셋**(androidMain, iosMain 등)이 `actual` 구현을 제공해야 하고, 하나라도 빠지면 **컴파일 에러**가 난다. 즉 플랫폼 구현의 존재가 빌드 시점에 보장된다.\n\n추가 포인트:\n- 함수뿐 아니라 **클래스, 프로퍼티, object, typealias**에도 적용된다 (`actual typealias`로 기존 플랫폼 클래스를 그대로 연결 가능)\n- 소스셋은 계층 구조(예: `appleMain` → `iosMain`)를 이루므로 중간 소스셋에서 actual을 한 번만 제공할 수도 있다\n- 같은 문제를 **인터페이스 + 의존성 주입**으로 풀 수도 있으며, 공개 API 설계에서는 오히려 그쪽이 권장되는 경우가 많다\n\n오답 정리: ①은 런타임 주입 메커니즘으로 오해한 것 — 리플렉션도, 런타임 바인딩도 없다. ② expect는 기본 구현을 가질 수 없고 모든 타겟이 각자 actual을 제공해야 한다. ③은 반대로, 클래스만이 아니라 함수·프로퍼티 수준에서도 쓸 수 있다.",
+      "keywords": [
+        "expect-actual"
+      ],
+      "related": [
+        "ktadv-008"
+      ]
+    },
+    {
+      "id": "ktadv-005",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 2,
+        "discrimination": 4
+      },
+      "question": "inline 함수의 람다 파라미터에 `noinline`이 아닌 `crossinline`을 붙여야 하는 상황은 언제인가?",
+      "choices": [
+        "람다를 변수에 저장하거나 인라인이 아닌 다른 함수의 인자로 전달해야 할 때",
+        "람다가 익명 객체나 중첩 람다 등 다른 실행 컨텍스트에서 호출되어, 인라인은 유지하되 비지역 반환을 금지해야 할 때",
+        "람다 안에서 suspend 함수를 호출해 코루틴 경계를 넘어야 할 때",
+        "람다가 바깥 함수의 지역 변수를 캡처할 수 있도록 클로저 생성을 허용해야 할 때"
+      ],
+      "correctIndex": 1,
+      "explanation": "inline 함수의 람다는 기본적으로 호출자의 프레임에 인라인되므로 `return`이 **바깥 호출 함수를 반환시키는 비지역 반환(non-local return)** 이 허용된다. 그런데 람다를 **다른 실행 컨텍스트** — 예를 들어 `Runnable` 익명 객체 안이나 다른 람다 내부 — 에서 호출하면, 그 시점에는 원래 호출자의 스택 프레임이 없을 수 있어 비지역 반환이 성립하지 않는다.\n\n```kotlin\ninline fun postToMain(crossinline block: () -> Unit) {\n    handler.post { block() }  // 다른 컨텍스트에서 호출 → crossinline 필요\n}\n```\n\n- **`crossinline`**: 람다는 여전히 인라인되지만 내부에서 **비지역 `return` 사용이 컴파일 에러**가 된다. \"인라인의 성능 이점은 유지하되 반환 의미만 제한\"하는 키워드다.\n- **`noinline`**: 인라인화 자체를 포기한다. 람다가 일반 `Function` 객체가 되므로 변수에 저장하거나 비인라인 함수에 전달할 수 있다 — 이것이 ①의 상황이다.\n\n오답 정리: ①은 `noinline`의 용도다. ③ suspend 경계와 crossinline은 무관하다. ④ 지역 변수 캡처는 어떤 람다든 기본적으로 가능하며 별도 키워드가 필요 없다.",
+      "keywords": [
+        "inline-function"
+      ],
+      "related": [
+        "ktadv-001"
+      ]
+    },
+    {
+      "id": "ktadv-006",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 2,
+        "centrality": 2,
+        "practicality": 3,
+        "discrimination": 4
+      },
+      "question": "`@JvmInline value class UserId(val value: Long)`가 언더라잉 타입(Long)이 아니라 박싱된 래퍼 객체로 표현되는 상황은?",
+      "choices": [
+        "`List<UserId>`의 원소처럼 제네릭 타입 인자로 쓰이거나 `UserId?` 같은 nullable 타입으로 쓰일 때",
+        "함수의 파라미터나 반환 타입으로 직접 선언되어 컴파일러가 시그니처 mangling을 적용할 때",
+        "`toString()`이나 `hashCode()` 같은 Any의 메서드를 직접 호출할 때",
+        "일반 클래스의 `val` 프로퍼티에 저장되어 소유 객체와 함께 힙 메모리에 올라갈 때"
+      ],
+      "correctIndex": 0,
+      "explanation": "**value class**의 핵심 약속은 \"가능한 곳에서는 래퍼 없이 **언더라잉 타입으로 표현**한다\"이다. 파라미터, 반환 타입, 지역 변수, 클래스 프로퍼티 모두 바이트코드에서는 그냥 `long`으로 다뤄진다. 이때 `UserId`를 받는 함수와 `Long`을 받는 함수의 시그니처 충돌을 막기 위해 컴파일러가 `transfer-Ab3xQ2k` 식으로 **이름 맹글링(name mangling)** 을 한다.\n\n**박싱이 발생하는 것은 value class가 \"다른 타입으로\" 쓰일 때**다:\n- **제네릭 타입 인자**: `List<UserId>` — 제네릭은 참조 타입만 담으므로 원소가 모두 박싱된다\n- **nullable**: `UserId?` — 원시 타입 `long`은 null을 표현할 수 없다\n- **상위 타입 참조**: `Any`나 구현한 인터페이스 타입으로 대입할 때\n\n그래서 value class를 컬렉션에 대량으로 담으면 제로 오버헤드라는 이점이 사라진다는 점이 실무 함정이다.\n\n오답 정리: ②·④는 언더라잉 타입 그대로 표현되는 대표 상황이다. ③ `toString()` 등을 직접 호출하면 컴파일러가 박싱 없이 static `toString-impl` 메서드 호출로 바꿔준다.",
+      "keywords": [
+        "value-class"
+      ],
+      "related": [
+        "ktadv-001"
+      ]
+    },
+    {
+      "id": "ktadv-007",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 2,
+        "discrimination": 3
+      },
+      "question": "Kotlin 2.0에서 기본이 된 K2 컴파일러의 핵심 변화는 무엇인가?",
+      "choices": [
+        "IR 백엔드가 처음 도입되어 JVM 바이트코드 생성 방식이 플랫폼별 백엔드로 분리되었다",
+        "생성되는 코드가 자체 런타임에 최적화되어 앱의 실행 성능이 크게 향상되었다",
+        "프런트엔드가 FIR 기반으로 재작성되어 컴파일 속도와 스마트 캐스트가 개선되고, 모든 타겟 플랫폼이 하나의 프런트엔드를 공유한다",
+        "새로운 문법 체계가 도입되어 기존 코드는 마이그레이션 도구로 변환해야 컴파일된다"
+      ],
+      "correctIndex": 2,
+      "explanation": "**K2 컴파일러**의 본질은 **프런트엔드 재작성**이다. 기존 프런트엔드는 PSI 트리와 디스크립터·바인딩 컨텍스트를 오가며 의미 분석을 했는데, K2는 이를 **FIR(Frontend Intermediate Representation)** 라는 단일 의미 트리로 교체했다. 그 결과:\n\n- **컴파일 속도 개선** — 클린 빌드 기준 유의미한 향상이 JetBrains 벤치마크로 보고됨\n- **스마트 캐스트 강화** — 더 많은 흐름 패턴에서 캐스트가 인정됨\n- **플랫폼 통합** — JVM/Native/JS/Wasm이 동일한 프런트엔드를 공유해 동작 일관성이 높아짐\n- 컴파일러 플러그인(Compose, serialization 등)도 새 FIR API 기반으로 재작성됨\n\n컴파일 파이프라인으로 보면 `소스 → 프런트엔드(파싱·의미 분석, K2/FIR) → IR 변환 → 백엔드(코드 생성)`이고, K2가 바꾼 것은 앞단이다.\n\n오답 정리: ① **IR 백엔드**는 K2 이전(JVM은 1.5부터 기본)에 도입되어 이미 플랫폼 간 공유되고 있었다 — K2는 백엔드 재작성이 아니다. ② 생성되는 바이트코드는 사실상 동일하므로 개선되는 것은 런타임 성능이 아니라 **빌드 속도**다. ④ 언어 문법은 호환을 유지하며, 마이그레이션 도구로 코드를 변환할 필요가 없다.",
+      "keywords": [
+        "k2-compiler"
+      ],
+      "related": [
+        "ktadv-008"
+      ]
+    },
+    {
+      "id": "ktadv-008",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 4,
+        "discrimination": 3
+      },
+      "question": "JSON 파싱을 Gson에서 kotlinx.serialization으로 마이그레이션할 때 얻는 대표적인 이점은?",
+      "choices": [
+        "kapt 어노테이션 프로세서가 Java 스텁을 생성해 직렬화 코드를 만들므로 증분 빌드가 훨씬 빨라진다",
+        "첫 파싱 때 클래스 구조를 분석해 캐싱하므로 두 번째 호출부터 리플렉션 비용이 사라진다",
+        "포맷별 직렬화 코드를 런타임에 동적으로 바이트코드로 생성해 어떤 클래스든 어노테이션 없이 처리할 수 있다",
+        "컴파일러 플러그인이 빌드 시점에 시리얼라이저를 생성해 런타임 리플렉션이 없고, 기본값·non-null 타입 같은 Kotlin 의미가 보존된다"
+      ],
+      "correctIndex": 3,
+      "explanation": "**kotlinx.serialization**은 kapt/KSP가 아닌 **컴파일러 플러그인**으로 동작한다. `@Serializable`을 붙이면 컴파일 시점에 해당 클래스의 companion에 시리얼라이저 코드가 생성되며, 런타임에는 **리플렉션을 전혀 쓰지 않는다.** 그 결과:\n\n- **Kotlin 의미 보존**: 생성자를 정상 경유하므로 **기본값(default value)이 적용**되고, non-null 프로퍼티에 null이 들어오면 디코딩 시점에 명확한 예외가 난다\n- **R8/ProGuard 친화적**: 리플렉션 대상이 없어 복잡한 keep 규칙이 거의 필요 없다\n- **KMP 지원**: JVM 전용이 아니라 iOS 등 모든 타겟에서 동일하게 동작한다\n\n반면 **Gson은 런타임 리플렉션** 기반이고, 기본 생성자가 없으면 `Unsafe`로 생성자를 우회해 객체를 만든다. 그래서 Kotlin 기본값이 무시되고, **non-null로 선언한 프로퍼티에 null이 조용히 들어가** 훨씬 나중에 NPE로 터지는 유명한 함정이 있다.\n\n오답 정리: ①은 kapt 기반이라는 전제부터 틀렸다 — 컴파일러 플러그인이라 Java 스텁 생성 단계가 없다. ②는 Gson류 리플렉션 라이브러리의 캐싱 동작에 가깝고, ③처럼 런타임 바이트코드 생성을 하지 않는다.",
+      "keywords": [
+        "kotlinx-serialization"
+      ],
+      "related": [
+        "ktadv-004",
+        "ktadv-007"
+      ]
+    },
+    {
+      "id": "ktadv-009",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 2,
+        "centrality": 2,
+        "practicality": 4,
+        "discrimination": 3
+      },
+      "question": "Compose 컴포저블의 파라미터를 `List<T>` 대신 kotlinx-collections-immutable의 `ImmutableList<T>`로 바꾸면 리컴포지션 최적화에 도움이 되는 이유는?",
+      "choices": [
+        "ImmutableList는 스냅샷 시스템에 자동 등록되어 요소 단위의 변경 추적이 가능해지기 때문",
+        "List는 읽기 전용 인터페이스일 뿐 구현체가 가변일 수 있어 불안정으로 판정되지만, ImmutableList는 불변이 보장되어 안정 타입으로 취급되기 때문",
+        "List는 equals 비교를 지원하지 않지만 ImmutableList는 구조적 동등성 비교를 지원하기 때문",
+        "ImmutableList는 요소 변경 시 복사 없이 제자리에서 수정되어 참조가 그대로 유지되기 때문"
+      ],
+      "correctIndex": 1,
+      "explanation": "Kotlin의 `List`는 **읽기 전용(read-only) 인터페이스일 뿐 불변(immutable)이 아니다.** 실제 구현체가 `ArrayList`라면 다른 참조를 통해 언제든 내용이 바뀔 수 있다. Compose 컴파일러는 이런 타입을 **불안정(unstable)** 으로 판정하고, 불안정한 파라미터를 받는 컴포저블은 값이 같아 보여도 **스킵되지 못해** 부모가 재구성될 때마다 다시 실행된다.\n\n`kotlinx-collections-immutable`의 `ImmutableList`/`PersistentList`는:\n- 생성 후 내용이 절대 변하지 않음을 **타입으로 보장**하므로 컴파일러가 **안정(stable) 타입**으로 취급한다 → 스킵 가능\n- `PersistentList`는 `add`/`remove` 시 **구조 공유(structural sharing)** 로 새 인스턴스를 효율적으로 만들어 불변성과 수정 편의를 함께 제공한다\n\n참고로 strong skipping 모드가 기본이 된 뒤에는 불안정 파라미터도 인스턴스 동일성 비교로 스킵될 수 있지만, 안정성 기반 동등성 비교가 여전히 더 정확한 스킵 판정을 준다.\n\n오답 정리: ①은 `mutableStateListOf`의 스냅샷 기반 동작과 혼동한 것이다. ③ `List`도 구조적 `equals`를 정상 지원한다. ④는 '불변'과 정면으로 모순된다 — ImmutableList는 제자리 수정이 불가능하다.",
+      "keywords": [
+        "stability",
+        "recomposition"
+      ],
+      "related": [
+        "ktadv-006",
+        "ktadv-008"
+      ]
+    },
+    {
+      "id": "ktadv-010",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 1,
+        "centrality": 2,
+        "practicality": 2,
+        "discrimination": 4
+      },
+      "question": "표준 라이브러리의 `checkNotNull(value)` 호출 이후 value가 스마트 캐스트되는 것은 Kotlin contracts 덕분이다. contracts의 동작에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "계약 내용은 컴파일러가 함수 본문과 대조해 검증하므로, 실제 동작과 다른 계약을 쓰면 컴파일 에러가 난다",
+        "계약은 런타임 검사 코드로 컴파일되어 조건 위반 시 IllegalStateException을 던진다",
+        "`returns() implies` 같은 계약으로 함수의 동작을 컴파일러에 알려, 호출 지점의 스마트 캐스트나 변수 초기화 흐름 분석을 가능하게 한다",
+        "`callsInPlace` 계약은 람다가 정확히 지정된 횟수만 실행되도록 런타임에 강제한다"
+      ],
+      "correctIndex": 2,
+      "explanation": "**contracts**는 함수가 \"내가 이렇게 동작한다\"를 **컴파일러에게 선언**하는 API다. 컴파일러는 함수 본문 안까지 흐름 분석을 하지 않기 때문에, 커스텀 검증 함수를 거친 뒤에는 원래 스마트 캐스트가 되지 않는다. 계약이 그 간극을 메운다.\n\n```kotlin\nfun validate(s: String?) {\n    contract { returns() implies (s != null) }\n    if (s == null) throw IllegalArgumentException()\n}\n// 호출 후 s가 String으로 스마트 캐스트됨\n```\n\n두 가지 대표 계약:\n- **`returns(...) implies 조건`**: \"정상 반환했다면 조건이 참\" — `require`, `check`, `checkNotNull` 등이 사용하며 호출 지점 **스마트 캐스트**를 가능하게 한다\n- **`callsInPlace(block, InvocationKind)`**: \"람다를 제자리에서 N번 호출한다\" — `run`/`let`/`apply` 등이 `EXACTLY_ONCE`를 선언해서 람다 안에서 바깥 `val`을 초기화하는 코드가 허용된다\n\n중요한 특징: **컴파일러는 계약의 진위를 검증하지 않고 그대로 믿는다.** 잘못된 계약을 쓰면 틀린 스마트 캐스트가 통과되어 런타임 오류로 이어질 수 있다 — 정확성은 전적으로 작성자 책임이다. 또한 계약은 순수 컴파일 타임 정보라서 바이트코드에 검사 코드를 만들지 않는다.\n\n오답 정리: ①은 반대로, 검증 없이 신뢰한다. ②·④는 계약을 런타임 방어 코드로 오해한 것 — 계약은 어떤 런타임 동작도 만들지 않는다.",
+      "keywords": [
+        "kotlin-contracts"
+      ],
+      "related": [
+        "ktadv-002",
+        "ktadv-007"
+      ]
+    },
+    {
+      "id": "ktadv-011",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 4,
+        "discrimination": 3
+      },
+      "question": "Hilt, Room 같은 어노테이션 기반 라이브러리의 코드 생성을 KAPT에서 KSP로 전환하면 빌드 속도가 개선된다. 그 이유로 옳은 것은?",
+      "choices": [
+        "KSP는 어노테이션 처리를 런타임 리플렉션으로 미루는 방식이라 컴파일 타임에 수행하는 작업이 거의 없기 때문이다",
+        "KAPT는 생성 코드를 바이트코드에 직접 삽입하는 반면 KSP는 소스 파일만 생성하므로 검증 비용이 낮기 때문이다",
+        "KAPT는 자바 스텁을 먼저 생성해 자바 어노테이션 프로세서를 실행하지만, KSP는 코틀린 심볼을 직접 분석해 스텁 단계가 없기 때문이다",
+        "KSP는 K2 컴파일러 전용 API여서 FIR 기반 해석 속도의 이점을 그대로 물려받기 때문이다"
+      ],
+      "correctIndex": 2,
+      "explanation": "**KAPT**(Kotlin Annotation Processing Tool)는 코틀린 코드를 기존 **자바** 어노테이션 프로세서에 연결하기 위한 다리다. 자바 프로세서는 자바 코드만 이해하므로, KAPT는 먼저 코틀린 코드로부터 **자바 스텁(stub)** 을 생성하고 그 위에서 프로세서를 돌린다. 이 스텁 생성 단계가 빌드마다 추가 비용을 만든다.\n\n**KSP**(Kotlin Symbol Processing)는 코틀린 컴파일러 위에서 코틀린 **심볼**(클래스·함수·프로퍼티)을 직접 분석하는 API다. 스텁 생성이 없어 빠르고, 확장 함수·sealed 클래스·기본 파라미터 같은 **코틀린 고유 기능을 그대로 이해**한다는 부수적 장점도 있다. Room, Hilt(Dagger), Glide 등 주요 라이브러리가 KSP를 지원한다.\n\n- ①은 반대에 가깝다. KSP도 KAPT처럼 **컴파일 타임 코드 생성** 도구이며 런타임 리플렉션과 무관하다.\n- ②는 사실관계가 틀렸다. KAPT도 소스(자바 파일)를 생성하며, 차이의 본질은 바이트코드 조작 여부가 아니라 **스텁 생성 단계의 유무**다.\n- ④ KSP는 K2 이전부터 존재했고 K2 전용이 아니다. K2의 FIR은 컴파일러 프론트엔드 개선이지 KSP의 속도 원천이 아니다.",
+      "keywords": [
+        "ksp",
+        "kapt",
+        "hilt",
+        "room"
+      ],
+      "related": [
+        "ktadv-007",
+        "ktadv-008"
+      ]
+    },
+    {
+      "id": "ktadv-012",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 2,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 3
+      },
+      "question": "라이브러리를 :core와 :feature 두 Gradle 모듈로 분리했더니, :core의 internal 헬퍼 클래스를 :feature에서 참조할 수 없게 됐다. 이 상황에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "internal은 함께 컴파일되는 모듈 단위로 적용되므로, 논리적으로 한 라이브러리라도 별도 모듈로 나뉘면 접근할 수 없다",
+        "internal은 같은 Gradle 루트 프로젝트 전체에서 접근 가능하므로, 참조가 막힌 것은 빌드 설정 오류다",
+        "internal은 자바의 package-private에 대응하므로 두 모듈의 패키지 이름을 맞추면 다시 접근할 수 있다",
+        "internal은 소스 의존일 때만 제한되고 컴파일된 아티팩트로 의존하면 접근할 수 있으므로 배포 방식을 바꾸면 된다"
+      ],
+      "correctIndex": 0,
+      "explanation": "Kotlin의 **internal 가시성**은 '함께 컴파일되는 소스의 집합', 즉 **컴파일 모듈**이 경계다. Gradle 멀티모듈 프로젝트에서는 모듈 하나하나가 각각의 컴파일 단위이므로, 같은 저장소·같은 라이브러리라도 모듈이 다르면 internal 선언은 보이지 않는다. 즉 **논리적 API 경계와 물리적 모듈 경계가 어긋나는 것**이 멀티모듈 설계(modularization)의 고전적인 긴장 지점이다.\n\n현재 실무에서 쓰이는 우회책은 세 가지다.\n1. 해당 선언을 **public으로 승격** — API 표면이 오염되고 외부 소비자에게도 노출된다 (`@InternalApi` 같은 opt-in 어노테이션으로 완화).\n2. 컴파일러 플래그 **-Xfriend-paths**로 friend 모듈 지정 — 문서화되지 않은 비공식 기능이라 언어 차원의 보장이 없다.\n3. **모듈을 합치기** — 빌드 구성이 복잡해지고 모듈화의 이점을 잃는다.\n\n이 간극을 언어 차원에서 메우려는 것이 shared internal 가시성 제안이다.\n\n- ②: internal의 경계는 Gradle 루트 프로젝트가 아니라 **개별 모듈**이다.\n- ③: internal은 패키지와 무관하다. package-private 대응은 흔한 오해다.\n- ④: 가시성 검사는 소스/아티팩트 의존과 무관하게 컴파일러가 동일하게 적용한다.",
+      "keywords": [
+        "internal-visibility",
+        "modularization"
+      ],
+      "related": [
+        "ktadv-013",
+        "ktadv-015"
+      ]
+    },
+    {
+      "id": "ktadv-013",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 1,
+        "centrality": 2,
+        "practicality": 2,
+        "discrimination": 4
+      },
+      "question": "Kotlin의 internal 선언이 JVM 바이트코드로 컴파일될 때의 처리 방식으로 옳은 것은?",
+      "choices": [
+        "JVM의 package-private 가시성으로 변환되어 같은 패키지의 클래스만 접근할 수 있다",
+        "JVM에 대응하는 가시성이 없어 public으로 컴파일되되, 모듈 이름 기반 접미사로 이름이 맹글링된다",
+        "private으로 컴파일되고 같은 모듈에서의 접근은 synthetic 접근자 메서드를 통해 이뤄진다",
+        "클래스 파일의 커스텀 속성에 가시성 정보가 기록되고, 클래스 로더가 로드 시점에 접근을 검사한다"
+      ],
+      "correctIndex": 1,
+      "explanation": "JVM의 가시성 체계(public / protected / package-private / private)에는 Kotlin의 '컴파일 모듈 단위'라는 개념이 없다. 그래서 internal 선언은 바이트코드 수준에서는 **public으로 컴파일**되고, 대신 함수 이름에 **모듈 이름 기반 접미사**를 붙이는 **이름 맹글링(name mangling)** 이 적용된다 (예: `loadUser` → `loadUser$core_release` 형태). 이렇게 하면 자바 코드에서 우발적으로 호출하기 어려워지고, 서로 다른 모듈에 시그니처가 같은 internal 멤버가 있어도 충돌하지 않는다.\n\n이 인프라는 friend 모듈 지원의 기반이기도 하다. shared internal 제안이 구현되려면 이 맹글링 처리를 확장하고, 모듈 경계를 넘는 override에 브리지 메서드를 만들고, 리플렉션 API가 새 가시성 의미론을 이해하게 해야 한다는 과제가 있다. 참고로 value class를 파라미터로 받는 함수에도 (오버로드 충돌 방지 목적의) 맹글링이 적용된다.\n\n- ①: internal은 패키지와 무관하므로 package-private 변환은 불가능하다. 가장 흔한 오해다.\n- ③: private으로 만들면 같은 모듈의 **다른 클래스·다른 파일**에서 접근할 수 없게 되므로 성립하지 않는다.\n- ④: JVM 클래스 로더는 Kotlin 가시성을 검사하지 않는다. internal은 순수하게 **컴파일 타임** 개념이다.",
+      "keywords": [
+        "internal-visibility",
+        "name-mangling"
+      ],
+      "related": [
+        "ktadv-012",
+        "ktadv-006"
+      ]
+    },
+    {
+      "id": "ktadv-014",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 2,
+        "centrality": 2,
+        "practicality": 3,
+        "discrimination": 4
+      },
+      "question": "kotlinx-collections-immutable의 PersistentList에 add로 요소를 추가하면 내부적으로 어떤 일이 일어나는가?",
+      "choices": [
+        "원본 리스트의 내부 배열을 수정한 뒤 읽기 전용 뷰를 반환하므로, 원본을 참조하던 코드도 변경을 보게 된다",
+        "모든 요소를 새 배열로 복사한 리스트를 만들기 때문에 표준 List에 + 연산자를 쓰는 것과 비용이 같다",
+        "변경 내역을 로그로만 기록해 두고 실제 요소를 읽는 시점에 병합하므로 읽기 비용이 커진다",
+        "새 리스트 인스턴스를 반환하되, 변경되지 않은 내부 구조를 원본과 공유해 전체 복사를 피한다"
+      ],
+      "correctIndex": 3,
+      "explanation": "**영속 컬렉션(persistent collection)** 은 수정 연산이 원본을 절대 바꾸지 않고 **새 컬렉션 인스턴스를 반환**하는 진짜 불변 컬렉션이다. 핵심은 효율이다. 요소 전체를 복사하는 대신, 트리 형태의 내부 구조에서 **변경된 경로만 새로 만들고 나머지는 원본과 공유**한다. 이를 **구조적 공유(structural sharing)** 라 하며, 덕분에 매 수정마다 O(n) 전체 복사를 하는 것보다 훨씬 저렴하다.\n\n표준 라이브러리의 `List`와의 차이도 중요하다. `List`는 **타입 수준의 읽기 전용 인터페이스**일 뿐, 하부 구현은 `MutableList`일 수 있어 다른 참조를 통해 내용이 바뀔 수 있다. 반면 PersistentList는 하부 자체가 불변이라 변경 가능성이 원천적으로 없다. 이 '증명 가능한 불변성' 덕분에 Compose 컴파일러가 안정성(stability)을 확신할 수 있다는 점이 ktadv-009에서 다룬 내용과 이어진다.\n\n- ①: 원본은 수정되지 않는다. 원본 참조를 들고 있는 코드는 이전 상태를 그대로 본다 (이것이 영속성의 정의다).\n- ②: 구조적 공유 덕분에 전체 복사(`List + 요소`)보다 효율적이다. 비용이 같다는 것이 이 자료구조를 쓰는 이유를 부정하는 오해다.\n- ③: 지연 병합 방식이 아니라 수정 시점에 새 구조가 즉시 만들어지며, 읽기는 추가 병합 비용 없이 동작한다.",
+      "keywords": [
+        "persistent-collection",
+        "kotlin-collections",
+        "stability"
+      ],
+      "related": [
+        "ktadv-009"
+      ]
+    },
+    {
+      "id": "ktadv-015",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 1,
+        "centrality": 2,
+        "practicality": 2,
+        "discrimination": 3
+      },
+      "question": "internal(모듈 내부)과 public(전체 공개) 사이의 간극을 메우기 위해 논의 중인 Kotlin의 'shared internal' 가시성 제안에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "어떤 모듈이든 의존성만 선언하면 별도 지정 없이 다른 모듈의 shared internal 선언에 접근할 수 있다",
+        "공유할 선언마다 명시적으로 표시해야 하며, 지정된 의존 모듈에게만 보이고 일반 외부 소비자에게는 보이지 않는다",
+        "@RequiresOptIn처럼 접근 시 컴파일 경고를 내는 어노테이션 기반 opt-in 메커니즘이다",
+        "호출자의 모듈 정보를 런타임에 검사해 허용된 모듈이 아니면 예외를 던지는 방식이다"
+      ],
+      "correctIndex": 1,
+      "explanation": "shared internal 제안은 internal과 public 사이에 위치하는 **새 가시성 수식어**를 도입하자는 것이다. 핵심 설계 결정은 **선언 단위의 명시적 표시**다. 모듈을 friend로 지정한다고 internal 전부가 열리는 게 아니라, 공유하겠다고 표시한 선언만 지정된 의존 모듈에 보인다. 자동 노출을 피한 이유는 기존 internal이 주는 캡슐화 기대('내 모듈 밖에서는 안 보인다')를 깨지 않기 위해서다.\n\n제안은 공유 정도를 4단계 레벨로 모델링한다. Level 0은 일반 의존(public만), Level 1은 선언을 노출하지 않으면서 타입 안정성만 보장해 모듈 경계 너머 스마트 캐스트를 가능하게 하는 단계, Level 2는 shared internal 멤버 접근, Level 3은 모든 internal이 보이는 최대 접근으로 현재의 friend 모듈(-Xfriend-paths)과 동등하다. 공유는 의존성 그래프를 따라 전이되며, 여러 경로가 있으면 '경로 안에서는 최솟값, 경로 사이에서는 최댓값'으로 유효 레벨을 계산한다. 공유 대상 모듈은 배포 아티팩트라면 Maven 좌표로, 로컬 모듈이라면 빌드 도구 식별자로 지정한다.\n\n- ①: 공유는 **제공하는 모듈이 대상 모듈을 명시적으로 지정**해야 성립한다. 의존성을 선언했다는 사실만으로 접근이 자동 부여되지 않는다.\n- ③: opt-in 어노테이션은 경고 기반의 사용 억제일 뿐 가시성을 바꾸지 못한다. 이 제안은 컴파일러가 강제하는 진짜 가시성이다.\n- ④: 가시성은 컴파일 타임에 검사되는 개념이며 런타임 모듈 검사와 무관하다.",
+      "keywords": [
+        "friend-module",
+        "internal-visibility"
+      ],
+      "related": [
+        "ktadv-012"
+      ]
+    }
+  ]
+}

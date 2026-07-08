@@ -1,0 +1,603 @@
+{
+  "id": "kotlin-language",
+  "title": "Kotlin 언어",
+  "description": "클래스 종류, 프로퍼티, 위임, 확장/스코프 함수, null 안정성, 동등성, 컬렉션",
+  "questions": [
+    {
+      "id": "kt-001",
+      "type": "choice",
+      "difficulty": 1,
+      "coverage": "core",
+      "eval": {
+        "frequency": 5,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 1
+      },
+      "question": "Kotlin data class에서 컴파일러가 자동 생성하는 멤버에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "클래스 본문(body)에 선언한 프로퍼티도 equals()와 hashCode() 계산에 자동으로 포함된다",
+        "data class는 다른 클래스가 상속할 수 있도록 open 키워드를 붙여 선언할 수 있다",
+        "equals/hashCode/toString/copy/componentN은 주 생성자에 선언된 프로퍼티만을 기준으로 생성된다",
+        "toString()은 프로퍼티 값이 아니라 객체의 해시 기반 주소 표현을 문자열로 반환한다"
+      ],
+      "correctIndex": 2,
+      "explanation": "**data class**는 값(데이터)을 담는 클래스를 위해 컴파일러가 다음 멤버를 자동 생성한다.\n\n- `equals()` / `hashCode()` — 구조적 동등성 비교\n- `toString()` — `User(name=kim, age=3)` 형태의 프로퍼티 나열\n- `copy()` — 일부 프로퍼티만 바꾼 새 인스턴스 생성\n- `componentN()` — 구조 분해 선언(`val (a, b) = user`) 지원\n\n핵심은 **이 모든 생성이 '주 생성자(primary constructor)에 선언된 프로퍼티'만 대상으로 한다**는 점이다. 클래스 본문에 선언한 프로퍼티는 equals/hashCode/toString/copy 어디에도 반영되지 않으므로 ①은 오답이며, 이를 모르면 \"분명 값이 다른데 equals가 true\"인 버그를 만나게 된다.\n\n②는 오답 — data class는 `open`, `abstract`, `sealed`, `inner`로 선언할 수 없어 상속 대상이 될 수 없다(다른 클래스나 인터페이스를 상속/구현하는 것은 가능). ④는 일반 클래스가 `toString()`을 재정의하지 않았을 때의 기본 동작(`클래스명@해시코드`)이며, data class는 프로퍼티 값을 출력하도록 재정의된다.",
+      "keywords": [
+        "data-class"
+      ],
+      "related": [
+        "kt-013",
+        "kt-006"
+      ]
+    },
+    {
+      "id": "kt-002",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 5,
+        "centrality": 4,
+        "practicality": 4,
+        "discrimination": 3
+      },
+      "question": "sealed class로 UI 상태를 모델링할 때 when 식의 동작에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "when을 식(expression)으로 사용해 모든 서브클래스를 분기하면 else 없이 컴파일되며, 서브클래스 추가 시 컴파일 오류로 누락을 잡아준다",
+        "sealed class의 직접 서브클래스는 프로젝트 내 어느 모듈에서든 자유롭게 선언할 수 있다",
+        "when에 else 분기를 추가해 두어야 새 서브클래스가 생겼을 때 컴파일 오류로 누락 분기를 알 수 있다",
+        "sealed class는 직접 인스턴스화가 가능한 일반 클래스이므로 abstract 멤버를 선언할 수 없다"
+      ],
+      "correctIndex": 0,
+      "explanation": "**sealed class**(및 sealed interface)는 **닫힌(closed) 상속 계층**을 만든다. 직접 서브클래스는 **같은 모듈, 같은 패키지 안에서만** 선언할 수 있어(②는 오답) 컴파일러가 '이 타입의 모든 경우'를 알 수 있다.\n\n덕분에 `when`을 **식(expression)** 으로 사용해 모든 서브클래스를 분기하면 `else`가 필요 없고, 나중에 새 서브클래스(예: `UiState.Empty`)를 추가하면 **누락된 분기가 컴파일 오류로 드러난다.** 이것이 `Loading / Success / Error` 같은 UI 상태나 MVI의 상태·인텐트 모델링에 sealed 계층이 표준으로 쓰이는 이유다.\n\n③은 **반대**다 — `else`를 넣어버리면 새 서브클래스가 추가되어도 `else`가 조용히 흡수해 컴파일 오류가 나지 않으므로, sealed 계층에서는 오히려 `else`를 피하는 것이 안전하다. ④도 오답 — sealed class는 그 자체로 **abstract**여서 직접 인스턴스화할 수 없고, abstract 멤버를 가질 수 있다.",
+      "keywords": [
+        "sealed-class",
+        "mvi"
+      ],
+      "related": [
+        "arch-001",
+        "kt-001"
+      ]
+    },
+    {
+      "id": "kt-003",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 4,
+        "centrality": 3,
+        "practicality": 2,
+        "discrimination": 2
+      },
+      "question": "object 선언과 companion object에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "object 선언은 사용할 때마다 새 인스턴스를 생성해 반환하는 팩토리 문법이다",
+        "companion object는 클래스의 인스턴스가 생성될 때마다 하나씩 함께 생성된다",
+        "companion object 멤버는 별도 처리 없이도 Java의 static 멤버와 동일한 형태로 컴파일된다",
+        "object 선언은 최초 접근 시점에 스레드 안전하게 초기화되는 싱글톤을 만들고, companion object는 클래스 이름으로 접근하는 멤버를 담는다"
+      ],
+      "correctIndex": 3,
+      "explanation": "**object 선언**은 클래스 정의와 인스턴스 생성을 동시에 하는 **싱글톤** 문법이다. JVM의 클래스 로딩 메커니즘 덕분에 **최초 접근 시점에 지연 초기화되며 스레드 안전**이 보장된다. ①은 오답 — 매번 새 인스턴스를 만드는 것은 object 표현식(`object : Listener { ... }`)과도 다르고, object 선언은 앱 전체에서 단 하나의 인스턴스만 존재한다.\n\n**companion object**는 클래스 내부에 선언하는 특수한 object로, `MyClass.CONSTANT`처럼 **클래스 이름으로 접근하는 멤버**(팩토리 메서드, 상수 등)를 담는다. 클래스당 하나만 존재하므로 ②는 오답이다.\n\n③은 흔한 오해다 — companion object 멤버는 실제로는 `Companion`이라는 **싱글톤 객체의 인스턴스 멤버**로 컴파일되고, 진짜 `static` 멤버가 필요하면(Java 상호운용 등) `@JvmStatic` 어노테이션이나 `const val`을 사용해야 한다. 참고로 companion object는 감싸는 클래스가 로드될 때 초기화되어, object 선언의 지연 초기화와 시점이 다르다.",
+      "keywords": [
+        "companion-object"
+      ],
+      "related": [
+        "kt-009"
+      ]
+    },
+    {
+      "id": "kt-004",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 5,
+        "centrality": 2,
+        "practicality": 2,
+        "discrimination": 2
+      },
+      "question": "스코프 함수 let / apply / also / run의 차이에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "apply는 람다의 결과를 반환하므로 객체를 설정한 뒤 다른 타입의 값을 만들어낼 때 적합하다",
+        "let은 수신 객체를 it 인자로 받고 람다 결과를 반환하므로, 안전 호출(?.)과 함께 null이 아닐 때의 변환 처리에 자주 쓰인다",
+        "also는 수신 객체를 this로 받으며 람다의 마지막 식을 결과로 반환한다",
+        "run과 with는 수신 객체를 it으로 참조하며 수신 객체 자신을 그대로 반환한다"
+      ],
+      "correctIndex": 1,
+      "explanation": "**스코프 함수**는 두 가지 축으로 구분하면 명확하다.\n\n| 함수 | 객체 참조 | 반환값 |\n|---|---|---|\n| `let` | `it` | 람다 결과 |\n| `run` | `this` | 람다 결과 |\n| `with` | `this` | 람다 결과 |\n| `apply` | `this` | **수신 객체** |\n| `also` | `it` | **수신 객체** |\n\n`let`은 객체를 `it`으로 받아 **람다 결과를 반환**하므로, `user?.let { format(it) }`처럼 **안전 호출과 결합해 null이 아닌 경우의 변환**에 관용적으로 쓰인다(②가 정답).\n\n- ①은 오답: `apply`는 람다 결과가 아니라 **수신 객체 자신**을 반환한다. 그래서 `Intent().apply { putExtra(...) }`처럼 객체 설정(빌더 스타일 초기화)에 적합하고, 다른 값을 만들 때는 `run`/`let`이 맞다.\n- ③은 오답: `also`는 `this`가 아니라 `it`으로 받고, 반환값도 람다 결과가 아니라 수신 객체다(로깅 등 부수 작업에 적합).\n- ④는 오답: `run`/`with`는 `this`로 참조하고 **람다 결과**를 반환한다.\n\n참고로 스코프 함수 대부분은 수신 객체에 대한 확장 함수로 정의되어 있다.",
+      "keywords": [
+        "scope-function",
+        "extension-function"
+      ],
+      "related": [
+        "kt-005",
+        "kt-007"
+      ]
+    },
+    {
+      "id": "kt-005",
+      "type": "choice",
+      "difficulty": 1,
+      "coverage": "core",
+      "eval": {
+        "frequency": 5,
+        "centrality": 4,
+        "practicality": 4,
+        "discrimination": 2
+      },
+      "question": "Kotlin의 null 안정성 연산자에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "안전 호출 a?.b는 a가 null이면 b를 평가하지 않고 전체 식의 값이 null이 된다",
+        "엘비스 연산자 a ?: b는 a가 null이 아닐 때 b를 반환한다",
+        "!! 연산자는 값이 null인 경우 컴파일 오류를 발생시켜 런타임 크래시를 사전에 막아준다",
+        "String?과 String은 런타임에 서로 다른 클래스로 표현되어 JVM이 null 여부를 구분한다"
+      ],
+      "correctIndex": 0,
+      "explanation": "Kotlin **null 안정성**의 핵심은 타입 시스템이 `String`(non-null)과 `String?`(nullable)을 구분해 **NPE 가능성을 컴파일 타임에 잡는 것**이다.\n\n- **안전 호출 `?.`** — `a?.b`는 `a`가 null이면 `b`에 접근하지 않고 식 전체가 null이 된다(①이 정답). `user?.address?.city`처럼 체이닝하면 중간에 null이 나와도 안전하다.\n- **엘비스 `?:`** — `a ?: b`는 `a`가 **null일 때** 대체값 `b`를 반환한다. ②는 반대로 서술해 오답.\n- **단언 `!!`** — nullable 값을 non-null로 강제 캐스트하며, 실제로 null이면 **런타임에 NullPointerException을 던진다.** 컴파일 오류로 막아주는 것이 아니므로 ③은 오답이고, `!!`는 사실상 \"여기서 크래시 나도 좋다\"는 선언이라 최소화해야 한다.\n\n④도 오답 — nullable 여부는 **컴파일 타임 개념**이고, 런타임에는 둘 다 같은 `java.lang.String`이다(제네릭처럼 소거되고 어노테이션/체크 코드로 흔적만 남는다). 그래서 Java 코드에서 넘어오는 **플랫폼 타입**은 컴파일러가 null 검증을 못 해 주의가 필요하다.",
+      "keywords": [
+        "null-safety"
+      ],
+      "related": [
+        "kt-004",
+        "kt-006"
+      ]
+    },
+    {
+      "id": "kt-006",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 4,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 2
+      },
+      "question": "Kotlin의 == 와 === 비교 연산자에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "==는 참조(주소) 비교를 수행하고, ===는 equals()를 호출해 값을 비교한다",
+        "a == b는 a.equals(b) 호출로 단순 치환되므로 a가 null이면 NPE가 발생한다",
+        "==는 null 검사를 포함해 equals()를 호출하는 구조적 동등성 비교이고, ===는 두 참조가 같은 객체를 가리키는지 비교한다",
+        "data class 인스턴스는 ===로 비교해도 프로퍼티 값이 모두 같으면 true를 반환한다"
+      ],
+      "correctIndex": 2,
+      "explanation": "Kotlin은 동등성을 두 가지로 구분한다.\n\n- **구조적 동등성 `==`** — 내용이 같은가. 컴파일 시 `a?.equals(b) ?: (b === null)` 형태로 변환되어 **null-safe**하다. `a`가 null이어도 NPE 없이 `b`도 null인지로 판정하므로 ②는 오답이다.\n- **참조 동등성 `===`** — 두 참조가 **같은 객체 인스턴스**를 가리키는가(Java의 `==`에 해당).\n\n①은 Java 습관에서 오는 대표적 오해로, 역할이 **반대**다. Java에서 `==`가 참조 비교였다면, Kotlin의 `==`는 equals 기반 값 비교이고 참조 비교가 필요하면 `===`를 명시적으로 쓴다.\n\n④도 오답 — data class는 `equals()`를 프로퍼티 기반으로 재정의하므로 `==` 비교는 값이 같으면 true지만, `===`는 equals와 무관하게 **동일 인스턴스 여부만** 본다. 값이 같은 두 인스턴스라도 `===`는 false다.\n\n참고: 원시 타입(Int 등)은 런타임에 박싱될 수 있어, 박싱된 값끼리의 `===`는 캐싱 범위에 따라 결과가 달라질 수 있으므로 값 비교에는 `==`를 쓰는 것이 원칙이다.",
+      "keywords": [
+        "null-safety",
+        "data-class"
+      ],
+      "related": [
+        "kt-001",
+        "kt-005"
+      ]
+    },
+    {
+      "id": "kt-007",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 4,
+        "centrality": 3,
+        "practicality": 2,
+        "discrimination": 3
+      },
+      "question": "확장 함수(extension function)의 동작 방식에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "확장 함수는 대상 클래스의 바이트코드를 수정해 실제 멤버 메서드로 추가된다",
+        "수신 객체를 첫 번째 인자로 받는 정적(static) 메서드로 컴파일되며, 대상 클래스의 private 멤버에는 접근할 수 없다",
+        "멤버 함수와 시그니처가 동일한 확장 함수를 정의하면 확장 함수가 우선 호출된다",
+        "확장 함수는 호출 시점의 실제 객체 타입에 따라 런타임에 동적으로 디스패치된다"
+      ],
+      "correctIndex": 1,
+      "explanation": "**확장 함수**는 기존 클래스를 수정하지 않고 새 함수를 '덧붙인 것처럼' 호출하게 해주는 문법이다. 실체는 **수신 객체를 첫 번째 파라미터로 받는 static 유틸리티 메서드**로 컴파일된다. 예를 들어 `fun String.shout() = uppercase() + \"!\"`는 JVM에서 `shout(String receiver)` 형태의 정적 메서드가 된다.\n\n이 구조에서 세 가지 성질이 따라 나온다.\n\n1. **클래스 외부 코드**이므로 대상 클래스의 `private`/`protected` 멤버에 접근할 수 없다(②가 정답, ①은 오답 — 바이트코드를 건드리지 않는다).\n2. **멤버가 항상 우선**한다. 시그니처가 같으면 확장 함수는 가려지므로(shadowing) ③은 반대다.\n3. **정적 디스패치** — 어떤 확장 함수가 호출될지는 **컴파일 타임의 선언 타입**으로 결정된다. `open class`의 오버라이드처럼 런타임 타입을 따라가지 않으므로 ④는 오답이며, 부모 타입 변수로 호출하면 부모용 확장이 호출된다.\n\n`let`, `apply` 같은 스코프 함수나 컬렉션의 `map`/`filter`도 모두 확장 함수로 구현되어 있다.",
+      "keywords": [
+        "extension-function"
+      ],
+      "related": [
+        "kt-004"
+      ]
+    },
+    {
+      "id": "kt-008",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 3
+      },
+      "question": "Kotlin 컬렉션의 List와 MutableList 구분에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "List 타입은 내용이 변하지 않는 불변(immutable) 컬렉션임을 보장한다",
+        "MutableList를 List 타입으로 업캐스트하면 원본 객체 자체가 수정 불가능한 컬렉션으로 변환된다",
+        "List에 add()가 없는 이유는 JVM에서 읽기 전용의 별도 컬렉션 클래스를 사용하기 때문이다",
+        "List는 수정 API가 없는 읽기 전용 인터페이스일 뿐이며, 같은 객체를 MutableList 참조가 쥐고 있으면 내용이 바뀔 수 있다"
+      ],
+      "correctIndex": 3,
+      "explanation": "Kotlin 컬렉션 API의 핵심 설계는 **읽기 전용(read-only) 인터페이스와 가변(mutable) 인터페이스의 분리**다. `MutableList`는 `List`를 상속하면서 `add`/`remove` 등 수정 API를 추가한 인터페이스다.\n\n중요한 것은 **읽기 전용 ≠ 불변**이라는 점이다. `List`는 \"이 참조를 통해서는 수정할 수 없다\"는 **뷰(view)의 약속**일 뿐, 객체 자체의 불변성을 보장하지 않는다. 같은 객체를 `MutableList` 참조가 함께 쥐고 있으면 `List` 참조로 보는 쪽에서도 내용이 변한다(④가 정답, ①은 오답). 진짜 불변이 필요하면 `kotlinx.collections.immutable`의 영속 컬렉션 같은 별도 구현이 필요하다.\n\n②는 오답 — 업캐스트는 **참조의 타입만** 바꿀 뿐 객체는 그대로이므로, 다시 `MutableList`로 다운캐스트하면 수정이 가능하다. ③도 오답 — 런타임에는 `ArrayList` 등 **같은 Java 컬렉션 클래스**가 쓰이며, 읽기 전용/가변 구분은 Kotlin **컴파일 타임 인터페이스 수준**의 구분이다. 그래서 Java 코드로 넘어간 `List`는 이 보호를 잃는다.",
+      "keywords": [
+        "kotlin-collections"
+      ],
+      "related": [
+        "kt-011",
+        "kt-015"
+      ]
+    },
+    {
+      "id": "kt-009",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 4,
+        "centrality": 2,
+        "practicality": 3,
+        "discrimination": 2
+      },
+      "question": "지연 초기화 수단인 by lazy와 lateinit의 비교로 옳은 것은?",
+      "choices": [
+        "by lazy는 val에 사용해 최초 접근 시점에 한 번만 초기화하고, lateinit은 var에 사용해 이후 원하는 시점에 직접 값을 할당한다",
+        "lateinit은 Int, Boolean 같은 원시 타입 프로퍼티에도 사용할 수 있다",
+        "by lazy는 기본 모드에서 스레드 안전을 보장하지 않으므로 멀티스레드 환경에서는 lateinit을 사용해야 한다",
+        "lateinit 프로퍼티를 초기화하기 전에 읽으면 예외 없이 null이 반환된다"
+      ],
+      "correctIndex": 0,
+      "explanation": "둘 다 \"선언 시점에 값을 줄 수 없는 non-null 프로퍼티\"를 다루는 수단이지만 메커니즘이 다르다.\n\n- **`by lazy { ... }`** — `val` 전용 **위임(delegation)**. 최초 접근 시 람다를 실행해 값을 만들고 캐시하며, 이후 접근은 캐시를 반환한다. 기본 모드는 `LazyThreadSafetyMode.SYNCHRONIZED`로 **스레드 안전이 기본 보장**되므로 ③은 오답이다(단일 스레드가 확실하면 `NONE`으로 동기화 비용을 뺄 수 있다).\n- **`lateinit var`** — 컴파일러 검사를 미루고 \"나중에 반드시 할당하겠다\"고 약속하는 `var` 전용 키워드. 값을 만드는 로직이 없고 **외부에서 주입/할당**하는 경우(DI, 테스트 setUp 등)에 적합하다.\n\n②는 오답 — lateinit의 backing field는 내부적으로 null로 초기화해 두고 접근 시 체크하는 방식이라 **null을 표현할 수 없는 원시 타입(Int, Boolean 등)에는 사용할 수 없다.** ④도 오답 — 초기화 전에 읽으면 null이 아니라 **`UninitializedPropertyAccessException`이 발생**한다. 초기화 여부는 `::prop.isInitialized`로 확인할 수 있다.",
+      "keywords": [
+        "backing-field",
+        "property-delegation"
+      ],
+      "related": [
+        "kt-003",
+        "kt-010"
+      ]
+    },
+    {
+      "id": "kt-010",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 2,
+        "discrimination": 3
+      },
+      "question": "Kotlin 프로퍼티의 backing field에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "커스텀 getter만 정의한 프로퍼티에도 값 저장을 위한 backing field가 자동으로 생성된다",
+        "커스텀 setter 안에서 프로퍼티 이름에 직접 대입하면 backing field에 값이 저장된다",
+        "field 식별자는 접근자 내부에서만 쓸 수 있으며, 기본 접근자를 사용하거나 접근자에서 field를 참조하는 프로퍼티에만 backing field가 생성된다",
+        "val size get() = list.size 같은 프로퍼티는 backing field에 캐시해 둔 값을 반환한다"
+      ],
+      "correctIndex": 2,
+      "explanation": "Kotlin에서 프로퍼티는 \"필드\"가 아니라 **접근자(getter/setter)의 묶음**이고, 값을 실제로 저장하는 JVM 필드가 **backing field**다.\n\nbacking field는 필요할 때만 생성된다: **기본 접근자를 쓰거나, 커스텀 접근자 안에서 `field` 식별자를 참조하는 경우**다(③이 정답). `field`는 접근자 내부에서만 유효한 특수 식별자로, 해당 프로퍼티의 backing field를 가리킨다.\n\n```kotlin\nvar counter = 0\n    set(value) { field = maxOf(0, value) } // field로 저장\n```\n\n- ①은 오답 — `val size get() = list.size`처럼 커스텀 getter만 있고 `field`를 참조하지 않으면 저장할 것이 없으므로 backing field가 생성되지 않는다.\n- ②는 위험한 오답 — setter 안에서 `this.value = x`처럼 프로퍼티 이름에 대입하면 **setter가 다시 setter를 호출해 무한 재귀**(StackOverflowError)에 빠진다. 반드시 `field = x`로 저장해야 한다.\n- ④는 오답 — 캐시가 아니라 **호출할 때마다 getter 본문을 계산**한다. 값이 매번 달라질 수 있는 이유이기도 하다.",
+      "keywords": [
+        "backing-field"
+      ],
+      "related": [
+        "kt-015",
+        "kt-009"
+      ]
+    },
+    {
+      "id": "kt-011",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 2,
+        "practicality": 3,
+        "discrimination": 3
+      },
+      "question": "컬렉션 연쇄 연산과 Sequence의 평가 방식 차이에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "Sequence는 중간 연산마다 새 컬렉션을 만들어 반환하므로 대용량 데이터에서 메모리를 더 많이 사용한다",
+        "Sequence의 map/filter 같은 중간 연산은 지연 평가되어, toList() 같은 최종 연산이 호출될 때 요소 단위로 한 번에 처리된다",
+        "List의 map().filter() 체인도 최종 결과를 실제로 사용할 때까지 실행이 미뤄진다",
+        "요소가 몇 개뿐인 짧은 체인에서도 Sequence가 오버헤드 없이 더 빠르게 동작한다"
+      ],
+      "correctIndex": 1,
+      "explanation": "**컬렉션 연산은 즉시(eager) 평가, Sequence는 지연(lazy) 평가**가 핵심 차이다.\n\n- `list.map { }.filter { }`는 **각 단계마다 전체 요소를 처리해 중간 List를 새로 생성**한다. 100만 개 리스트라면 중간 컬렉션이 단계 수만큼 만들어진다(③은 오답 — 미뤄지지 않고 그 자리에서 실행된다).\n- `list.asSequence().map { }.filter { }.toList()`는 **중간 연산이 실행되지 않고 파이프라인만 쌓아 두었다가**, `toList()`/`first()` 같은 **최종(terminal) 연산**이 호출될 때 **요소 하나가 map→filter를 통과하는 식으로 수직 처리**된다(②가 정답). 중간 컬렉션이 없으므로 ①은 반대 서술이다.\n\n그래서 Sequence는 **요소가 많고 연산 단계가 여러 개**이거나, `first { ... }`처럼 **일부만 필요해 조기 종료**할 수 있을 때 유리하다. 반면 요소가 적고 체인이 짧으면 Sequence의 람다/이터레이터 래핑 오버헤드가 이득을 상쇄하므로 ④는 오답 — 작은 컬렉션에는 일반 컬렉션 연산이 보통 더 낫다.",
+      "keywords": [
+        "kotlin-collections"
+      ],
+      "related": [
+        "kt-008"
+      ]
+    },
+    {
+      "id": "kt-012",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 2,
+        "centrality": 2,
+        "practicality": 2,
+        "discrimination": 3
+      },
+      "question": "fun interface와 SAM 변환에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "추상 메서드가 하나인 Kotlin 인터페이스는 별도 키워드 없이도 람다로 대체할 수 있다",
+        "SAM 변환은 Java에서 정의한 인터페이스에는 적용되지 않고 Kotlin의 fun interface에만 동작한다",
+        "fun interface에는 추상 메서드 외에 구현이 있는 다른 멤버를 둘 수 없다",
+        "fun interface로 선언한 인터페이스는 람다를 그 구현체로 자동 변환(SAM 변환)해 전달할 수 있다"
+      ],
+      "correctIndex": 3,
+      "explanation": "**SAM(Single Abstract Method) 변환**은 추상 메서드가 하나뿐인 인터페이스 자리에 람다를 넘기면 컴파일러가 **그 인터페이스의 구현 객체로 자동 변환**해 주는 기능이다.\n\n```kotlin\nfun interface Predicate { fun test(x: Int): Boolean }\nval isEven = Predicate { it % 2 == 0 }  // 람다 → 구현체\n```\n\n- **Java 인터페이스**(`Runnable`, `OnClickListener` 등)는 SAM 변환이 **자동 지원**된다. Java 상호운용에서 리스너를 람다로 넘길 수 있는 이유다. 따라서 ②는 반대로 서술한 오답이다.\n- **Kotlin 인터페이스**는 함수 타입(`(Int) -> Boolean`)이라는 더 자연스러운 수단이 있기 때문에 자동 변환되지 않고, **`fun interface`로 명시**해야 SAM 변환이 활성화된다(①은 오답, ④가 정답).\n- ③도 오답 — fun interface의 제약은 \"**추상 메서드가 정확히 1개**\"라는 것이고, 구현이 있는 다른 멤버(디폴트 구현 메서드 등)는 함께 선언할 수 있다.\n\nfun interface는 함수 타입과 달리 **이름 있는 타입**이라 의미를 드러내고 Java에서도 쓰기 좋다는 장점이 있다.",
+      "keywords": [
+        "sam-conversion"
+      ],
+      "related": [
+        "kt-007",
+        "kt-004"
+      ]
+    },
+    {
+      "id": "kt-013",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 2,
+        "centrality": 2,
+        "practicality": 4,
+        "discrimination": 3
+      },
+      "question": "data class의 copy() 함수를 사용할 때 주의할 점으로 옳은 것은?",
+      "choices": [
+        "copy()는 프로퍼티 참조를 그대로 복사하는 얕은 복사이므로, 프로퍼티가 가변 리스트라면 원본과 복사본이 같은 리스트 객체를 공유한다",
+        "copy()는 중첩된 객체까지 새로 복제하므로 복사본을 수정해도 원본에는 영향을 주지 않는다",
+        "copy()는 주 생성자 프로퍼티뿐 아니라 클래스 본문에 선언한 var 프로퍼티의 현재 값도 함께 복사한다",
+        "copy()로 일부 프로퍼티만 바꾸려면 나머지 프로퍼티 값도 모두 명시적으로 전달해야 한다"
+      ],
+      "correctIndex": 0,
+      "explanation": "`copy()`는 **주 생성자를 다시 호출하면서 각 프로퍼티의 '참조'를 그대로 넘기는 얕은 복사(shallow copy)** 다. 프로퍼티가 String, Int 같은 불변 값이면 문제가 없지만, **가변 객체(MutableList 등)라면 원본과 복사본이 같은 객체를 공유**한다(①이 정답, ②는 반대).\n\n```kotlin\ndata class State(val tags: MutableList<String>)\nval a = State(mutableListOf(\"x\"))\nval b = a.copy()\nb.tags.add(\"y\")   // a.tags에도 \"y\"가 보인다!\n```\n\n이 때문에 \"copy했으니 안전하다\"고 믿고 상태를 수정하면 원본까지 오염되는 버그가 생긴다. UI 상태처럼 copy 기반으로 갱신하는 data class의 프로퍼티는 **읽기 전용 컬렉션과 불변 값으로 구성**하는 것이 안전한 설계다.\n\n③은 오답 — copy()는 주 생성자를 재호출하는 방식이라 **클래스 본문의 프로퍼티는 복사되지 않고 초기화 로직대로 다시 계산**된다. ④도 오답 — copy()의 각 파라미터에는 현재 값이 **기본 인자(default argument)** 로 들어 있어 바꿀 프로퍼티만 이름 지정 인자로 넘기면 된다(`state.copy(loading = false)`).",
+      "keywords": [
+        "data-class",
+        "kotlin-collections"
+      ],
+      "related": [
+        "kt-001",
+        "kt-008"
+      ]
+    },
+    {
+      "id": "kt-014",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 2,
+        "centrality": 2,
+        "practicality": 3,
+        "discrimination": 3
+      },
+      "question": "Kotlin의 중첩 클래스(nested class)와 inner class의 차이에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "클래스 안에 선언한 클래스는 기본적으로 외부 클래스 인스턴스 참조를 가지며, 참조를 없애려면 static 키워드를 붙인다",
+        "inner 키워드를 붙인 클래스만 외부 클래스 인스턴스에 대한 암묵적 참조를 가지므로, 그 인스턴스가 오래 살아남으면 외부 객체까지 함께 누수될 수 있다",
+        "기본 중첩 클래스는 외부 클래스의 인스턴스 프로퍼티에 자유롭게 접근할 수 있다",
+        "inner class는 외부 참조를 약참조(weak reference)로 보관하기 때문에 메모리 누수 걱정 없이 사용할 수 있다"
+      ],
+      "correctIndex": 1,
+      "explanation": "Kotlin에서 클래스 안에 선언한 클래스는 **기본이 중첩(nested) 클래스**로, Java의 `static` 중첩 클래스처럼 **외부 인스턴스 참조를 갖지 않는다.** 외부 인스턴스의 멤버에 접근해야 할 때만 `inner` 키워드를 붙이며, 이때 컴파일러가 **외부 인스턴스에 대한 암묵적 강한 참조**를 심어 준다(②가 정답).\n\n①은 Java와 혼동한 오답이다 — Java는 기본이 inner(외부 참조 보유)라 `static`으로 끊지만, Kotlin은 **기본이 안전한 쪽(nested)** 이고 필요할 때만 `inner`로 참조를 추가하는 반대 설계다(Kotlin에는 `static` 키워드 자체가 없다).\n\n③은 오답 — 기본 중첩 클래스는 외부 참조가 없으므로 외부 클래스의 **인스턴스** 프로퍼티에 접근할 수 없다. ④도 오답 — inner class의 외부 참조는 **강한 참조**다.\n\n실무 함정: Activity 안의 inner class(또는 익명 객체/핸들러) 인스턴스를 싱글톤, 정적 컬렉션, 오래 사는 콜백에 넘기면 **그 인스턴스가 Activity 전체를 붙잡아 메모리 누수**가 된다. Context 누수와 같은 패턴이므로, 오래 살아남는 객체는 nested 클래스 + 필요한 값만 명시적으로 전달하는 편이 안전하다.",
+      "keywords": [
+        "activity",
+        "context"
+      ],
+      "related": [
+        "basics-004"
+      ]
+    },
+    {
+      "id": "kt-015",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 3,
+        "centrality": 2,
+        "practicality": 3,
+        "discrimination": 3
+      },
+      "question": "val 키워드의 의미에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "val list = mutableListOf(1, 2)에서 list.add(3)은 재할당에 해당하므로 컴파일 오류가 발생한다",
+        "val은 const val과 마찬가지로 컴파일 타임에 값이 결정되는 상수를 만든다",
+        "val은 참조의 재할당만 금지할 뿐이며, 커스텀 getter를 정의하면 읽을 때마다 다른 값을 반환할 수도 있다",
+        "부모 클래스에 val로 선언된 프로퍼티는 자식 클래스에서 var로 오버라이드할 수 없다"
+      ],
+      "correctIndex": 2,
+      "explanation": "`val`의 정확한 의미는 **\"읽기 전용(read-only) 참조\"이지 \"불변(immutable) 값\"이 아니다**(③이 정답).\n\n`val`이 금지하는 것은 **재할당 하나뿐**이다. 여기서 두 가지 결과가 나온다.\n\n1. **참조 대상의 내부 상태는 바뀔 수 있다.** `val list = mutableListOf(1, 2)`에서 `list = other`는 컴파일 오류지만 `list.add(3)`은 객체 내부를 바꾸는 것이라 허용된다(①은 오답).\n2. **커스텀 getter를 두면 읽을 때마다 값이 달라질 수 있다.** `val now: Long get() = System.currentTimeMillis()`는 val이지만 매번 다른 값을 반환한다. val에 backing field가 항상 있는 것이 아니라 getter 호출일 뿐이기 때문이다.\n\n②는 오답 — `const val`은 **컴파일 타임 상수**(원시 타입/String만, top-level 또는 object 내부)로 호출 지점에 값이 인라인되지만, 일반 `val`은 런타임에 초기화되는 값이면 충분하다. ④도 오답 — `open val`을 자식에서 `var`로 오버라이드하는 것은 **허용**된다(getter만 있던 계약에 setter를 추가하는 것이므로). 반대 방향(var→val)은 불가능하다.",
+      "keywords": [
+        "backing-field",
+        "kotlin-collections"
+      ],
+      "related": [
+        "kt-008",
+        "kt-010"
+      ]
+    },
+    {
+      "id": "kt-016",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 4
+      },
+      "question": "Kotlin에서 nullable 타입 변수 a, b를 `a == b`로 비교하는 식이 컴파일될 때 실제로 수행되는 동작으로 옳은 것은?",
+      "choices": [
+        "a가 null이 아니면 a.equals(b)를 호출하고, a가 null이면 b === null 참조 비교의 결과를 반환하도록 변환된다.",
+        "b?.equals(a) 형태로 우변을 기준으로 변환되어, equals 구현은 우변 객체의 것이 호출된다.",
+        "널 검사 없이 a.equals(b)로 그대로 변환되므로, a가 null일 수 있는 타입이면 컴파일 오류가 발생한다.",
+        "두 객체의 hashCode를 먼저 비교해 값이 다르면 equals 호출 없이 false를 반환하도록 변환된다."
+      ],
+      "correctIndex": 0,
+      "explanation": "Kotlin 컴파일러는 `a == b`를 `a?.equals(b) ?: (b === null)`로 변환한다. 좌변이 null이 아니면 **좌변의 equals 구현**이 호출되고, 좌변이 null이면 우변도 null인지 참조 비교(`===`)로 확인해 `null == null`이 true가 된다. 이 덕분에 nullable 타입끼리도 NPE 걱정 없이 `==`를 쓸 수 있는데, 이것이 구조적 동등성이다. data class는 주 생성자 프로퍼티 기반으로 equals를 자동 생성하므로 `==`가 곧 값 비교로 동작한다.\n\n②는 방향이 반대다 — 기준은 좌변이며, equals를 오버라이드했다면 좌변 타입의 구현이 사용된다. ③은 틀렸다 — nullable 타입에도 `==`는 그대로 허용되고 컴파일러가 null 안전 코드를 생성해 준다(널 검사를 강제하는 것은 `.equals()` 직접 호출 쪽이다). ④의 hashCode는 `==` 평가에 관여하지 않는다 — hashCode 선비교는 HashMap 같은 해시 컬렉션이 버킷을 찾을 때의 이야기이지, 언어 차원의 `==` 변환 규칙이 아니다.",
+      "keywords": [
+        "structural-equality",
+        "null-safety",
+        "data-class"
+      ],
+      "related": [
+        "kt-006",
+        "kt-001"
+      ]
+    },
+    {
+      "id": "kt-017",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 2,
+        "discrimination": 3
+      },
+      "question": "Kotlin 1.5 이후 기준으로, sealed class의 직접 서브클래스를 선언할 수 있는 위치에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "직접 서브클래스는 sealed class가 선언된 파일 안에만 둘 수 있다.",
+        "직접 서브클래스는 같은 모듈의 같은 패키지 안이라면 다른 파일에 두어도 된다.",
+        "직접 서브클래스는 sealed class 본문 안에 중첩 클래스로만 선언할 수 있다.",
+        "같은 Gradle 프로젝트에 속해 있다면 다른 모듈에서도 직접 상속할 수 있다."
+      ],
+      "correctIndex": 1,
+      "explanation": "Kotlin 1.5부터 sealed class(및 sealed interface)의 직접 서브클래스는 **같은 모듈 + 같은 패키지**에 있으면 되고, 파일은 달라도 된다. 계층이 커지면 서브클래스를 파일별로 나눠 관리할 수 있다는 뜻이다.\n\n①의 '같은 파일 필수'는 Kotlin 1.1~1.4 시절 규칙으로 지금은 낡은 지식이고, ③의 '본문 중첩만 허용'은 그보다 더 오래된 1.0 규칙이다. ④는 과잉 일반화다 — 모듈 경계는 여전히 넘을 수 없으며, 바로 이 제한 덕분에 컴파일러가 컴파일 시점에 서브타입 집합을 확정해 when 식의 완전성(exhaustiveness) 검사를 보장할 수 있다. 참고로 이 위치 제한은 직접 서브클래스에만 적용되고, 그 서브클래스가 sealed가 아닌 open이라면 그 자손은 어디서든 선언할 수 있다.",
+      "keywords": [
+        "sealed-class"
+      ],
+      "related": [
+        "kt-002",
+        "kt-018"
+      ]
+    },
+    {
+      "id": "kt-018",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 2,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 3
+      },
+      "question": "UI 상태 계층을 sealed class 대신 sealed interface로 설계했을 때 추가로 가능해지는 것은?",
+      "choices": [
+        "when 식에서 else 분기 없이 모든 서브타입을 처리했는지 컴파일러가 검사해 준다.",
+        "컴파일된 모듈 밖의 외부 모듈에서도 새 서브타입을 자유롭게 추가할 수 있다.",
+        "하나의 타입이 여러 sealed 계층에 동시에 참여할 수 있고, enum class도 계층의 멤버가 될 수 있다.",
+        "서브타입들이 공유할 상태(프로퍼티와 backing field)를 계층의 공통 구현으로 둘 수 있다."
+      ],
+      "correctIndex": 2,
+      "explanation": "클래스는 단일 상속만 가능하지만 인터페이스는 여러 개 구현할 수 있다. 그래서 sealed interface를 쓰면 (1) 하나의 타입이 **여러 sealed 계층에 동시에 참여**할 수 있고(예: `object Loading : HomeUiState, DetailUiState`), (2) enum class는 클래스를 상속할 수 없지만 인터페이스는 구현할 수 있으므로 **enum과 data class가 섞인 계층**도 만들 수 있다.\n\n①의 when 완전성 검사는 sealed class에도 동일하게 제공되므로 '추가로 가능해지는 것'이 아니다. ②는 틀렸다 — sealed interface도 sealed class와 마찬가지로 구현체를 같은 모듈·같은 패키지로 제한하며, 그래야 봉인 계층으로서 의미가 있다. ④는 반대로 sealed class 쪽의 장점이다 — 인터페이스는 상태를 저장하는 backing field를 가질 수 없으므로, 서브타입이 공유할 상태가 필요하면 sealed class를 선택한다.",
+      "keywords": [
+        "sealed-interface",
+        "sealed-class"
+      ],
+      "related": [
+        "kt-002",
+        "kt-017"
+      ]
+    },
+    {
+      "id": "kt-019",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 2,
+        "centrality": 2,
+        "practicality": 4,
+        "discrimination": 3
+      },
+      "question": "ViewModel에서 외부에는 읽기 전용 StateFlow를 노출하고 내부에서는 MutableStateFlow를 조작하려고 `_uiState`/`uiState` 두 프로퍼티를 쓰는 패턴이 흔하다. Kotlin의 명시적 백킹 필드(explicit backing field)가 이 패턴을 프로퍼티 하나로 줄이는 방식으로 옳은 것은?",
+      "choices": [
+        "컴파일러가 프로퍼티 이름 앞에 밑줄을 붙인 가변 버전 프로퍼티를 자동 생성해, 같은 클래스 안에서만 접근하게 해 준다.",
+        "프로퍼티를 var로 선언하면 setter는 클래스 내부 전용으로, getter는 외부 공개로 가시성이 자동으로 분리된다.",
+        "by 위임(property delegation)의 문법 설탕으로, 컴파일러가 만든 위임 객체가 내부와 외부 사이의 타입 변환을 담당한다.",
+        "field 키워드로 프로퍼티보다 구체적인 타입의 필드를 직접 선언하면, 선언 스코프 안에서는 필드 타입으로, 밖에서는 프로퍼티 타입으로 해석된다."
+      ],
+      "correctIndex": 3,
+      "explanation": "명시적 백킹 필드는 프로퍼티 선언 본문에 `field` 키워드로 백킹 필드의 타입을 프로퍼티 타입과 다르게(더 구체적으로) 지정하는 기능이다:\n\n```kotlin\nval uiState: StateFlow<UiState>\n    field = MutableStateFlow(UiState())\n\nfun refresh() {\n    uiState.update { ... } // 내부에서는 MutableStateFlow로 보임\n}\n```\n\n선언 스코프 안에서는 이름이 필드 타입(가변형)으로 해석되고, 밖에서는 프로퍼티에 선언된 타입(읽기 전용)으로 해석되어 `_uiState`/`uiState` 이중 프로퍼티 패턴을 하나로 대체한다. Kotlin 1.7의 K2 프리뷰부터 실험적으로 제공되다가 Kotlin 2.4에서 안정화됐다. 제약도 함께 알아두자 — **val 전용**이고 사실상 final이어야 하며, 인터페이스·abstract·expect·확장 프로퍼티에는 쓸 수 없고, 필드의 가시성은 프로퍼티보다 좁아야 한다.\n\n①처럼 밑줄 프로퍼티가 자동 생성되는 것이 아니라 프로퍼티는 하나만 존재한다. ②는 var의 setter 가시성 축소(`private set`)와의 혼동으로, 그 방식은 타입을 이원화하지 못한다. ③의 property delegation은 별개 메커니즘이며, 명시적 백킹 필드는 위임 객체 없이 필드 하나로 처리된다.",
+      "keywords": [
+        "explicit-backing-field",
+        "backing-field",
+        "stateflow"
+      ],
+      "related": [
+        "kt-010"
+      ]
+    },
+    {
+      "id": "kt-020",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 1,
+        "centrality": 2,
+        "practicality": 2,
+        "discrimination": 3
+      },
+      "question": "Kotlin 2.4에서 안정화된 컨텍스트 파라미터를 `context(logger: Logger)`처럼 함수에 선언했을 때, 호출 시 이 파라미터가 채워지는 방식으로 옳은 것은?",
+      "choices": [
+        "호출 지점 스코프에서 파라미터와 같은 이름의 값을 찾아 바인딩하며, 이름이 다르면 컴파일 오류가 난다.",
+        "호출 지점의 암묵 스코프에서 타입이 일치하는 후보를 찾아, 정확히 하나일 때만 자동으로 전달된다.",
+        "타입이 일치하는 후보가 스코프에 없으면 null이 전달되고, 함수 본문에서 null 검사 후 사용해야 한다.",
+        "런타임에 DI 컨테이너처럼 리플렉션으로 인스턴스를 찾아 주입하며, 등록된 것이 없으면 예외가 발생한다."
+      ],
+      "correctIndex": 1,
+      "explanation": "컨텍스트 파라미터는 함수가 요구하는 암묵적 의존성을 이름과 함께 선언하는 기능이다. 호출 지점에서 컴파일러가 **암묵 스코프를 타입 기준으로 탐색**해, 타입이 맞는 후보가 정확히 하나일 때만 자동으로 전달한다. 후보가 없으면 컴파일 오류(NoContextArgument), 둘 이상이면 모호성 오류(AmbiguousContextArgument)가 난다 — 전 과정이 컴파일 타임에 결정되는 메커니즘이다.\n\n①처럼 이름으로 매칭하지 않는다 — 파라미터 이름은 함수 본문에서 그 값을 참조할 때 쓰일 뿐, 해석 자체는 타입 기반이다. ③처럼 null이 기본값으로 전달되는 일은 없으며 후보 부재는 곧 컴파일 오류다. ④는 Hilt 같은 런타임 DI 프레임워크와의 혼동으로, 리플렉션도 런타임 예외도 개입하지 않는다. 참고로 후보가 여럿이라 모호성 오류가 나는 상황은 실험 플래그(-Xexplicit-context-arguments)를 켜서 호출 시 인자를 명시적으로 넘겨 해소할 수 있다.",
+      "keywords": [
+        "context-parameter",
+        "dependency-injection"
+      ],
+      "related": [
+        "kt-004"
+      ]
+    },
+    {
+      "id": "kt-021",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 1,
+        "centrality": 1,
+        "practicality": 2,
+        "discrimination": 3
+      },
+      "question": "Kotlin 2.4의 실험적 컬렉션 리터럴 문법 `[1, 2, 3]`에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "리터럴은 읽기 전용 List를 생성하도록 고정되어 있어, Set 등 다른 컬렉션이 기대되는 자리에는 별도 변환이 필요하다.",
+        "컴파일러의 언어 버전을 2.4 이상으로 설정하기만 하면 별도 플래그 없이 자동으로 활성화된다.",
+        "기대 타입에 선언된 operator fun of(...) 호출로 디슈거링되므로, of 연산자를 제공하는 커스텀 타입도 이 문법을 지원할 수 있다.",
+        "애노테이션 인자에 쓰이던 배열 리터럴을 일반 코드로 확장한 것이라 결과는 Array 타입으로 생성된다."
+      ],
+      "correctIndex": 2,
+      "explanation": "컬렉션 리터럴의 핵심은 디슈거링 방식이다 — `[1, 2, 3]`은 그 위치의 **기대 타입에 선언된 `operator fun of(...)` 호출**로 변환되고, 빈 `[]`는 인자 없는 `of()` 호출이 된다. 기대 타입이 무엇이냐에 따라 호출되는 of가 달라지므로, companion object에 of 연산자를 선언한 커스텀 타입도 리터럴 문법을 지원할 수 있다. of 오버로드가 여럿이면 일반 오버로드 해석 규칙에 따라 가장 구체적인 것이 선택된다. 연산자 컨벤션(플러스, 인덱스 접근 등)으로 문법을 디슈거링하는 Kotlin의 일관된 설계가 리터럴에도 적용된 사례다.\n\n①은 틀렸다 — List로 고정되지 않고 기대 타입이 결정한다. ②도 틀렸다 — 이 기능은 어떤 언어 버전도 자동으로 켜지 않는 순수 opt-in이며, `-Xcollection-literals` 플래그를 명시해야 한다. ④는 애노테이션 배열 리터럴과의 혼동으로, 결과 타입은 Array로 고정되지 않고 of 연산자의 반환 타입이 정한다.",
+      "keywords": [
+        "collection-literal",
+        "kotlin-collections"
+      ],
+      "related": [
+        "kt-008",
+        "kt-011"
+      ]
+    }
+  ]
+}

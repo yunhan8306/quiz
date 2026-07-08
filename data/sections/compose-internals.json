@@ -1,0 +1,805 @@
+{
+  "id": "compose-internals",
+  "title": "Compose 내부 동작",
+  "description": "컴파일러 IR, 슬롯 테이블, 스냅샷 시스템, 안정성 추론, 리컴포지션 메커니즘",
+  "questions": [
+    {
+      "id": "cint-001",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 4,
+        "centrality": 5,
+        "practicality": 2,
+        "discrimination": 5
+      },
+      "question": "Compose 컴파일러가 @Composable 함수를 컴파일할 때 수행하는 변환으로 옳은 것은?",
+      "choices": [
+        "런타임에 리플렉션 프록시를 생성해 @Composable 호출을 가로채며, 함수의 시그니처는 컴파일 후에도 원본 그대로 유지된다.",
+        "함수 시그니처에 $composer와 $changed 파라미터를 삽입하고, 본문을 그룹 호출로 감싸 재시작(restart)과 스킵이 가능한 형태로 재작성한다.",
+        "KAPT/KSP 어노테이션 프로세서로 동작하여 컴포저블마다 컴포지션을 관리하는 별도의 래퍼 클래스를 생성하고 원본 함수와 연결한다.",
+        "suspend 함수와 동일한 CPS 변환을 적용해, 컴포저블이 Continuation 객체를 통해 중단되고 재개되도록 만든다."
+      ],
+      "correctIndex": 1,
+      "explanation": "Compose 컴파일러는 어노테이션 프로세서가 아니라 **Kotlin 컴파일러 플러그인**으로, IR(중간 표현) 단계에 개입해 `@Composable` 함수 자체를 재작성한다.\n\n핵심 변환은 두 가지다.\n\n- **파라미터 주입**: 시그니처 끝에 `$composer: Composer`와 `$changed: Int`가 추가된다. 모든 컴포저블 호출에 Composer 인스턴스가 전달되므로 런타임이 슬롯 테이블에 실행 기록을 남길 수 있다. 일반 함수에서 @Composable을 호출할 수 없는 이유도 넘겨줄 `$composer`가 없기 때문이다.\n- **본문 재작성**: 본문이 `startRestartGroup(key)` / `endRestartGroup()`으로 감싸이고, `endRestartGroup()?.updateScope { ... }`로 \"이 함수만 다시 실행하는\" 재시작 람다가 등록된다. 여기에 `$dirty` 비트 검사 후 변경이 없으면 `skipToGroupEnd()`로 건너뛰는 스킵 로직이 삽입된다. 이것이 리컴포지션의 최소 재실행 단위를 만든다.\n\n①은 리플렉션/프록시를 쓰지 않는다는 점에서 오답 — 전부 컴파일 타임 코드 재작성이다. ③은 KAPT/KSP는 기존 코드를 수정할 수 없고 새 파일만 생성할 수 있으므로 시그니처를 바꾸는 이 변환은 컴파일러 플러그인만 가능하다. ④는 흔한 비유에서 나온 오해로, suspend와 '암시적 컨텍스트 전달'이라는 개념은 닮았지만 실제 메커니즘은 Continuation 기반 CPS가 아니라 Composer 전달이다.",
+      "keywords": [
+        "recomposition",
+        "slot-table"
+      ],
+      "related": [
+        "cint-007",
+        "cint-005"
+      ]
+    },
+    {
+      "id": "cint-002",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 4,
+        "centrality": 5,
+        "practicality": 4,
+        "discrimination": 4
+      },
+      "question": "remember로 저장한 값이 리컴포지션을 거치며 유지되는 기준, 즉 포지셔널 메모이제이션(positional memoization)에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "remember는 변수 이름을 키로 전역 캐시에 값을 저장하므로, 호출 위치가 바뀌어도 이름만 같으면 같은 값을 되찾는다.",
+        "remember는 컴포저블 함수 타입 단위로 값을 공유하므로, 같은 컴포저블을 여러 곳에서 호출하면 저장된 상태도 서로 공유된다.",
+        "remember는 컴포지션 내 호출 위치(슬롯 테이블상의 포지션)를 기준으로 값을 저장하므로, 조건 분기 등으로 위치 정체성이 바뀌면 기존 값은 폐기되고 새로 생성된다.",
+        "remember는 rememberSaveable과 같은 Bundle 저장소를 쓰므로, 프로세스가 죽어도 호출 위치와 무관하게 값이 그대로 복원된다."
+      ],
+      "correctIndex": 2,
+      "explanation": "Compose 런타임은 **포지셔널 메모이제이션**을 쓴다. `remember`가 반환하는 값은 이름이나 타입이 아니라 **컴포지션 실행 중 그 호출이 차지하는 위치**(컴파일러가 부여한 그룹 key + 실행 순서)를 기준으로 슬롯 테이블에 저장되고, 다음 리컴포지션에서 같은 위치에 도달하면 저장된 값을 돌려받는다.\n\n이 때문에 실무에서 중요한 결과가 생긴다.\n\n```kotlin\nif (isEditing) EditorPane() else ViewerPane()\n```\n\n분기가 바뀌면 이전 그룹은 통째로 폐기되고 새 그룹이 만들어지므로, 그 안의 `remember` 값과 상태는 모두 사라진다. 같은 컴포저블이라도 호출 지점이 다르면 서로 독립된 슬롯을 가지며, 반복문에서는 `key()`로 명시적 정체성을 부여해야 순서 변경 시 상태가 따라간다.\n\n①은 변수 이름은 저장 키와 무관하다는 점에서 오답이고, ②는 반대로 호출 지점마다 독립적이라는 성질을 뒤집은 오해다. ④는 rememberSaveable과의 바꿔치기로, `remember`는 메모리(컴포지션) 안에만 살고 프로세스 죽음은커녕 컴포지션 이탈만으로도 사라진다.",
+      "keywords": [
+        "positional-memoization",
+        "slot-table"
+      ],
+      "related": [
+        "cint-008",
+        "cint-009"
+      ]
+    },
+    {
+      "id": "cint-003",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 5,
+        "centrality": 4,
+        "practicality": 5,
+        "discrimination": 3
+      },
+      "question": "Compose 컴파일러의 안정성(stability) 추론 규칙에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "public 프로퍼티가 모두 val이고 그 타입이 전부 안정적인 클래스는 stable로 추론되며, 스냅샷 상태로 위임되지 않은 일반 var 프로퍼티가 있으면 unstable로 판정된다.",
+        "List·Map 같은 읽기 전용 컬렉션 인터페이스 타입은 수정 API가 노출되지 않으므로, 컴파일러가 안심하고 stable로 추론한다.",
+        "MutableState를 프로퍼티로 가진 클래스는 내부 값이 언제든 변할 수 있으므로, 그 클래스 자체가 unstable 판정을 받아 스킵을 막는다.",
+        "Compose 컴파일러가 적용되지 않은 외부 모듈의 클래스라도 필드가 전부 val이고 구성이 단순하면 자동으로 stable로 추론된다."
+      ],
+      "correctIndex": 0,
+      "explanation": "안정성 추론의 기본 규칙: 어떤 타입이 **stable**로 판정되려면 (1) 동일한 두 인스턴스의 `equals` 결과가 영원히 같고, (2) public 프로퍼티가 변하면 컴포지션에 알려지며, (3) 모든 public 프로퍼티 타입이 stable이어야 한다. 원시 타입, String, 함수 타입은 기본적으로 stable이고, **모든 public 프로퍼티가 `val`+stable 타입인 클래스**가 stable로 추론된다. 일반 필드 기반 `var`는 값이 추적 없이 바뀔 수 있으므로 unstable이 된다. 단, `var name by mutableStateOf(...)`처럼 **스냅샷 상태로 위임된 var**는 변경이 컴포지션에 추적·통지되므로(규칙 2 충족) 예외적으로 stable을 유지할 수 있다.\n\n안정성이 중요한 이유는 **스킵 판정** 때문이다. unstable 파라미터가 하나라도 있으면(strong skipping 비활성 기준) 그 컴포저블은 skippable이 되지 못해, 부모가 리컴포지션될 때마다 함께 재실행된다.\n\n②가 대표적 함정 — `List`는 인터페이스라 런타임 구현체가 `ArrayList`처럼 가변일 수 있어 **unstable**로 판정된다. `kotlinx.collections.immutable`이나 `@Immutable` 어노테이션으로 해결한다. ③은 반대로, `MutableState`는 변경이 스냅샷 시스템으로 추적·통지되므로 **stable**이다. ④도 오답 — Compose 컴파일러를 거치지 않은 모듈의 클래스는 안정성 메타데이터가 없어 unstable로 취급되며, stability configuration 파일이나 어노테이션으로 명시해야 한다.",
+      "keywords": [
+        "stability",
+        "recomposition"
+      ],
+      "related": [
+        "cint-006",
+        "cint-015",
+        "compose-001"
+      ]
+    },
+    {
+      "id": "cint-004",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 3,
+        "centrality": 5,
+        "practicality": 3,
+        "discrimination": 5
+      },
+      "question": "Compose의 스냅샷(Snapshot) 시스템이 여러 스레드에 걸친 상태 읽기·쓰기의 일관성을 보장하는 방식으로 옳은 것은?",
+      "choices": [
+        "모든 상태 읽기와 쓰기를 메인 스레드로 강제 전환해 동시 접근이 발생할 여지 자체를 차단한다.",
+        "상태 객체마다 synchronized 락을 걸어 한 시점에 하나의 스레드만 값을 읽거나 쓸 수 있게 한다.",
+        "상태를 불변 객체로만 허용하고, 값이 바뀌면 컴포지션 전체를 루트부터 다시 실행해 일관성을 회복한다.",
+        "상태 객체가 버전별 레코드를 유지하는 MVCC 방식으로, 각 스냅샷은 격리된 일관 뷰를 보고 변경은 apply 시점에 원자적으로 전파된다."
+      ],
+      "correctIndex": 3,
+      "explanation": "스냅샷 시스템은 데이터베이스의 **MVCC(다중 버전 동시성 제어)**와 같은 모델이다.\n\n- `mutableStateOf`가 만드는 상태 객체는 값 하나가 아니라 **버전(snapshot id)이 붙은 상태 레코드(state record)의 연결 리스트**를 가진다.\n- 스냅샷은 \"그 시점 상태 세계의 일관된 사진\"이다. 스냅샷 안에서 읽으면 자신의 id로 보이는 가장 최신 유효 레코드를 읽고, 쓰면 자신만 보는 새 레코드가 생긴다.\n- `Snapshot.takeMutableSnapshot()`으로 격리된 세계를 열어 백그라운드 스레드에서 자유롭게 수정한 뒤, `apply()`를 호출하는 순간 변경 전체가 **원자적으로** 전역 스냅샷에 반영되고 apply 옵저버에게 통지된다. 이 통지가 리컴포지션 무효화의 출발점이다.\n\n이 구조 덕에 락 없이도 여러 스레드가 동시에 상태를 읽고, 리컴포지션이 진행되는 도중에 다른 스레드가 값을 바꿔도 진행 중인 컴포지션은 찢어진(inconsistent) 상태를 보지 않는다.\n\n①·②는 락/스레드 강제 모델로, 스냅샷 시스템이 정확히 피하려는 방식이다(상태 쓰기는 어느 스레드에서든 허용된다). ③은 불변 강제도, 루트부터 전체 재실행도 하지 않는다 — 변경된 상태를 읽은 스코프만 무효화된다.",
+      "keywords": [
+        "snapshot-system"
+      ],
+      "related": [
+        "cint-010",
+        "cint-005"
+      ]
+    },
+    {
+      "id": "cint-005",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 4,
+        "centrality": 5,
+        "practicality": 3,
+        "discrimination": 4
+      },
+      "question": "mutableStateOf로 만든 상태에 새 값을 쓴 뒤 화면이 갱신되기까지, Compose 런타임 내부에서 일어나는 경로로 옳은 것은?",
+      "choices": [
+        "값을 쓰는 즉시 그 상태를 읽었던 컴포저블들이 같은 호출 스택 안에서 동기적으로 다시 실행된다.",
+        "스냅샷 apply 알림으로 변경된 상태 객체가 Recomposer에 전달되고, 그 상태를 읽었던 RecomposeScope들이 무효화되어 다음 프레임에 맞춰 재실행이 스케줄링된다.",
+        "상태 쓰기가 LiveData처럼 등록된 옵저버 목록에 콜백을 브로드캐스트하고, 각 컴포저블이 콜백 안에서 자신이 다시 그려질지 직접 판단한다.",
+        "Recomposer가 매 프레임 컴포지션 트리 전체를 순회하면서 이전 프레임과 값이 달라진 노드를 diff 알고리즘으로 찾아 갱신한다."
+      ],
+      "correctIndex": 1,
+      "explanation": "무효화 경로는 다음 단계로 이어진다.\n\n1. **읽기 추적**: 컴포지션 중 상태를 읽으면, 스냅샷의 read observer가 \"이 RecomposeScope가 이 상태 객체를 읽었다\"는 관계를 기록해 둔다.\n2. **쓰기와 apply**: 새 값을 쓰면 현재 스냅샷에 새 상태 레코드가 생기고, 스냅샷이 apply될 때 변경된 상태 객체 집합이 apply 옵저버에게 통지된다.\n3. **무효화**: Recomposer(정확히는 각 Composition)가 통지받은 상태 객체를 읽기 기록과 대조해, 해당 상태를 읽었던 **RecomposeScope만** `invalidate` 처리한다.\n4. **프레임 스케줄링**: Recomposer는 무효화된 컴포지션이 생기면 `MonotonicFrameClock`(안드로이드에서는 Choreographer와 연동된 `AndroidUiDispatcher`의 프레임 클록)의 다음 프레임에서 리컴포지션을 수행하고, 이어서 레이아웃·드로잉이 진행된다.\n\n①은 오답 — 쓰기는 값 기록일 뿐이고 재실행은 프레임 단위로 **비동기** 스케줄링된다(그래서 한 프레임에 여러 번 써도 리컴포지션은 한 번으로 합쳐진다). ③은 View 시대 옵저버 패턴과의 바꿔치기로, Compose는 콜백 브로드캐스트가 아니라 읽기 추적 기반 정밀 무효화다. ④는 React 가상 DOM과의 혼동 — Compose는 전체 트리 diff를 하지 않고 무효화된 스코프만 다시 실행한다.",
+      "keywords": [
+        "recomposer",
+        "snapshot-system",
+        "recomposition"
+      ],
+      "related": [
+        "cint-004",
+        "cint-011",
+        "cint-001"
+      ]
+    },
+    {
+      "id": "cint-006",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 4,
+        "centrality": 3,
+        "practicality": 5,
+        "discrimination": 3
+      },
+      "question": "strong skipping이 비활성화된 컴파일러(Kotlin 2.0.20 이전 기본값) 기준, 컴포저블에 전달되는 람다에 대해 Compose 컴파일러가 수행하는 메모이제이션의 동작으로 옳은 것은?",
+      "choices": [
+        "캡처한 값들을 key 삼아 람다를 remember로 감싸 재사용하며, 불안정한 값을 캡처한 람다는 메모이제이션되지 않아 리컴포지션마다 새 인스턴스가 된다.",
+        "아무 값도 캡처하지 않은 람다도 호출될 때마다 새로 할당되므로, 재사용하려면 개발자가 직접 remember로 감싸야 한다.",
+        "람다는 함수 타입이라는 특성상 unstable로 취급되기 때문에, 람다를 파라미터로 받는 컴포저블은 스킵 대상에서 제외된다.",
+        "메모이제이션은 람다 본문의 바이트코드 동일성을 비교해 이루어지므로, 캡처한 값이 달라져도 같은 인스턴스가 재사용된다."
+      ],
+      "correctIndex": 0,
+      "explanation": "**람다 메모이제이션**은 컴파일러가 자동으로 넣어 주는 최적화다.\n\n- 값을 캡처하는 람다는 컴파일러가 `remember(캡처값들) { 람다 }` 형태로 감싼다. 캡처한 값이 그대로면 이전 인스턴스가 재사용되어, 자식 컴포저블 입장에서 \"같은 파라미터\"로 인식되고 스킵이 유지된다.\n- 아무것도 캡처하지 않은 람다는 아예 **싱글톤 인스턴스**로 승격되어 remember조차 필요 없다(②가 틀린 이유).\n- 단, 이 remember 방식 메모이제이션은 **캡처된 값이 모두 stable일 때만** 적용된다. unstable한 값(예: unstable로 추론된 클래스 인스턴스)을 캡처하면 메모이제이션이 포기되고, 리컴포지션마다 새 람다 인스턴스가 만들어진다. 그 람다를 받는 자식은 매번 \"파라미터가 바뀌었다\"고 판단해 스킵에 실패한다 — 실무에서 리컴포지션 낭비의 단골 원인이다.\n\n③은 반대로 뒤집은 오해 — 함수 타입은 Compose에서 **stable**로 취급되며, 람다 파라미터 자체는 스킵을 막지 않는다. 문제는 람다의 안정성이 아니라 인스턴스가 매번 바뀌는 것이다. ④는 근거 없는 설명으로, 비교 기준은 바이트코드가 아니라 캡처값이다. 대응책으로는 캡처 값 안정화, 메서드 참조 사용, strong skipping 활성화가 있다.",
+      "keywords": [
+        "lambda-memoization",
+        "stability"
+      ],
+      "related": [
+        "cint-015",
+        "cint-003",
+        "compose-001"
+      ]
+    },
+    {
+      "id": "cint-007",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 2,
+        "centrality": 4,
+        "practicality": 2,
+        "discrimination": 5
+      },
+      "question": "Compose 컴파일러가 컴포저블 시그니처에 삽입하는 $changed 비트마스크의 역할에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "$changed는 각 파라미터의 해시값을 담고 있어, 런타임이 해시 비교만으로 값 변경 여부를 판별하게 한다.",
+        "$changed는 이 컴포저블이 슬롯 테이블에서 차지하는 그룹의 시작 인덱스를 전달해 슬롯 조회를 빠르게 한다.",
+        "호출부가 파라미터별로 '동일함이 확실/변경됨/불확실' 등을 비트로 인코딩해 전달하며, 불확실한 파라미터만 런타임이 슬롯 테이블의 이전 값과 비교한다.",
+        "$changed는 부모 스코프의 무효화 횟수를 세는 카운터로, 임계치를 넘으면 하위 트리 전체의 강제 재실행을 트리거한다."
+      ],
+      "correctIndex": 2,
+      "explanation": "`$changed`는 **스킵 판정을 값싸게 만들기 위한 호출부→피호출부 힌트**다.\n\n- 파라미터마다 몇 비트씩 배정되어 호출부가 아는 정보를 인코딩한다: 컴파일 타임 상수처럼 절대 변하지 않는 값(static), 호출부가 같음을 보장할 수 있는 값(same), 바뀐 값(different), 그리고 판단 불가(uncertain).\n- 피호출부는 이 비트와 자체 검사 결과를 합쳐 `$dirty`를 구성한다. **uncertain인 파라미터에 대해서만** `composer.changed(value)`를 호출해 슬롯 테이블에 저장된 이전 값과 비교하고, static/same으로 표시된 파라미터는 비교 자체를 건너뛴다.\n- 최종적으로 모든 파라미터가 '변하지 않음'이고 함수가 skippable이면 본문 대신 `skipToGroupEnd()`가 실행된다. 상위 컴포저블이 자기 파라미터를 그대로 자식에게 넘길 때 자신의 `$changed` 비트를 자식 호출로 전파할 수 있어, 비교 비용이 트리 아래로 갈수록 절약된다.\n\n①은 해시가 아니라 실제 값 비교(equals 또는 ===)와 비트 힌트의 조합이라는 점에서 오답이다. ②는 슬롯 위치와 무관하고(그룹 위치는 컴파일러가 넣는 group key와 실행 순서로 결정), ④의 무효화 카운터 같은 것은 존재하지 않는다.",
+      "keywords": [
+        "slot-table",
+        "stability",
+        "recomposition"
+      ],
+      "related": [
+        "cint-001",
+        "cint-003"
+      ]
+    },
+    {
+      "id": "cint-008",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 4,
+        "practicality": 4,
+        "discrimination": 4
+      },
+      "question": "Compose 런타임이 슬롯 테이블에 기록하는 그룹(group)의 종류와 역할에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "restartable group은 if/else 분기에서 내용 교체를 담당하고, replaceable group은 스코프 단위의 독립 재실행을 담당한다.",
+        "movable group은 컴파일러가 모든 컴포저블 호출에 기본으로 생성하므로, key()를 쓰지 않아도 형제 순서가 바뀌면 상태가 자동으로 따라 이동한다.",
+        "그룹은 디버그 빌드에서만 기록되는 진단용 정보이며, 릴리스 빌드에서는 제거되어 스킵 판정에 관여하지 않는다.",
+        "restartable group은 독립적으로 재실행 가능한 스코프를 만들고, key()로 생성되는 movable group은 형제 간 순서가 바뀌어도 상태와 함께 이동하는 정체성을 부여한다."
+      ],
+      "correctIndex": 3,
+      "explanation": "그룹은 슬롯 테이블에 트리 구조와 정체성을 부여하는 단위로, 대표적인 세 종류의 역할이 뚜렷하게 다르다.\n\n- **Restartable group**: 재시작 가능한 컴포저블 본문을 감싼다(`startRestartGroup`). 이 그룹이 RecomposeScope와 연결되어 \"이 함수만 다시 실행\"하는 리컴포지션의 최소 단위가 된다.\n- **Replaceable group**: `if/else`, `when` 같은 조건 분기에 삽입된다(`startReplaceGroup`). 분기가 바뀌어 그룹 key가 달라지면 이전 그룹의 슬롯 내용(remember 값, 상태 포함)을 폐기하고 새 내용으로 교체한다.\n- **Movable group**: `key(id) { ... }` 호출로 만들어지며, 형제들 사이에서 위치가 바뀌어도 슬롯 내용을 통째로 **이동**시킬 수 있는 명시적 정체성을 준다. LazyColumn의 `items(key = ...)`가 상태를 보존하면서 재정렬되는 근거다.\n\n①은 restartable과 replaceable의 역할을 서로 바꾼 오답이다. ②는 위험한 오해 — movable group은 기본이 아니라 `key()`를 써야만 생기며, 없으면 포지셔널 메모이제이션에 따라 순서 변경 시 상태가 엉뚱한 아이템에 붙거나 재생성된다. ③은 사실무근으로, 그룹은 릴리스 빌드에서도 존재하는 런타임 핵심 구조다.",
+      "keywords": [
+        "slot-table",
+        "positional-memoization"
+      ],
+      "related": [
+        "cint-002",
+        "cint-009"
+      ]
+    },
+    {
+      "id": "cint-009",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 2,
+        "centrality": 3,
+        "practicality": 1,
+        "discrimination": 4
+      },
+      "question": "Compose 슬롯 테이블이 저장 구조로 gap buffer를 채택한 이유로 가장 적절한 것은?",
+      "choices": [
+        "UI 변경은 대체로 트리의 한 지점에 국소적으로 몰리므로, gap을 그 위치로 옮겨 두면 연속된 삽입·삭제를 배열 전체 이동 없이 처리할 수 있기 때문",
+        "해시 테이블처럼 그룹 key만으로 O(1) 임의 접근이 가능해, 어느 위치의 컴포저블이든 즉시 찾아 갱신할 수 있기 때문",
+        "연결 리스트 기반 구조라서 삽입·삭제 시 배열 복사가 전혀 없고, 캐시 지역성도 평탄한 배열보다 우수하기 때문",
+        "스레드마다 독립된 버퍼 구간을 할당해 락 없이 여러 스레드가 병렬로 컴포지션을 기록할 수 있기 때문"
+      ],
+      "correctIndex": 0,
+      "explanation": "gap buffer는 텍스트 에디터가 커서 주변 편집을 빠르게 하려고 쓰는 자료구조로, **평탄한 배열 중간에 빈 공간(gap)을 유지**하는 방식이다. 슬롯 테이블은 그룹 배열과 슬롯 배열을 이 구조로 관리한다.\n\n- 리컴포지션에서 발생하는 편집(조건 분기 교체, 리스트 아이템 삽입·삭제)은 대개 **한 지점에 국소적으로 몰린다**. gap을 편집 지점으로 옮겨 놓으면 이후의 연속적인 삽입·삭제는 배열 요소 이동 없이 gap을 채우거나 넓히는 것으로 끝난다.\n- 평탄한 배열이므로 순차 순회(컴포지션 재실행 시 슬롯을 순서대로 읽는 패턴)에서 캐시 지역성이 좋다.\n- 대가는 gap을 먼 위치로 옮길 때의 O(n) 요소 이동이다. 편집 위치가 흩어지는 워크로드에 약하다는 한계가 알려져 있고, 이를 개선하려는 대안 구조(링크 기반 슬롯 저장)가 런타임 플래그 뒤에서 실험되어 왔다.\n\n②는 오답 — gap buffer는 key 기반 O(1) 조회를 제공하지 않으며, 특정 그룹 참조는 gap 이동을 보정하는 **anchor**를 통해 유지한다. ③은 gap buffer가 연결 리스트가 아니라 배열 기반이라는 사실과 모순된다. ④도 오답으로, 하나의 컴포지션 기록은 단일 스레드에서 이루어지며 스레드 간 일관성은 슬롯 테이블이 아니라 스냅샷 시스템의 몫이다.",
+      "keywords": [
+        "slot-table"
+      ],
+      "related": [
+        "cint-002",
+        "cint-008"
+      ]
+    },
+    {
+      "id": "cint-010",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 1,
+        "centrality": 3,
+        "practicality": 2,
+        "discrimination": 5
+      },
+      "question": "백그라운드 스레드에서 Snapshot.takeMutableSnapshot()으로 상태를 수정한 뒤 apply()를 호출했는데, 그 사이 다른 스냅샷이 같은 상태 객체를 먼저 변경·적용해 둔 상황의 동작으로 옳은 것은?",
+      "choices": [
+        "나중에 apply한 쪽이 이기는 last-write-wins 규칙에 따라, 먼저 적용된 변경 내용을 덮어쓴다.",
+        "SnapshotMutationPolicy의 merge로 충돌 병합을 시도하고, 병합에 실패하면 apply()가 Failure 결과를 반환해 변경 적용이 거부된다.",
+        "apply()가 내부 락을 대기했다가 앞선 스냅샷이 끝난 뒤 변경을 자동으로 다시 기록하므로, 충돌 자체가 발생하지 않는다.",
+        "충돌한 상태 객체만 메인 스레드 큐로 옮겨져, 다음 프레임에서 두 변경이 순차적으로 재계산된다."
+      ],
+      "correctIndex": 1,
+      "explanation": "MutableSnapshot의 `apply()`는 트랜잭션 커밋과 같다. 커밋 시점에 런타임은 \"내가 수정한 상태 객체를, 내가 스냅샷을 딴 이후 다른 누군가가 먼저 변경·적용했는가\"를 검사한다.\n\n충돌이 발견되면 곧바로 실패하는 것이 아니라, 각 상태 객체의 **`SnapshotMutationPolicy.merge(previous, current, applied)`**에게 병합 기회를 준다.\n\n- 기본 정책인 `structuralEqualityPolicy`는 양쪽이 결과적으로 **같은 값**을 썼다면 충돌이 아닌 것으로 처리한다.\n- 카운터처럼 병합 규칙을 정의할 수 있는 상태라면 커스텀 정책으로 두 변경을 합칠 수 있다.\n- 병합이 불가능하면 `apply()`는 예외를 던지는 대신 **`SnapshotApplyResult.Failure`**를 반환하고, 그 스냅샷의 변경은 전역 상태에 반영되지 않는다. 호출 측이 재시도 여부를 결정한다.\n\n①은 반대 방향의 오해 — 스냅샷 시스템은 조용히 덮어쓰는 last-write-wins가 아니라 충돌을 **감지·보고**하는 낙관적 동시성 모델이다. ③처럼 락으로 직렬화하지 않으며(락 없는 동시 수정이 이 시스템의 존재 이유), ④ 같은 메인 스레드 재계산 큐도 존재하지 않는다.",
+      "keywords": [
+        "snapshot-system"
+      ],
+      "related": [
+        "cint-004"
+      ]
+    },
+    {
+      "id": "cint-011",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 5,
+        "discrimination": 4
+      },
+      "question": "스크롤 오프셋처럼 빠르게 변하는 상태를 상위 컴포저블에서 Float 값으로 읽어 내리는 대신 () -> Float 람다로 전달하는 최적화(이른바 donut-hole skipping 활용)가 효과를 내는 이유로 옳은 것은?",
+      "choices": [
+        "람다로 감싸면 Float가 참조 타입으로 박싱되어, 리컴포지션 시 equals 비교가 원시 타입보다 빨라지기 때문",
+        "컴파일러가 상태를 읽는 람다를 인라인 처리해, 상태 읽기 자체가 컴파일 타임 상수로 대체되기 때문",
+        "상태 읽기가 값을 실제로 소비하는 지점(하위 스코프나 그리기·레이아웃 단계)으로 미뤄져, 무효화 범위가 그 지점에 국한되고 중간 컴포저블들은 스킵되기 때문",
+        "람다로 전달하면 상태가 자동으로 derivedStateOf로 감싸져, 계산 결과가 같을 때 변경 알림이 생략되기 때문"
+      ],
+      "correctIndex": 2,
+      "explanation": "Compose의 무효화 단위는 \"상태를 **읽은** 스코프\"다. 상위 컴포저블 본문에서 `scrollOffset.value`를 읽으면 그 상위 스코프 전체가 매 프레임 무효화되어 자식들까지 다시 실행 여부를 검사하게 된다.\n\n`() -> Float` 람다로 감싸 전달하면 상위 스코프는 **State 객체를 읽지 않고 람다만 만들어** 넘긴다. 실제 읽기는:\n\n- 최하위 컴포저블 스코프에서 일어나면 그 작은 스코프만 리컴포지션되고,\n- `Modifier.graphicsLayer { translationY = offset() }`나 `Modifier.drawBehind { ... }`처럼 레이아웃·그리기 단계 람다 안에서 일어나면 **리컴포지션 없이** 해당 단계만 다시 실행된다.\n\n바깥(도넛)은 건너뛰고 실제 읽기가 일어난 안쪽 구멍(hole)만 갱신된다고 해서 **donut-hole skipping**이라 부른다. 상태 읽기 위치를 뒤로 미루는 것(deferred read)이 Compose 성능 최적화의 핵심 기법인 이유다.\n\n①·②는 박싱이나 인라인과는 무관한 근거 없는 설명이고(오히려 람다는 할당이 하나 늘어난다), ④는 다른 API와의 바꿔치기 — derivedStateOf는 개발자가 명시적으로 써야 하는 별도 도구이며 람다 전달로 자동 적용되지 않는다.",
+      "keywords": [
+        "recomposition",
+        "snapshot-system"
+      ],
+      "related": [
+        "cint-005",
+        "compose-001"
+      ]
+    },
+    {
+      "id": "cint-012",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 4
+      },
+      "question": "SubcomposeLayout이 일반 Layout 컴포저블과 구별되는 핵심 동작으로 옳은 것은?",
+      "choices": [
+        "measure를 두 번 수행해 최종 크기를 미리 계산해 두는 lookahead 패스를 내장한 것이 핵심 차이다.",
+        "자식 컴포저블들을 백그라운드 스레드에서 병렬로 컴포지션해 측정 시간을 단축한다.",
+        "컴포지션 단계를 생략하고 measure 결과만으로 UI 노드를 직접 생성해 슬롯 테이블 비용을 없앤다.",
+        "자식의 컴포지션을 측정(measure) 단계까지 지연시켜, 실제 제약(Constraints)이나 다른 자식의 측정 결과에 따라 무엇을 컴포지션할지 결정할 수 있다."
+      ],
+      "correctIndex": 3,
+      "explanation": "일반적인 프레임 파이프라인은 **컴포지션 → 레이아웃 → 드로잉** 순서라서, 레이아웃 단계에 도달했을 때는 무엇을 그릴지가 이미 확정되어 있다. `SubcomposeLayout`은 이 순서를 부분적으로 뒤집어, **measure 람다 안에서 `subcompose(slotId, content)`를 호출해 그 시점에 서브컴포지션을 수행**한다.\n\n덕분에 다음이 가능해진다.\n\n- `BoxWithConstraints`: 부모가 내려준 실제 Constraints 값을 읽어 어떤 내용을 컴포지션할지 분기한다.\n- `LazyColumn`/`LazyRow`: 뷰포트 크기를 측정 단계에 알게 된 뒤, 화면에 보일 아이템만 골라 컴포지션한다(여기에 아이템 컴포지션 재사용과 prefetch가 결합된다).\n- 한 자식의 측정 결과를 보고 다른 자식의 내용을 결정하는 레이아웃도 만들 수 있다.\n\n대가도 분명하다. 컴포지션 작업이 측정 단계에 묶이므로 일반 Layout보다 비용이 크고, 독립된 서브컴포지션들을 관리해야 한다. 제약을 알 필요가 없다면 일반 `Layout`을 쓰는 것이 원칙이다.\n\n①은 다른 시스템과의 혼동 — lookahead는 공유 요소 전환 등을 위한 별도 사전 측정 메커니즘이다. ②는 사실무근으로 서브컴포지션도 같은 스레드에서 수행되며, ③은 반대 설명 — 컴포지션을 생략하는 것이 아니라 시점을 **지연**시키는 것이다.",
+      "keywords": [
+        "recomposition"
+      ],
+      "related": [
+        "cint-011",
+        "cint-014"
+      ]
+    },
+    {
+      "id": "cint-013",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 2,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 4
+      },
+      "question": "커스텀 Modifier를 구현할 때 composed { } 방식 대신 Modifier.Node 시스템이 권장되는 이유로 옳은 것은?",
+      "choices": [
+        "Modifier.Node는 LayoutNode에 유지되는 노드 인스턴스를 재사용하고 변경 시 제자리에서 갱신하므로, 요소마다 컴포지션을 수행하는 비용이 사라지기 때문",
+        "composed는 메인 스레드에서만 실행할 수 있지만, Modifier.Node는 어떤 스레드에서 만들어도 안전하게 동작하기 때문",
+        "Modifier.Node는 기존 View 시스템과 직접 호환되어, AndroidView 없이도 XML 뷰에 그대로 부착할 수 있기 때문",
+        "composed로 만든 Modifier는 한 체인에서 한 번만 쓸 수 있지만, Modifier.Node 기반 Modifier는 같은 체인에 여러 번 넣을 수 있기 때문"
+      ],
+      "correctIndex": 0,
+      "explanation": "`composed { }`는 modifier 팩토리 안에서 `remember` 같은 컴포지션 API를 쓰기 위한 장치인데, 그 대가로 **modifier 요소 하나하나가 자기만의 컴포지션 세계**를 갖게 된다. 체인이 만들어질 때마다 컴포지션 비용이 들고, 상태가 바뀌면 리컴포지션을 거쳐야 하며, 결과 Modifier는 비교 가능성이 깨져 상위 스킵 최적화도 방해한다.\n\n**Modifier.Node 시스템**은 이를 구조적으로 해결한다.\n\n- 공개 API 쪽은 가벼운 불변 `ModifierNodeElement`로, `create()`와 `update(node)` 그리고 equals를 정의한다.\n- 런타임은 체인이 바뀔 때 이전 요소들과 **diff**해서, 같은 요소는 기존 `Modifier.Node` 인스턴스를 그대로 두고 값만 바뀐 요소는 `update(node)`로 **제자리 갱신**한다. 노드는 LayoutNode에 계속 붙어 산다.\n- 노드는 `DrawModifierNode`, `LayoutModifierNode`, `PointerInputModifierNode` 등 역할별 인터페이스를 구현하고, 필요한 무효화(`invalidateDraw()` 등)만 정밀하게 요청한다. attach/detach 생명주기와 자체 코루틴 스코프도 가진다.\n\n결과적으로 리컴포지션 없이 상태를 유지·갱신할 수 있어 성능이 크게 유리하며, `composed`는 사실상 레거시 경로가 되었다. ②의 스레드 제약 차이, ③의 View 직접 호환, ④의 사용 횟수 제한은 모두 존재하지 않는 규칙이다.",
+      "keywords": [
+        "modifier-node",
+        "recomposition"
+      ],
+      "related": [
+        "cint-014"
+      ]
+    },
+    {
+      "id": "cint-014",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 2,
+        "centrality": 3,
+        "practicality": 1,
+        "discrimination": 4
+      },
+      "question": "Compose 런타임의 Applier 추상화에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "Applier는 컴포저블의 스킵 여부를 판정하기 위해 컴파일러가 생성하는 코드로, 릴리스 빌드에서는 인라인되어 사라진다.",
+        "컴포지션이 계산한 노드 삽입·이동·삭제를 실제 트리에 반영하는 인터페이스로, UI에서는 UiApplier가 LayoutNode 트리에 적용하며 커스텀 Applier로 UI가 아닌 트리도 구동할 수 있다.",
+        "Applier는 스냅샷 상태의 변경을 감지해 Recomposer에게 무효화를 전달하는 옵저버 계층의 이름이다.",
+        "Applier는 measure/layout 결과를 GPU 렌더 노드 명령으로 변환하는, 드로잉 파이프라인의 마지막 단계다."
+      ],
+      "correctIndex": 1,
+      "explanation": "Compose가 컴파일러/런타임/UI 세 층으로 나뉠 수 있는 비밀이 **Applier**다.\n\n- 런타임(컴포저블 실행, 슬롯 테이블, 스냅샷, Recomposer)은 \"어떤 노드를 어디에 넣고 빼고 옮길지\"라는 **변경 목록**까지만 계산하고, 노드가 실제로 무엇인지는 모른다.\n- `Applier<N>` 인터페이스가 그 경계다. 트리를 오르내리는 `down(node)`/`up()`과 `insertTopDown`/`insertBottomUp`, `remove`, `move` 연산으로 변경을 실제 트리에 적용한다.\n- 안드로이드 UI에서는 **UiApplier**가 이 역할을 맡아 `LayoutNode` 트리를 조작한다(새 서브트리를 bottom-up으로 조립해 attach 시 중복 통지를 줄이는 최적화를 쓴다).\n- 같은 런타임에 다른 Applier를 꽂으면 전혀 다른 트리를 선언형으로 구동할 수 있다 — 벡터 그래픽(`rememberVectorPainter`의 벡터 트리)이 대표적이고, 이 원리가 커스텀 노드 트리에 Compose 런타임을 재사용하는 길을 연다.\n\n①은 스킵 판정 메커니즘($changed/$dirty)과의 혼동이고, ③은 방향이 반대 — 무효화 전달은 스냅샷 apply 옵저버와 Recomposer의 일이며 Applier는 그 **결과**를 트리에 반영한다. ④는 드로잉 파이프라인(RenderNode/Canvas)과의 바꿔치기로, Applier는 그리기가 아니라 트리 구조 변경을 담당한다.",
+      "keywords": [
+        "applier",
+        "recomposer"
+      ],
+      "related": [
+        "cint-013",
+        "cint-005"
+      ]
+    },
+    {
+      "id": "cint-015",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 4,
+        "discrimination": 4
+      },
+      "question": "Compose 컴파일러의 strong skipping 모드가 실제로 바꾸는 동작에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "unstable 타입을 컴파일러가 stable로 재분류해 주므로, @Immutable 어노테이션이나 stability 설정 파일이 더 이상 필요 없어진다.",
+        "스킵 최적화를 전면 비활성화해 모든 컴포저블이 매번 재실행되게 함으로써, 리컴포지션 문제를 재현하기 쉽게 만드는 디버깅용 모드다.",
+        "unstable 파라미터를 가진 컴포저블도 스킵 가능하게 만들되 그런 파라미터는 인스턴스 동일성(===)으로 비교하며, unstable 값을 캡처한 람다도 메모이제이션한다.",
+        "파라미터 비교 단계를 생략하는 대신 컴포저블의 실행 결과를 캐싱해 두었다가 반환하는 방식으로 스킵률을 높인다."
+      ],
+      "correctIndex": 2,
+      "explanation": "**Strong skipping**(Kotlin 2.0.20 컴파일러부터 기본 활성화)은 스킵과 람다 메모이제이션의 **규칙**을 바꾸는 것이지, 타입의 안정성 판정을 바꾸는 것이 아니다.\n\n바뀌는 것:\n\n- 기존(strong skipping 이전) 모드에서는 unstable 파라미터가 하나라도 있으면 컴포저블이 skippable이 되지 못했지만, strong skipping에서는 **skippable로 컴파일**된다. 비교 방법이 이원화되어 stable 파라미터는 `equals`, **unstable 파라미터는 인스턴스 동일성(===)** 으로 판단한다.\n- unstable 값을 캡처한 람다도 메모이제이션된다(캡처값을 === 기준 key로 remember).\n\n바뀌지 않는 것(흔한 오해):\n\n- 타입의 stable/unstable **분류 자체는 그대로**다. unstable한 List를 리컴포지션마다 새로 만들어 넘기면, 내용이 같아도 ===가 다르므로 여전히 스킵에 실패한다. 그래서 ①처럼 어노테이션·stability 설정 파일이 무의미해지는 것이 아니라, 동등성 기반 스킵이 필요한 타입에는 여전히 유효한 도구다.\n\n②는 정반대 설명이고(스킵을 끄는 것이 아니라 넓히는 모드), ④는 존재하지 않는 방식 — 컴포저블 실행 결과를 통째로 캐싱하는 메커니즘이 아니라 파라미터 비교 규칙을 완화하는 것이다.",
+      "keywords": [
+        "strong-skipping",
+        "stability",
+        "lambda-memoization"
+      ],
+      "related": [
+        "cint-003",
+        "cint-006"
+      ]
+    },
+    {
+      "id": "cint-016",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 1,
+        "centrality": 3,
+        "practicality": 2,
+        "discrimination": 5
+      },
+      "question": "Compose 런타임에서 remember로 저장된 객체가 컴포지션 생명주기를 통지받기 위해 구현하는 RememberObserver 인터페이스의 세 콜백(onRemembered / onForgotten / onAbandoned)에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "onRemembered는 remember 호출이 실행되는 순간 컴포지션 도중에 동기적으로 호출되고, onForgotten은 객체가 가비지 컬렉션될 때 호출된다.",
+        "onRemembered는 객체가 슬롯 테이블에 커밋된 뒤 호출되고, onForgotten은 어디에서도 더 이상 기억되지 않게 됐을 때 호출되며, 커밋되지 못하고 버려진 컴포지션에서는 onRemembered 대신 onAbandoned가 호출된다.",
+        "onAbandoned는 onForgotten 직후에 이어서 호출되는 최종 정리 단계 콜백으로, 두 콜백은 한 쌍으로 함께 동작한다.",
+        "이 인터페이스는 LaunchedEffect를 위한 런타임 내부 전용 API라서, 사용자 정의 클래스가 구현하더라도 런타임이 콜백을 호출해 주지 않는다."
+      ],
+      "correctIndex": 1,
+      "explanation": "**RememberObserver는 Compose 이펙트 시스템의 뿌리가 되는 인터페이스**다. remember로 저장되는 객체가 이를 구현하면 컴포지션 생명주기 이벤트를 받는다.\n\n- **onRemembered**: 객체가 **슬롯 테이블에 커밋된 시점**에 호출된다. remember 팩토리가 실행되는 순간이 아니라, 해당 리컴포지션의 변경사항이 적용(apply)될 때다.\n- **onForgotten**: 키 변경으로 교체되거나 그룹이 제거되어 **어디에서도 더 이상 기억되지 않게 된 시점**에 호출된다.\n- **onAbandoned**: 컴포지션이 도중에 실패해 **커밋되지 못하고 버려진 경우**, onRemembered를 받지 못한 객체가 대신 받는 콜백이다.\n\nonRemembered/onForgotten은 모두 컴포지션의 apply 스레드에서 실행된다. LaunchedEffect와 DisposableEffect의 구현체가 바로 이 인터페이스 위에 만들어져 있다.\n\n①은 호출 시점이 틀렸다 — 커밋 이후이며 GC와도 무관하다. ③은 onAbandoned의 역할을 오해한 것으로, onForgotten의 후속이 아니라 '한 번도 커밋되지 못한' 인스턴스가 onRemembered **대신** 받는 별도 경로다. ④는 사실과 다르다 — 공개된 인터페이스라 커스텀 사이드 이펙트 구현에 직접 활용할 수 있다.",
+      "keywords": [
+        "remember-observer",
+        "side-effect",
+        "slot-table"
+      ],
+      "related": [
+        "cint-017",
+        "cint-019"
+      ]
+    },
+    {
+      "id": "cint-017",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 2,
+        "centrality": 4,
+        "practicality": 2,
+        "discrimination": 5
+      },
+      "question": "LaunchedEffect(key1)의 key가 바뀌면 기존 작업이 중단되고 블록이 처음부터 다시 실행된다. Compose 런타임 내부에서 이 '재시작'이 구현되는 방식으로 옳은 것은?",
+      "choices": [
+        "이펙트 구현체가 remember(key) { ... }로 저장되기 때문에, 키 비교가 실패하면 이전 인스턴스는 forget 대상이 되고 새 인스턴스가 remember되는 교체 사이클이 곧 재시작이다.",
+        "Recomposer가 이펙트별 키 목록을 별도 레지스트리에 유지하다가, 키 변경이 감지되면 해당 이펙트 객체에 재시작 신호를 개별적으로 전달한다.",
+        "스냅샷 시스템이 키로 전달된 값의 쓰기를 관찰해 실행 중인 이펙트 코루틴에 예외를 던진 뒤, 같은 코루틴 인스턴스를 처음부터 재개시킨다.",
+        "컴파일러가 키마다 전용 restartable group을 생성해, apply 단계를 거치지 않고 컴포지션 실행 도중 즉시 코루틴을 교체한다."
+      ],
+      "correctIndex": 0,
+      "explanation": "**모든 이펙트 핸들러의 원시 연산은 remember 하나**다. LaunchedEffect도 내부적으로는 `remember(key) { LaunchedEffectImpl(...) }` 형태로 구현된다.\n\nremember는 포지셔널 메모이제이션에 따라 저장된 값을 찾고, **키가 이전과 다르면 팩토리를 다시 실행해 새 객체를 저장**한다. 이때:\n\n1. 이전 구현체는 폐기 대상이 되어 apply 시점에 **onForgotten**을 받고 → 내부 Job을 취소한다.\n2. 새 구현체는 **onRemembered**를 받고 → suspend 블록을 launch한다.\n\n즉 '취소 후 재시작'이라는 동작은 별도의 재시작 엔진이 있어서가 아니라, RememberObserver 콜백 순서(forget → remember)에서 자연스럽게 따라 나오는 결과다.\n\n②처럼 Recomposer가 이펙트 레지스트리를 따로 관리하지 않으며, ③처럼 스냅샷 관찰로 동작하는 것도 아니다 — 키는 단순히 이전 값과의 동등성 비교로 판정된다. ④는 교체가 apply 단계의 콜백 디스패치에서 일어난다는 점에서 틀렸다.",
+      "keywords": [
+        "side-effect",
+        "positional-memoization",
+        "remember-observer"
+      ],
+      "related": [
+        "cint-016",
+        "cint-002",
+        "cint-020"
+      ]
+    },
+    {
+      "id": "cint-018",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 2,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 4
+      },
+      "question": "LaunchedEffect 블록이 실행되는 코루틴 컨텍스트는 어디에서 오며, 그 구성이 만들어내는 동작으로 옳은 것은?",
+      "choices": [
+        "호스트 화면의 viewModelScope를 상속하므로, 화면을 벗어나도 ViewModel이 살아 있는 동안에는 이펙트 코루틴이 계속 실행된다.",
+        "GlobalScope에서 Dispatchers.Default로 실행되므로, DisposableEffect에 취소 코드를 함께 등록해야 코루틴 누수를 막을 수 있다.",
+        "Recomposer가 프레임 클록(MonotonicFrameClock)과 effectJob을 합성해 만든 컨텍스트를 쓰기 때문에, 컴포지션이 dispose되면 자동으로 취소되고 withFrameNanos 기반 애니메이션도 추가 설정 없이 동작한다.",
+        "리컴포지션이 일어날 때마다 비어 있는 새 컨텍스트가 만들어지므로, 프레임 클록이 필요하면 이펙트 블록 안에서 디스패처와 함께 직접 주입해야 한다."
+      ],
+      "correctIndex": 2,
+      "explanation": "LaunchedEffect가 사용하는 컨텍스트는 현재 Composer의 apply 컨텍스트에서 오는데, 이는 **Recomposer가 사용자 제공 컨텍스트에 MonotonicFrameClock과 effectJob을 합성해 만든 것**이다. 이 구성이 두 가지 중요한 성질을 만든다.\n\n1. **자동 취소**: 이펙트 코루틴의 부모가 effectJob이므로, 컴포지션이 dispose되면 구조화된 동시성에 따라 모든 이펙트 코루틴이 함께 취소된다. 개발자가 취소 코드를 따로 쓸 필요가 없다.\n2. **프레임 클록 내장**: 컨텍스트에 MonotonicFrameClock이 있어 `withFrameNanos`를 쓰는 애니메이션 코드를 별도 설정 없이 바로 실행할 수 있다.\n\n①은 틀렸다 — 이펙트의 생명은 ViewModel이 아니라 **컴포지션**에 묶인다. ②는 반대다 — GlobalScope가 아니며 자동 취소가 핵심 설계다. ④는 컨텍스트가 리컴포지션 단위가 아니라 컴포지션 수준에서 유지된다는 점에서 오답이다.",
+      "keywords": [
+        "recomposer",
+        "side-effect",
+        "structured-concurrency"
+      ],
+      "related": [
+        "cint-016",
+        "cint-017"
+      ]
+    },
+    {
+      "id": "cint-019",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 1,
+        "centrality": 2,
+        "practicality": 2,
+        "discrimination": 4
+      },
+      "question": "리컴포지션 결과가 apply될 때 Compose 런타임(RememberEventDispatcher)이 강제하는 생명주기 콜백과 SideEffect의 실행 순서로 옳은 것은?",
+      "choices": [
+        "새로 기억된 객체들의 onRemembered가 먼저 호출되어 새 리소스를 확보한 뒤, 이전 객체들의 onForgotten이 호출되어 교체가 무중단으로 이뤄진다.",
+        "SideEffect가 가장 먼저 실행되어 외부 시스템을 준비시킨 뒤, onForgotten과 onRemembered가 차례로 이어진다.",
+        "콜백 순서는 각 객체가 슬롯 테이블에 저장된 물리적 위치에 따라 결정되므로, 호출 순서에 대한 별도의 보장은 없다.",
+        "잊히는 객체들의 onForgotten이 기억된 순서의 역순으로 먼저 호출되고, 새 객체들의 onRemembered가 정방향으로 이어지며, SideEffect는 그 둘이 모두 끝난 뒤 실행된다."
+      ],
+      "correctIndex": 3,
+      "explanation": "변경사항을 적용하는 apply 단계에서 런타임은 **엄격한 3단계 순서**를 강제한다.\n\n1. **onForgotten** — 잊히는 옵저버들이 기억된 순서의 **역순**으로 통지받는다 (나중에 만들어진 것이 먼저 정리됨).\n2. **onRemembered** — 새로 기억된 옵저버들이 **정방향**으로 통지받는다.\n3. **SideEffect** — 마지막에 실행된다.\n\nSideEffect를 맨 뒤에 두는 이유가 핵심이다: 사이드 이펙트 블록이 참조하는 remember된 객체들이 **onRemembered까지 받아 완전히 초기화된 상태**임을 보장하기 위해서다.\n\n①은 순서가 반대다 — 해제(forget)가 먼저 오고 새 객체 통지가 뒤따르며, 이 순서 덕분에 LaunchedEffect의 키 교체 시 '이전 코루틴 취소 → 새 코루틴 시작'이 성립한다. ②는 SideEffect의 위치가 틀렸고, ③은 순서가 명시적으로 강제된다는 사실에 어긋난다.",
+      "keywords": [
+        "remember-observer",
+        "side-effect",
+        "slot-table"
+      ],
+      "related": [
+        "cint-016",
+        "cint-008"
+      ]
+    },
+    {
+      "id": "cint-020",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 4,
+        "discrimination": 3
+      },
+      "question": "리컴포지션 때마다 새로 생성되는 객체(예: 즉석에서 만든 람다)를 LaunchedEffect의 key로 전달했을 때의 동작과, LaunchedEffect(Unit)이 '한 번만 실행'이 되는 이유로 옳은 것은?",
+      "choices": [
+        "키는 호출 위치로만 식별되므로 어떤 값을 넘기든 이펙트는 최초 컴포지션에서 한 번만 실행된다.",
+        "새 인스턴스 키는 첫 비교에서만 변경으로 취급되고, 이후에는 런타임이 내용 기반 비교로 전환해 불필요한 재시작을 막아 준다.",
+        "새 인스턴스 키는 매번 변경으로 판정되어 이펙트가 리컴포지션마다 취소·재시작되고, Unit은 절대 변하지 않는 값이라 remember가 재실행되지 않아 한 번만 실행된다.",
+        "Unit 키 이펙트는 컴포지션과 무관한 전역 스코프에 등록되어 화면을 떠나도 유지되기 때문에 결과적으로 한 번만 실행되는 것이다."
+      ],
+      "correctIndex": 2,
+      "explanation": "이펙트의 재시작 여부는 **키의 동등성 비교**가 전부다. 매 컴포지션마다 새로 할당되는 객체나 람다를 키로 넘기면 비교가 항상 '변경됨'이 되어, 이펙트가 리컴포지션마다 forget/remember 사이클을 돌며 **코루틴 취소·재기동을 반복**한다. 이는 성능 낭비이자, 진행 중인 작업이 계속 끊기는 버그의 원인이 된다.\n\n`LaunchedEffect(Unit)`이 '한 번만 실행'인 이유는 특별한 메커니즘이 아니라 **Unit이 절대 변하지 않는 값**이라 remember가 재실행될 일이 없기 때문이다. 다만 이 관용구에는 함정이 있다: 블록이 캡처한 변수는 이후 리컴포지션에서 갱신되지 않아 **stale**해질 수 있으므로, 최신 값이 필요하면 rememberUpdatedState처럼 State 읽기로 우회해야 한다.\n\n①은 위치 기반 저장은 맞지만 키 비교 단계를 무시했고, ②와 같은 비교 방식 전환은 존재하지 않으며, ④는 틀렸다 — Unit 키라도 컴포지션을 떠나면 코루틴은 취소된다.",
+      "keywords": [
+        "side-effect",
+        "recomposition",
+        "positional-memoization"
+      ],
+      "related": [
+        "cint-017",
+        "cint-002"
+      ]
+    },
+    {
+      "id": "cint-021",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 4,
+        "discrimination": 3
+      },
+      "question": "Compose 안정성 어노테이션 @Immutable과 @Stable이 컴파일러와 맺는 계약의 차이에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "@Immutable은 생성 후 관찰 가능한 상태가 변하지 않는다는 약속이고, @Stable은 변할 수는 있지만 모든 변경이 스냅샷 상태를 통해 관찰된다는 약속이며, 둘 다 컴파일러가 검증하지 않는다.",
+        "@Immutable을 붙이면 컴파일러가 모든 프로퍼티의 불변성을 실제로 검사해서, var 프로퍼티가 하나라도 있으면 컴파일 에러를 발생시킨다.",
+        "@Stable이 더 강한 계약이므로 @Stable 타입에는 var 프로퍼티를 둘 수 없고, @Immutable 타입에는 자유롭게 둘 수 있다.",
+        "두 어노테이션 모두 런타임에 객체를 동결시켜서, 이후 상태를 변경하려고 하면 예외를 던지도록 만든다."
+      ],
+      "correctIndex": 0,
+      "explanation": "두 어노테이션은 컴파일러가 스스로 안정성을 추론할 수 없는 타입(인터페이스, 외부 모듈 타입 등)에 대해 **개발자가 대신 해 주는 약속**이다.\n\n- **@Immutable**: 인스턴스의 관찰 가능한 상태가 **생성 이후 절대 변하지 않는다**는 가장 강한 약속. 가장 강한 최적화를 허용한다.\n- **@Stable**: 상태가 **변할 수는 있지만, 모든 변경이 스냅샷 상태 시스템을 통해 관찰 가능**하다는 더 약한 약속. 변경이 일어나면 Compose가 통지받을 수 있으므로 스킵 판단에 쓸 수 있다.\n\n중요한 점은 **컴파일러가 이 약속을 전혀 검증하지 않는다**는 것이다. 스냅샷 밖에서 몰래 변하는 타입에 이 어노테이션을 붙이면, Compose는 '변한 게 없다'고 믿고 리컴포지션을 스킵해 **화면이 갱신되지 않는(stale UI) 버그**가 생긴다.\n\n②는 검증이 없다는 핵심을 뒤집은 오답이고, ③은 강약 관계가 반대다 — @Immutable이 더 강한 계약이다. ④ 같은 런타임 동결 메커니즘은 존재하지 않으며 순수하게 컴파일 타임 힌트다.",
+      "keywords": [
+        "stability",
+        "snapshot-system",
+        "recomposition"
+      ],
+      "related": [
+        "cint-003",
+        "cint-015"
+      ]
+    },
+    {
+      "id": "cint-022",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 2,
+        "centrality": 3,
+        "practicality": 4,
+        "discrimination": 4
+      },
+      "question": "strong skipping 모드가 켜진 상태에서, 불안정(unstable) 타입 파라미터를 받는 컴포저블이 여전히 스킵 이득을 보지 못하는 호출 패턴은?",
+      "choices": [
+        "object로 선언해 둔 싱글턴 설정 객체를 파라미터로 전달하는 경우",
+        "호출부 인자 자리에서 listOf(...)나 data class의 copy() 결과처럼 매 리컴포지션 새 인스턴스를 만들어 전달하는 경우",
+        "rememberScrollState()처럼 remember로 메모이즈되어 매번 같은 인스턴스가 반환되는 상태 객체를 전달하는 경우",
+        "상위 컴포저블에서 remember로 고정해 둔 콜백 람다 인스턴스를 그대로 전달하는 경우"
+      ],
+      "correctIndex": 1,
+      "explanation": "strong skipping 모드에서 불안정 파라미터는 **참조 동일성(===)** 으로만 비교된다. 따라서 스킵이 성립하려면 **리컴포지션 사이에 같은 인스턴스가 재사용**되어야 한다.\n\n호출부에서 `listOf(...)`로 컬렉션을 즉석 생성하거나 `copy()` 결과를 넘기면 매번 새 인스턴스가 만들어지므로, **내용이 equals()로는 같더라도 참조 비교는 항상 실패**해 재구성이 일어난다. 이것이 '내용은 같은데 매번 새 객체로 도착해 낭비 리컴포지션을 만드는' 대표 패턴이며, 해결책은 값을 remember로 끌어올려 인스턴스를 고정하거나 타입을 안정화해 구조적 비교로 전환하는 것이다.\n\n①(싱글턴), ③(remember된 상태 객체), ④(고정된 람다)는 모두 동일 인스턴스가 유지되는 경우라 참조 비교가 성립해 스킵된다. 이런 구분 때문에 strong skipping은 '같은 인스턴스가 재사용될 때를 잡아 주는 안전망'이고, 안정성은 '인스턴스가 달라도 동등한 값을 같다고 보장하는 장치'로 역할이 다르다.",
+      "keywords": [
+        "strong-skipping",
+        "stability",
+        "recomposition"
+      ],
+      "related": [
+        "cint-015",
+        "cint-023"
+      ]
+    },
+    {
+      "id": "cint-023",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 1,
+        "centrality": 2,
+        "practicality": 3,
+        "discrimination": 5
+      },
+      "question": "strong skipping 모드에서 컴포저블 본문의 람다가 자동 메모이즈될 때, 캐시된 람다를 재사용할지 새로 만들지 판정하는 방식으로 옳은 것은?",
+      "choices": [
+        "람다 본문의 코드가 같으면 캡처한 값과 무관하게 같은 인스턴스를 재사용한다.",
+        "캡처된 값이 하나라도 불안정 타입이면 메모이제이션 자체가 비활성화되어 매번 새 람다가 생성된다.",
+        "모든 캡처 값을 equals()로 비교해서 내용이 같으면 캐시를 유지하고 다르면 재생성한다.",
+        "캡처 값별로 안정 타입은 구조적 동등성, 불안정 타입은 참조 동일성으로 검사한 결과를 결합해, 하나라도 변경이면 람다를 재생성한다."
+      ],
+      "correctIndex": 3,
+      "explanation": "strong skipping 모드에서는 컴포저블 안의 람다가 composer의 캐시(`cache()`)로 자동 메모이즈된다. 캐시 무효화 판정은 **캡처된 값의 종류에 따라 다른 비교**를 쓴다:\n\n- **안정 캡처** → 구조적 동등성 비교 (equals 기반, `changed()`)\n- **불안정 캡처** → 참조 동일성 비교 (`===` 기반, `changedInstance()`)\n\n이 검사 결과들을 OR로 결합해 **하나라도 '변경됨'이면 람다를 새로 만든다**. 따라서 불안정 값을 캡처한 람다는 그 값이 내용상 같아도 새 인스턴스로 도착하면 람다가 재생성되고, 그 람다를 받는 하위 컴포저블의 스킵까지 연쇄적으로 깨진다.\n\n②는 strong skipping **이전**의 동작이다 — 과거에는 불안정 캡처가 있으면 람다 메모이제이션이 되지 않았고, 이를 바꾼 것이 strong skipping의 핵심 개선점 중 하나다. ①은 캡처 값 비교를 무시했고, ③은 불안정 캡처가 equals가 아닌 참조 비교라는 점에서 틀렸다.",
+      "keywords": [
+        "lambda-memoization",
+        "strong-skipping",
+        "stability"
+      ],
+      "related": [
+        "cint-006",
+        "cint-015",
+        "cint-022"
+      ]
+    },
+    {
+      "id": "cint-024",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 1,
+        "centrality": 2,
+        "practicality": 2,
+        "discrimination": 4
+      },
+      "question": "strong skipping이 비활성화된 컴파일러에서, 필수 파라미터 중 하나가 불안정 타입인 컴포저블에 대해 컴파일러가 생성하는 코드의 특징으로 옳은 것은?",
+      "choices": [
+        "스킵 가능성이 없다고 판단해 파라미터 비교와 스킵 분기 코드를 아예 생성하지 않으며, 부모가 재구성되면 본문이 무조건 다시 실행된다.",
+        "모든 파라미터에 대한 equals() 비교 코드는 생성하지만, 비교 결과와 무관하게 항상 본문을 실행하도록 분기가 고정된다.",
+        "안정 파라미터에 대해서만 비교 코드를 생성해서, 불안정 파라미터를 제외한 나머지에 대한 부분 스킵을 수행한다.",
+        "스킵 판정을 런타임으로 미뤄서, Composer가 리플렉션으로 파라미터 타입의 안정성을 매 호출마다 재평가한다."
+      ],
+      "correctIndex": 0,
+      "explanation": "strong skipping이 꺼진 컴파일러는 필수 파라미터 중 불안정 타입이 하나라도 있으면 그 컴포저블을 **스킵 불가능**으로 판정하고(내부적으로 mightSkip=false), **파라미터 비교·스킵 검사 코드 자체를 생성하지 않는다**. 결과적으로 부모 스코프가 재구성될 때마다 이 함수의 본문은 조건 없이 재실행된다.\n\n이 지점이 strong skipping이 실제로 바꾸는 부분이다: 모드를 켜면 같은 자리에 참조 동일성 검사(changedInstance)가 생성되어, 동일 인스턴스가 전달되는 한 스킵이 가능해진다.\n\n②는 '비교는 하되 무시한다'는 오해로, 실제로는 비교 코드조차 없다. ③의 부분 스킵은 존재하지 않는 개념이다 — 스킵은 함수 단위 결정이라 파라미터 하나의 불안정이 함수 전체의 스킵을 막는다(이것이 불안정 파라미터 하나가 서브트리 전체 리컴포지션으로 번지는 이유다). ④는 틀렸다 — 안정성은 컴파일 타임에 $stable 정보로 결정되며 런타임 리플렉션은 개입하지 않는다.",
+      "keywords": [
+        "strong-skipping",
+        "stability",
+        "recomposition"
+      ],
+      "related": [
+        "cint-007",
+        "cint-015"
+      ]
+    },
+    {
+      "id": "cint-025",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 2,
+        "centrality": 3,
+        "practicality": 4,
+        "discrimination": 4
+      },
+      "question": "Column의 content 람다 안에서만 읽는 상태가 바뀌었는데도, Column을 호출한 컴포저블 함수 전체가 다시 실행되는 것이 관찰된다. 이 동작의 원인으로 옳은 것은?",
+      "choices": [
+        "Column이 CompositionLocal을 암시적으로 구독하고 있어서 상태 변경 시 부모 스코프까지 무효화가 전파되기 때문이다.",
+        "content 람다가 불안정 타입으로 분류되어 Column 자체가 스킵 불가능해지기 때문이다.",
+        "Column·Row·Box는 inline 함수라 content가 호출부에 인라인되어, 자체 리컴포지션 스코프(restart group)를 만들지 않기 때문이다.",
+        "레이아웃 계열 컴포저블은 측정 정책상 부모와 같은 프레임에 재구성되도록 런타임이 강제하기 때문이다."
+      ],
+      "correctIndex": 2,
+      "explanation": "상태 읽기는 **가장 가까운 restartable한 리컴포지션 스코프**에 기록되고, 상태가 바뀌면 그 스코프가 무효화되어 재실행된다.\n\n그런데 Column·Row·Box는 **inline 함수**다. 컴파일 시 content 람다가 호출부에 그대로 인라인되므로, 이들은 **자체 restart group(리컴포지션 스코프)을 만들지 않는다**. 그 결과 content 안에서 일어난 상태 읽기는 Column이 아니라 **그 바깥의 호출자 스코프**에 귀속되고, 상태가 바뀌면 호출자 함수 전체가 다시 실행된다.\n\n리컴포지션 범위를 좁히고 싶다면 상태를 읽는 부분을 **inline이 아닌 별도의 컴포저블 함수로 추출**해 독립 스코프를 만들어 주면 된다.\n\n①은 존재하지 않는 구독이며, ②는 원인을 안정성으로 오인한 것이다 — 스킵 여부 이전에 스코프 자체가 없는 것이 문제다. ④는 측정 정책과 리컴포지션 경계를 혼동한 설명으로, 이 동작은 런타임 강제가 아니라 컴파일 산출물의 구조에서 나온다.",
+      "keywords": [
+        "recompose-scope",
+        "recomposition",
+        "compose-phases"
+      ],
+      "related": [
+        "cint-005",
+        "cint-026"
+      ]
+    },
+    {
+      "id": "cint-026",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 4,
+        "practicality": 5,
+        "discrimination": 4
+      },
+      "question": "`if (isEditing) EditorPane() else ViewerPane()`처럼 조건 분기가 뒤집히거나 형제 컴포저블의 순서가 바뀔 때, remember로 저장된 상태에 일어나는 일과 그 대응 방법으로 옳은 것은?",
+      "choices": [
+        "remember 값은 컴포저블 함수 이름으로 식별되므로, 분기나 순서가 바뀌어도 같은 함수를 호출하는 한 상태가 유지된다.",
+        "분기가 바뀌면 이전 분기 그룹의 슬롯이 폐기되어 상태가 사라지며, 순서가 바뀌는 형제들은 key(id)로 movable group을 만들어 데이터 키 기준으로 상태가 따라가게 한다.",
+        "rememberSaveable로 바꾸면 위치와 무관한 별도 저장소에 기록되므로, 분기 전환 후에도 상태가 자동 복원된다.",
+        "슬롯 테이블이 구조 변경을 감지해 이전 그룹의 슬롯을 새 그룹으로 자동 이관하므로, 개발자의 별도 처리가 필요 없다."
+      ],
+      "correctIndex": 1,
+      "explanation": "Compose의 identity는 **포지셔널 메모이제이션**, 즉 호출 위치(+컴파일러가 부여한 그룹 키) 기반이다. 이 때문에 두 가지 엣지 케이스가 생긴다.\n\n1. **분기 전환**: if의 참/거짓 분기는 서로 다른 그룹이다. 분기가 뒤집히면 이전 분기의 그룹과 그 슬롯이 통째로 폐기되므로, 그 안의 remember 상태는 **소실**된다.\n2. **형제 순서 변경**: 위치로 매칭되므로 형제들의 순서가 바뀌면 상태가 엉뚱한 항목에 붙어 **뒤바뀔** 수 있다.\n\n대응은 `key(id) { ... }` 컴포저블이다. key는 슬롯 테이블에 **movable group**을 만들어 위치가 아닌 **지정한 데이터 키로 매칭·이동**시키므로, 항목이 재배치되어도 상태가 데이터를 따라간다. LazyColumn의 `items(key = ...)`가 중요한 것도 같은 원리다.\n\n①은 틀렸다 — 이름이 아니라 위치가 기준이다. ③도 오답인데, rememberSaveable 역시 **위치 기반 키**로 저장되므로 그룹이 폐기되는 분기 전환에서는 마찬가지로 유실된다(그 용도는 프로세스 재생성·구성 변경 대비다). ④ 같은 자동 이관은 없으며, 그 역할을 명시적으로 하는 것이 key다.",
+      "keywords": [
+        "positional-memoization",
+        "movable-group",
+        "slot-table",
+        "lazy-list-key"
+      ],
+      "related": [
+        "cint-002",
+        "cint-008",
+        "cint-025"
+      ]
+    },
+    {
+      "id": "cint-027",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 1,
+        "centrality": 2,
+        "practicality": 1,
+        "discrimination": 3
+      },
+      "question": "Compose 런타임이 실험적으로 도입한 LinkBuffer가, gap buffer 기반 슬롯 테이블의 구조 변경(삭제·재배치) 비용 문제를 해결하는 방식으로 옳은 것은?",
+      "choices": [
+        "gap을 여러 위치에 분산 배치해서, 편집 지점까지 gap을 옮기는 평균 이동 거리와 복사량을 줄인다.",
+        "그룹 데이터를 불변 영속 자료구조로 바꿔, 편집 시 구조 공유(structural sharing)로 배열 복사를 회피한다.",
+        "그룹 배열을 균형 트리로 재구성해 편집을 로그 시간에 처리하는 대신, 읽기 순회도 트리 탐색 비용을 치르게 한다.",
+        "그룹을 형제·부모·첫 자식 링크를 가진 포인터 레코드로 표현해, 배열 복사 대신 포인터 갱신만으로 삭제·이동을 처리하므로 비용이 이동 거리와 무관해진다."
+      ],
+      "correctIndex": 3,
+      "explanation": "기존 슬롯 테이블의 gap buffer는 순차 삽입에는 강하지만, 삭제나 재배치 시 **gap을 목표 위치까지 옮기며 배열 원소를 대량 복사**해야 하고 이 비용은 컴포지션 크기에 선형 비례한다. LazyList 재배치처럼 구조 변경이 잦은 현대적 UI 패턴에서 이 약점이 드러났다.\n\nLinkBuffer는 각 그룹을 **6개 필드(키, 다음 형제 링크, 부모 참조, 첫 자식 참조, 플래그, 슬롯 범위)로 이뤄진 포인터 레코드**로 표현한다. 편집이 포인터 갱신으로 끝나므로 삭제는 노드 언링크 한 번, 임의 거리의 재배치도 포인터 두 개 갱신이면 된다 — **비용이 이동 거리와 무관**해진다. 그 대가로 그룹당 필드가 늘어 메모리를 약 20% 더 쓰고, 재배치는 2배 이상·일반 연산은 10% 수준 개선이라는 트레이드오프를 갖는다. 슬롯 데이터 쪽은 bump allocation과 주기적 컴팩션으로 관리한다.\n\n①·②는 실제 채택된 방식이 아니고, ③은 읽기 특성이 틀렸다 — 읽기 순회는 두 구현 모두 그룹당 O(1)이며 gap 오프셋 계산 대신 포인터 추적을 한다는 차이만 있다.",
+      "keywords": [
+        "link-buffer",
+        "slot-table"
+      ],
+      "related": [
+        "cint-009",
+        "cint-008"
+      ]
+    }
+  ]
+}

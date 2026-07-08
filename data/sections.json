@@ -1,0 +1,14 @@
+{
+  "sections": [
+    "android-core",
+    "android-internals",
+    "kotlin-language",
+    "kotlin-advanced",
+    "coroutines",
+    "compose-ui",
+    "compose-internals",
+    "architecture",
+    "network-data",
+    "quality"
+  ]
+}

@@ -1,0 +1,480 @@
+{
+  "id": "architecture",
+  "title": "아키텍처 & DI",
+  "description": "MVVM/MVI, 상태 생산 파이프라인, 오프라인 우선, 디자인 패턴, Hilt",
+  "questions": [
+    {
+      "id": "arch-001",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 4,
+        "centrality": 4,
+        "practicality": 3,
+        "discrimination": 4
+      },
+      "question": "MVVM과 비교했을 때 MVI의 특징으로 옳은 것은?",
+      "choices": [
+        "MVI는 화면 상태를 여러 개의 독립적인 StateFlow 필드로 분산시켜 각 View가 따로 구독하게 한다",
+        "MVI는 상태 관리 구조가 단순하기 때문에 어떤 화면이든 MVVM보다 항상 코드량이 적게 나온다",
+        "MVI는 하나의 불변 State 객체와 Intent → Reducer → State 단방향 순환으로 상태 불일치를 방지한다",
+        "MVI에서는 View가 Reducer를 거치지 않고 Model을 직접 수정해 렌더링 성능을 높인다"
+      ],
+      "correctIndex": 2,
+      "explanation": "**MVVM**\n- ViewModel이 여러 개의 관찰 가능한 필드(StateFlow 여러 개 등)로 상태를 노출\n- View가 각각을 구독해 갱신. 자유도가 높지만 상태 조합이 흩어질 수 있음\n\n**MVI (Model-View-Intent)**\n- 화면 상태를 **하나의 불변 State 객체**로 통합 (`data class UiState(...)`)\n- 사용자 액션을 **Intent(이벤트)** 로 정의하고, `Intent → Reducer → 새 State` 의 **단방향 순환 구조**\n\n**MVI가 해결하는 것**\n- 여러 상태 필드가 따로 갱신되며 생기는 **상태 불일치**(로딩인데 데이터도 보이는 등)\n- 상태 변화가 Reducer 한 곳에 모여 **추적/디버깅/테스트 용이**\n\n대신 보일러플레이트가 늘고 단순한 화면엔 과할 수 있어, 화면 복잡도에 따라 선택한다 (②는 그래서 오답).",
+      "keywords": [
+        "mvvm",
+        "mvi",
+        "udf",
+        "viewmodel"
+      ],
+      "related": [
+        "arch-004",
+        "co-005"
+      ]
+    },
+    {
+      "id": "arch-002",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 4,
+        "centrality": 3,
+        "practicality": 4,
+        "discrimination": 3
+      },
+      "question": "Hilt에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "@Singleton으로 스코프된 객체라도 Activity가 재생성될 때마다 컴포넌트와 함께 새로 만들어진다",
+        "자식 컴포넌트는 부모 컴포넌트의 바인딩을 볼 수 없으므로 같은 의존성을 계층마다 다시 선언해야 한다",
+        "SavedStateHandle은 Hilt가 관리하지 않는 객체라서 ViewModel 생성자로 주입받을 수 없다",
+        "@HiltViewModel을 붙이면 별도 Factory 작성 없이 생성자 주입된 ViewModel을 hiltViewModel()로 얻을 수 있다"
+      ],
+      "correctIndex": 3,
+      "explanation": "**컴포넌트 계층** (부모 → 자식)\n`SingletonComponent → ActivityRetainedComponent → ViewModelComponent → ActivityComponent → FragmentComponent → ViewComponent`\n\n- 각 컴포넌트는 대응하는 안드로이드 클래스의 **생명주기에 맞춰 생성/파괴**됨\n- 스코프 어노테이션(`@Singleton`, `@ActivityRetainedScoped`, `@ViewModelScoped` 등)을 붙이면 해당 컴포넌트 수명 동안 **같은 인스턴스**를 재사용\n- **자식 컴포넌트는 부모의 바인딩을 볼 수 있음** (②는 반대)\n\n**@HiltViewModel**\n- ViewModel 생성자 주입을 가능하게 함. Hilt가 ViewModelFactory를 자동 생성해주므로 `hiltViewModel()` / `by viewModels()` 만으로 의존성이 주입된 ViewModel을 얻는다\n- `SavedStateHandle`도 생성자로 자동 주입 가능 (③은 반대)",
+      "keywords": [
+        "hilt",
+        "dependency-injection",
+        "viewmodel"
+      ],
+      "related": [
+        "arch-004"
+      ]
+    },
+    {
+      "id": "arch-003",
+      "type": "choice",
+      "difficulty": 1,
+      "coverage": "core",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 2
+      },
+      "question": "Repository 패턴의 목적으로 가장 적절한 것은?",
+      "choices": [
+        "UI 로직을 재사용하기 위해 View를 추상화한다",
+        "데이터 출처(네트워크/DB/캐시)를 추상화해서 상위 계층이 출처를 몰라도 되게 한다",
+        "ViewModel의 개수를 줄이기 위한 패턴이다",
+        "모든 데이터를 반드시 메모리에 캐싱하기 위한 패턴이다"
+      ],
+      "correctIndex": 1,
+      "explanation": "Repository는 **데이터 소스의 추상화 계층**. ViewModel/UseCase는 \"사용자 목록을 달라\"고만 하고, 그것이 서버에서 오는지 Room에서 오는지 캐시에서 오는지는 Repository가 결정한다.\n\n덕분에 데이터 출처 변경이 상위 계층에 영향을 주지 않고, 테스트 시 Fake Repository로 쉽게 대체할 수 있다.",
+      "keywords": [
+        "repository"
+      ],
+      "related": [
+        "arch-002",
+        "arch-004"
+      ]
+    },
+    {
+      "id": "arch-004",
+      "type": "choice",
+      "difficulty": 1,
+      "coverage": "core",
+      "eval": {
+        "frequency": 4,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 2
+      },
+      "question": "의존성 주입(DI)의 장점으로 옳지 **않은** 것은?",
+      "choices": [
+        "의존 객체를 외부에서 주입받아 결합도가 낮아지고 구현체 교체가 쉬워진다",
+        "객체 생성을 프레임워크가 대신하므로 런타임 성능이 항상 빨라진다",
+        "테스트에서 Fake/Mock 객체를 주입해 격리된 단위 테스트가 가능하다",
+        "인스턴스의 수명과 스코프 관리가 일원화된다"
+      ],
+      "correctIndex": 1,
+      "explanation": "DI는 설계 품질을 위한 기법이지 성능 최적화 기법이 아니다. 오히려 리플렉션/코드 생성 비용이 조금 붙는다 (②가 정답 — 옳지 않음).\n\n**DI의 실제 장점**\n- **결합도 감소**: 의존 객체를 직접 생성하지 않고 주입받으므로 구현체 교체가 쉬움 (인터페이스에 의존)\n- **테스트 용이성**: Fake/Mock 주입으로 격리된 단위 테스트 가능\n- **생명주기/스코프 관리**: Hilt 같은 프레임워크가 인스턴스 수명(싱글톤, 화면 단위 등)을 일관되게 관리\n- **보일러플레이트 감소**: 객체 생성 그래프(A→B→C 연쇄)를 프레임워크가 자동 해결\n- **관심사 분리**: '객체를 만드는 방법'과 '사용하는 로직'이 분리됨",
+      "keywords": [
+        "dependency-injection",
+        "hilt"
+      ],
+      "related": [
+        "arch-002",
+        "arch-003"
+      ]
+    },
+    {
+      "id": "arch-005",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 4,
+        "centrality": 4,
+        "practicality": 4,
+        "discrimination": 3
+      },
+      "question": "뉴스 앱의 홈 화면은 Room에서 오는 기사 목록 Flow, 사용자가 선택한 카테고리 필터, 북마크 목록 Flow를 조합해 하나의 화면 상태를 만들어야 한다. 모던 안드로이드 UI 레이어 가이드에 가장 부합하는 상태 생산 방식은?",
+      "choices": [
+        "각 소스를 별도의 StateFlow로 노출하고, UI가 세 개를 각각 collect해 화면 쪽에서 최종 상태를 조립한다",
+        "ViewModel에서 `combine`으로 세 소스를 조합해 불변 UiState를 만들고, `stateIn`으로 StateFlow로 변환해 단일 상태로 노출한다",
+        "각 Flow를 LiveData로 변환한 뒤 MediatorLiveData로 병합해 UI에 노출한다",
+        "각 소스가 바뀔 때마다 suspend 함수로 현재 값을 읽어 MutableStateFlow에 수동으로 set하는 갱신 함수를 만든다"
+      ],
+      "correctIndex": 1,
+      "explanation": "모던 UI 레이어 가이드의 핵심은 **상태 생산 파이프라인(state production pipeline)** 이다. 화면에 필요한 여러 소스를 ViewModel에서 하나의 흐름으로 합쳐 **단일 UiState**로 만든다.\n\n```kotlin\nval uiState: StateFlow<HomeUiState> =\n    combine(articlesFlow, selectedCategory, bookmarksFlow) { articles, category, bookmarks ->\n        HomeUiState.Success(articles.filter { it.category == category }, bookmarks)\n    }.stateIn(\n        scope = viewModelScope,\n        started = SharingStarted.WhileSubscribed(5_000),\n        initialValue = HomeUiState.Loading,\n    )\n```\n\n- **스트림 소스**(Room Flow, DataStore 등)는 `combine`으로 조합하고, 새로고침 같은 **원샷(one-shot) 작업**의 결과는 조합에 참여하는 상태(예: `MutableStateFlow`)를 갱신하는 방식으로 파이프라인에 합류시킨다.\n- `stateIn` + `WhileSubscribed(5000)`은 UI가 구독할 때만 업스트림을 살리고, 구성 변경 동안 잠깐의 재구독에는 파이프라인을 유지한다.\n\n오답 정리: ①은 조합 로직이 UI로 새어 나가고, 세 스트림의 갱신 시점 차이로 화면이 일시적으로 불일치 상태가 될 수 있다. UI는 **하나의 상태만 관찰**해야 UDF가 유지된다. ③ MediatorLiveData는 Flow 조합 연산자가 없던 시절의 레거시 접근으로, Flow 기반 소스를 굳이 LiveData로 되돌릴 이유가 없다. ④ 수동 set 방식은 각 소스의 변경 구독을 직접 관리해야 해서 갱신 누락과 경쟁 조건에 취약하다.",
+      "keywords": [
+        "state-production-pipeline",
+        "stateflow",
+        "flow",
+        "udf",
+        "viewmodel"
+      ],
+      "related": [
+        "arch-006",
+        "arch-007",
+        "arch-001"
+      ]
+    },
+    {
+      "id": "arch-006",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 3,
+        "centrality": 4,
+        "practicality": 4,
+        "discrimination": 3
+      },
+      "question": "오프라인 우선(offline-first) 아키텍처에서 '단일 진실 공급원(SSOT)' 원칙을 가장 올바르게 적용한 설계는?",
+      "choices": [
+        "네트워크 응답을 UI에 바로 표시하고, 요청이 실패했을 때만 로컬 DB에 캐시된 데이터로 폴백한다",
+        "읽기는 로컬 DB에서 하되, 쓰기는 네트워크에 먼저 반영하고 성공 응답을 받은 뒤 DB에 저장한다",
+        "UI는 로컬 DB가 노출하는 Flow만 관찰하고, 네트워크 동기화 결과는 DB에 기록해 UI에 간접적으로 반영되게 한다",
+        "가장 빠른 메모리 캐시를 진실 공급원으로 삼고, DB와 네트워크는 백그라운드에서 메모리 캐시에 맞춰 갱신한다"
+      ],
+      "correctIndex": 2,
+      "explanation": "**단일 진실 공급원(Single Source of Truth)** 은 특정 데이터의 '진짜' 값을 소유하는 곳을 하나로 정하고, 나머지는 그것을 관찰만 하게 하는 원칙이다. 오프라인 우선 설계에서는 **로컬 DB(Room)가 SSOT**가 된다.\n\n- **읽기 경로**: UI(ViewModel) → Repository → Room `Flow` 관찰. 네트워크에서 새 데이터가 오면 DB에 **쓰기만** 하고, DB Flow가 자동으로 새 값을 방출해 UI가 갱신된다.\n- **쓰기 경로**: 사용자의 변경도 로컬 DB에 먼저 반영하고, WorkManager 등으로 백그라운드에서 서버에 동기화한다. 그래서 비행기 모드에서도 읽기/쓰기가 모두 동작한다.\n\n이 구조의 이점: 화면은 항상 한 곳의 데이터만 보므로 캐시-화면 불일치가 사라지고, 네트워크 상태와 무관하게 동일한 코드 경로로 동작하며, 데이터 일관성 검증 지점이 하나로 모인다.\n\n오답 정리: ①은 네트워크 우선 + 캐시 폴백 구조라서 온라인/오프라인일 때 서로 다른 데이터 경로를 타게 되고, '오프라인은 예외 상황'으로 취급하는 정반대 설계다. ②는 쓰기가 네트워크에 의존하므로 오프라인에서는 쓰기가 불가능해진다. ④ 메모리 캐시는 프로세스가 종료되면 사라지므로 진실 공급원 역할을 할 수 없다.",
+      "keywords": [
+        "offline-first",
+        "single-source-of-truth",
+        "repository",
+        "flow"
+      ],
+      "related": [
+        "arch-005",
+        "arch-003"
+      ]
+    },
+    {
+      "id": "arch-007",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 4,
+        "discrimination": 4
+      },
+      "question": "UDF(단방향 데이터 흐름) 구조에서 '저장 완료' 스낵바 같은 일회성 메시지를 ViewModel이 UI로 전달해야 한다. 최신 안드로이드 공식 가이드가 권장하는 방식은?",
+      "choices": [
+        "replay가 0인 SharedFlow로 이벤트 스트림을 노출하고 UI에서 collect한다",
+        "Channel에 이벤트를 보내면 구독 시점과 무관하게 버퍼링되어 전달되므로 이 방식이 표준으로 권장된다",
+        "Activity가 콜백 인터페이스를 구현해 ViewModel에 등록하고, ViewModel이 콜백을 직접 호출한다",
+        "메시지를 UiState의 필드로 모델링해 노출하고, UI가 표시를 마치면 ViewModel에 알려 해당 필드를 비운다"
+      ],
+      "correctIndex": 3,
+      "explanation": "공식 가이드(UI events / one-off event 안티패턴 문서)는 일회성 이벤트도 **상태로 모델링**하라고 권장한다.\n\n```kotlin\ndata class UiState(\n    val items: List<Item> = emptyList(),\n    val userMessage: String? = null, // 일회성 메시지도 상태의 일부\n)\n\nfun userMessageShown() {\n    _uiState.update { it.copy(userMessage = null) } // 소비 통지 → 상태 초기화\n}\n```\n\n핵심 논리는 \"**이벤트를 밀어 보내는(fire-and-forget)** 순간, 그 전달을 보장할 방법이 없다\"는 것이다. 상태는 값이므로 언제 구독을 다시 시작해도(구성 변경, 화면 복귀) 현재 상태를 그대로 재현할 수 있고, 표시 완료를 UI가 명시적으로 알리므로 전달이 보장된다. 이것이 UDF의 상태 모델과도 자연스럽게 맞는다.\n\n오답 정리: ① `SharedFlow(replay = 0)`는 방출 시점에 구독자가 없으면 이벤트가 **그냥 소실**된다. 화면 회전 직후나 백그라운드 전환 중 방출되면 스낵바가 사라진다. ② Channel은 버퍼링은 되지만 상태 모델 밖에 존재해 프로세스 종료 시 유실되고, UI가 실제로 처리했는지 보장할 수 없어 공식 가이드가 **안티패턴**으로 분류한다. ③ ViewModel이 Activity 콜백을 직접 잡으면 UI 참조를 보유하게 되어 계층 역전과 메모리 누수를 일으킨다.",
+      "keywords": [
+        "udf",
+        "mvi",
+        "stateflow",
+        "sharedflow",
+        "side-effect"
+      ],
+      "related": [
+        "arch-005",
+        "arch-001"
+      ]
+    },
+    {
+      "id": "arch-008",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "core",
+      "eval": {
+        "frequency": 4,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 3
+      },
+      "question": "ViewModel의 비즈니스 로직이 비대해져 도메인 계층(UseCase) 도입을 검토 중이다. 공식 아키텍처 가이드에 비추어 가장 적절한 판단은?",
+      "choices": [
+        "여러 ViewModel이 공유하는 로직이나 여러 Repository를 조합하는 복잡한 로직이 있을 때 선택적으로 도입한다",
+        "도메인 계층은 데이터 계층 아래에 위치하므로, Repository가 UseCase를 호출하도록 재구성한다",
+        "UseCase는 화면 상태를 보관하는 계층이므로, 화면 간 공유가 필요한 상태 캐싱을 UseCase에 맡긴다",
+        "단순 위임(pass-through)이라도 UseCase를 거쳐 Repository에 접근하게 하는 것이 공식 가이드의 기본 전제다"
+      ],
+      "correctIndex": 0,
+      "explanation": "공식 아키텍처 가이드에서 **도메인 계층은 선택적(optional)** 이다. UI 계층과 데이터 계층 사이에 두며, 도입 기준은 다음과 같다.\n\n- **재사용**: 같은 비즈니스 로직을 여러 ViewModel이 사용할 때 (예: `FormatDateUseCase`)\n- **조합**: 여러 Repository의 결과를 엮는 복잡한 로직이 있을 때 (예: `GetNewsWithAuthorsUseCase`가 뉴스 Repository와 작성자 Repository를 결합)\n- **ViewModel 슬림화**: 화면 로직(상태 노출)과 비즈니스 규칙을 분리하고 싶을 때\n\nUseCase 관례: 상태를 갖지 않고(stateless), 보통 `operator fun invoke` 하나만 노출하며, 내부에서 적절한 디스패처로 옮겨 **메인 스레드에서 호출해도 안전**하게 작성한다.\n\n오답 정리: ②는 계층 방향이 반대다. 의존성은 UI → 도메인 → 데이터로 흐르고, Repository는 UseCase의 존재를 몰라야 한다. ③ 상태 보관은 ViewModel(화면 상태)과 데이터 계층(앱 데이터 캐싱)의 책임이고, UseCase는 상태를 갖지 않는 것이 원칙이다. ④ 모든 접근에 pass-through UseCase를 강제하는 것은 보일러플레이트만 늘리는 과잉 설계이며, 가이드도 필요한 곳에만 두라고 안내한다.",
+      "keywords": [
+        "domain-layer",
+        "viewmodel",
+        "repository"
+      ],
+      "related": [
+        "arch-003",
+        "arch-006"
+      ]
+    },
+    {
+      "id": "arch-009",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 2,
+        "discrimination": 3
+      },
+      "question": "Hilt 모듈에서 인터페이스 `AnalyticsService`에 구현체 `FirebaseAnalyticsService`(@Inject 생성자 보유)를 연결하려 한다. `@Binds`와 `@Provides`의 차이에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "@Provides는 abstract 함수에 붙여 선언만 하고, @Binds는 함수 본문에서 인스턴스를 직접 생성해 반환한다",
+        "@Binds는 abstract 함수로 인터페이스-구현 매핑만 선언하며, 이 경우 @Provides보다 생성되는 코드가 적어 더 효율적이다",
+        "@Binds는 Retrofit처럼 소유하지 않은 외부 클래스 인스턴스를 만들 때 쓰고, @Provides는 인터페이스 바인딩 전용이다",
+        "둘은 동일한 팩토리 코드를 생성하므로 어느 쪽을 쓰든 컴파일 산출물에는 차이가 없다"
+      ],
+      "correctIndex": 1,
+      "explanation": "```kotlin\n@Module\n@InstallIn(SingletonComponent::class)\nabstract class AnalyticsModule {\n    @Binds\n    abstract fun bindAnalytics(impl: FirebaseAnalyticsService): AnalyticsService\n}\n```\n\n**@Binds**는 \"이 인터페이스를 요청하면 이 구현체를 써라\"는 **매핑 선언**이다. 조건은 세 가지: abstract 함수일 것, 파라미터가 구현체 하나일 것, 구현체가 그래프에서 생성 가능할 것(@Inject 생성자 보유). Dagger는 구현체의 @Inject 생성자 팩토리를 직접 재사용하므로 모듈 인스턴스화나 provide 메서드 호출을 감싸는 코드가 필요 없어 **생성 코드가 더 적고 효율적**이다.\n\n**@Provides**는 함수 **본문**에서 인스턴스를 만들어 반환한다. @Inject 생성자를 붙일 수 없는 외부 라이브러리 객체(Retrofit, Room, OkHttp)나 빌더 설정이 필요한 객체에 사용하며, Dagger가 모듈을 거쳐 해당 메서드를 호출하는 팩토리를 생성한다.\n\n오답 정리: ①은 두 어노테이션의 역할을 반대로 뒤집었다. ③도 용도가 서로 바뀌었다 — 외부 클래스 생성이 @Provides의 대표 용도다. ④ 산출물이 다르다. @Binds는 별도 provide 팩토리 없이 기존 팩토리를 위임 재사용하기 때문에 Dagger 공식 문서도 가능한 경우 @Binds를 권장한다.",
+      "keywords": [
+        "hilt",
+        "dependency-injection"
+      ],
+      "related": [
+        "arch-002",
+        "arch-012",
+        "arch-004"
+      ]
+    },
+    {
+      "id": "arch-010",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 2,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 3
+      },
+      "question": "멀티모듈 프로젝트에서 `:feature:home`이 `:core:network`를 Gradle의 `implementation`으로 의존하도록 선언했다. `api` 의존과 비교했을 때의 효과로 옳은 것은?",
+      "choices": [
+        ":core:network의 타입이 :feature:home을 소비하는 모듈의 컴파일 클래스패스에 노출되지 않아, 변경 시 재컴파일 파급 범위가 줄어든다",
+        "api로 선언한 쪽이 의존성 그래프를 평탄화해 주기 때문에 전체 빌드 시간은 api가 더 짧다",
+        "implementation으로 선언한 모듈의 클래스는 런타임 클래스패스에서도 빠지므로 리플렉션으로만 접근할 수 있다",
+        "두 키워드는 의존 의도를 문서화하는 표기 차이일 뿐, 컴파일과 빌드 동작은 동일하다"
+      ],
+      "correctIndex": 0,
+      "explanation": "`implementation`과 `api`의 차이는 **컴파일 클래스패스의 전이(transitive) 노출** 여부다.\n\n- **implementation**: `:core:network`는 `:feature:home`의 내부 구현 디테일로 취급된다. `:feature:home`을 의존하는 모듈(예: `:app`)은 `:core:network`의 타입을 컴파일 시점에 볼 수 없다. 따라서 `:core:network`의 공개 API(ABI)가 바뀌어도 `:feature:home`만 재컴파일하면 되고, 그 상위 소비자까지 재컴파일이 번지지 않는다. 캡슐화가 강제되어 모듈 간 결합도도 낮아진다.\n- **api**: 의존이 전이 노출된다. `:feature:home`의 **공개 API 시그니처에 그 모듈의 타입이 등장할 때만** 사용해야 한다 (예: 공개 함수가 `:core:model`의 타입을 반환하는 경우).\n\n모듈화의 빌드 이점(증분 컴파일, 빌드 캐시, 병렬화)은 상당 부분 implementation을 기본값으로 쓰는 데서 나온다. api를 남용하면 한 모듈의 변경이 그래프 전체 재컴파일로 번진다.\n\n오답 정리: ②는 반대다 — api가 재컴파일 파급을 키워 빌드가 느려지는 쪽이다. ③ 런타임 클래스패스에는 implementation 의존도 정상적으로 포함된다. 숨겨지는 것은 소비자의 **컴파일** 클래스패스뿐이다. ④ 컴파일 가시성과 증분 빌드 동작이 실제로 달라진다.",
+      "keywords": [
+        "modularization"
+      ],
+      "related": [
+        "arch-009"
+      ]
+    },
+    {
+      "id": "arch-011",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 2,
+        "practicality": 2,
+        "discrimination": 2
+      },
+      "question": "AlertDialog.Builder, NotificationCompat.Builder처럼 자바 기반 안드로이드 API에 흔한 Builder 패턴이 Kotlin 코드베이스에서는 상대적으로 덜 쓰인다. 그 이유로 가장 적절한 것은?",
+      "choices": [
+        "data class의 copy()가 선택적 인자를 조합하는 객체 생성을 대신하도록 설계된 기능이기 때문",
+        "apply 스코프 함수가 빌더의 단계적 구성과 불변성 보장까지 그대로 제공하기 때문",
+        "Kotlin 컴파일러가 텔레스코핑 생성자의 오버로드들을 자동으로 만들어 주기 때문",
+        "기본값 있는 매개변수와 named arguments로 선택적 인자를 생성자에서 직접 처리할 수 있기 때문"
+      ],
+      "correctIndex": 3,
+      "explanation": "Builder 패턴이 해결하는 핵심 문제는 **텔레스코핑 생성자(telescoping constructor)** — 선택적 매개변수가 많을 때 생성자 오버로드가 폭발하고 호출부의 가독성이 무너지는 문제다. 자바에는 매개변수 기본값과 이름 지정 호출이 없어 빌더가 관용구로 자리 잡았다.\n\nKotlin은 이 문제를 언어 차원에서 해결한다.\n\n```kotlin\nclass Notification(\n    val title: String,\n    val icon: Int = R.drawable.default_icon,\n    val priority: Int = PRIORITY_DEFAULT,\n    val autoCancel: Boolean = true,\n)\n\nval n = Notification(title = \"완료\", priority = PRIORITY_HIGH) // 필요한 것만 지정\n```\n\n기본값 + named arguments 조합이 빌더의 '필요한 것만 골라 설정한다'는 가치를 그대로 제공하므로, 순수 Kotlin API에서는 빌더가 불필요한 경우가 많다. 다만 자바 호환 API 제공, 다단계 검증, DSL 스타일 구성이 필요할 때는 Kotlin에서도 여전히 빌더(또는 DSL 빌더)를 쓴다.\n\n오답 정리: ① `copy()`는 **이미 존재하는** 인스턴스의 일부를 바꾼 사본을 만드는 기능으로, 최초 생성의 매개변수 폭발 문제와는 별개다. ② `apply`는 설정 코드를 블록으로 묶어줄 뿐, 대상이 가변 객체여야 하고 불변성 보장은 없다. ③ 오버로드 자동 생성은 `@JvmOverloads`를 명시해야 하며 이는 자바 호출자를 위한 기능이지 Kotlin 쪽 해법이 아니다.",
+      "keywords": [
+        "builder-pattern"
+      ],
+      "related": [
+        "arch-012"
+      ]
+    },
+    {
+      "id": "arch-012",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 2,
+        "centrality": 2,
+        "practicality": 3,
+        "discrimination": 4
+      },
+      "question": "채팅 앱에서 ViewModel이 아닌 일반 클래스 `ChatRoomSession`이, Hilt 그래프가 제공하는 `MessageRepository`와 런타임에야 알 수 있는 `roomId: String`을 모두 생성자로 받아야 한다. Hilt에서 가장 적절한 구성 방법은?",
+      "choices": [
+        "roomId를 @Provides 함수로 모듈에 등록해 MessageRepository와 함께 그래프에서 주입받는다",
+        "MessageRepository만 생성자로 주입하고, roomId는 인스턴스 생성 후 setter로 채워 넣는다",
+        "@AssistedInject 생성자에서 roomId를 @Assisted로 표시하고, @AssistedFactory로 생성한 팩토리를 주입받아 인스턴스를 만든다",
+        "roomId용 @Qualifier를 정의해 같은 String 타입이라도 방마다 다른 바인딩으로 구분해 주입한다"
+      ],
+      "correctIndex": 2,
+      "explanation": "DI가 제공하는 의존성과 **런타임 값**을 한 생성자에서 섞어 받는 문제의 정석 해법이 **Assisted Injection**이다.\n\n```kotlin\nclass ChatRoomSession @AssistedInject constructor(\n    private val repository: MessageRepository, // 그래프가 제공\n    @Assisted private val roomId: String,      // 호출자가 런타임에 제공\n)\n\n@AssistedFactory\ninterface ChatRoomSessionFactory {\n    fun create(roomId: String): ChatRoomSession\n}\n```\n\n컴파일 시 Dagger가 `ChatRoomSessionFactory` 구현을 생성하고, 사용처는 팩토리를 주입받아 `factory.create(roomId)`로 인스턴스를 만든다. DI 의존성은 그래프가, 런타임 인자는 호출자가 채우는 역할 분담이 코드로 명시된다.\n\n오답 정리: ① Hilt/Dagger의 그래프는 컴파일 타임에 고정되므로, 화면 진입마다 달라지는 값을 @Provides로 등록할 방법이 없다(전역 가변 홀더를 두는 우회는 상태 오염과 경쟁 조건을 부른다). ② setter 주입은 불변성이 깨지고 초기화 전 접근이라는 시한폭탄을 만든다. ④ @Qualifier는 같은 타입의 **서로 다른 컴파일 타임 바인딩**을 구분하는 도구이지, 런타임 값을 전달하는 수단이 아니다. 참고로 ViewModel이라면 내비게이션 인자는 `SavedStateHandle`로 받는 것이 우선이고, Hilt는 ViewModel용 assisted 주입도 별도로 지원한다.",
+      "keywords": [
+        "assisted-injection",
+        "hilt",
+        "dependency-injection",
+        "viewmodel"
+      ],
+      "related": [
+        "arch-009",
+        "arch-002"
+      ]
+    },
+    {
+      "id": "arch-013",
+      "type": "choice",
+      "difficulty": 3,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 2,
+        "centrality": 3,
+        "practicality": 2,
+        "discrimination": 4
+      },
+      "question": "멀티모듈 Compose 앱에서 화면 전환이 각 feature 모듈의 클릭 핸들러 안 `navController.navigate(...)` 같은 명령형 호출로 흩어져 있다. KSP 기반 빌드 타임 도구가 이런 앱의 내비게이션 그래프를 자동 추출하지 못하는 근본적인 이유는?",
+      "choices": [
+        "KSP는 선언과 어노테이션 등 심볼 수준 정보만 제공하고 함수 본문 안의 호출문은 분석하지 않아, 핸들러 내부의 전환 코드가 프로세서에게 보이지 않기 때문",
+        "Compose 컴파일러가 컴포저블 본문을 재작성하는 과정에서 navigate 호출이 인라인으로 풀려 호출의 원형이 사라지기 때문",
+        "KSP는 단일 모듈의 심볼만 처리하도록 설계되어 멀티모듈 프로젝트 빌드 자체를 지원하지 않기 때문",
+        "route를 클래스 타입으로 정의하면 제네릭처럼 타입 정보가 소거되어 빌드 타임에는 타입을 읽을 수 없기 때문"
+      ],
+      "correctIndex": 0,
+      "explanation": "KSP(Kotlin Symbol Processing)는 클래스·함수·프로퍼티 **선언**과 거기에 붙은 **어노테이션**을 심볼 수준에서 읽는 API다. 함수 **본문 내부의 호출문**은 KSP의 분석 대상이 아니므로, 클릭 핸들러 안에 명령형으로 흩어진 `navigate(...)` 호출은 정적 프로세서에게 존재하지 않는 것과 같다. 그래서 빌드 타임에 내비게이션 그래프를 뽑아내려는 도구들은 명령형 코드를 파싱하는 대신, 목적지와 전환 관계를 표시하는 **선언적 어노테이션을 진실의 원천(source of truth)** 으로 삼는 트레이드오프를 택한다 — 개발자가 어노테이션을 유지하는 비용을 내는 대신, 그래프가 KSP로 수집 가능해지고 모듈별 결과를 병합할 수 있게 된다. Room이 DAO 인터페이스 선언에, Hilt가 `@Inject` 같은 선언부 어노테이션에 의존하는 것과 같은 원리다.\n\n②는 오답 — Compose 컴파일러는 컴포저블에 `$composer` 파라미터 삽입 등 변환을 하지만 navigate 호출을 제거하지 않으며, 애초에 KSP는 그 변환 이전의 소스를 본다. ③은 반대 — KSP는 모듈 단위로 실행될 뿐 멀티모듈 빌드에서 널리 쓰이며, 도구는 모듈별 그래프를 추출한 뒤 병합하면 된다. ④는 오답 — 타입 소거는 런타임 제네릭 인자 이야기이고, 클래스 선언은 빌드 타임에 오히려 문자열 route보다 분석하기 쉽다.",
+      "keywords": [
+        "ksp",
+        "modularization"
+      ],
+      "related": [
+        "arch-010",
+        "arch-016"
+      ]
+    },
+    {
+      "id": "arch-014",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 2,
+        "centrality": 2,
+        "practicality": 3,
+        "discrimination": 3
+      },
+      "question": "스크린샷 테스트나 화면 썸네일 생성을 위해, CI 서버에서 에뮬레이터·실기기 없이 컴포저블 화면을 비트맵으로 렌더링하려 한다. 이를 가능하게 하는 기술 기반에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "컴포저블을 픽셀로 그리려면 기기의 GPU와 SurfaceFlinger가 필요하므로, 비트맵을 얻으려면 최소한 에뮬레이터를 띄워야 한다",
+        "Layoutlib은 XML 레이아웃 전용 렌더러라서 Compose UI는 그릴 수 없고, Compose 화면을 캡처하려면 계측 테스트로 기기를 구동해야 한다",
+        "Android Studio 프리뷰를 그리는 렌더링 엔진인 Layoutlib을 호스트 JVM에서 구동하거나, Robolectric으로 프레임워크를 시뮬레이션해 기기 없이 렌더링할 수 있다",
+        "Robolectric은 프레임워크 로직을 흉내 내는 데 그치고 그리기 기능이 없어, 이미지 생성 용도로는 부적합하다"
+      ],
+      "correctIndex": 2,
+      "explanation": "핵심은 안드로이드 UI 렌더링이 기기 하드웨어 없이도 **호스트 JVM에서 재현 가능**하다는 점이다. 두 가지 기반 기술이 있다. (1) **Layoutlib** — Android Studio가 XML 레이아웃 프리뷰와 Compose `@Preview`를 IDE 안에서 그릴 때 쓰는 JVM용 렌더링 라이브러리로, 프레임워크의 렌더링 경로를 호스트에서 직접 구동한다. Paparazzi 같은 스크린샷 테스트 도구와 내비게이션 그래프 썸네일 생성 도구가 이 위에 서 있다. (2) **Robolectric** — 안드로이드 프레임워크를 JVM에서 시뮬레이션하는 테스트 프레임워크로, 네이티브 그래픽 지원을 통해 실제 픽셀을 그릴 수 있어 Roborazzi 같은 JVM 스크린샷 테스트의 기반이 된다. 일부 도구는 Layoutlib을 기본으로 쓰고 Layoutlib이 처리하지 못하는 프리뷰만 Robolectric으로 폴백하는 식으로 둘을 조합한다. 전 과정이 빌드 파이프라인 안에서 완결되므로 CI에서 기기 팜 없이 이미지 산출물을 만들 수 있다.\n\n①은 오답 — 호스트에서 소프트웨어 렌더링이 가능하며 GPU·SurfaceFlinger는 필수가 아니다. ②는 오답 — Studio의 Compose 프리뷰 자체가 Layoutlib으로 그려진다. ④는 오답 — Robolectric은 그래픽 렌더링을 지원하며 실제로 스크린샷 도구들이 활용한다.",
+      "keywords": [
+        "layoutlib",
+        "robolectric"
+      ],
+      "related": [
+        "perf-006",
+        "perf-010"
+      ]
+    },
+    {
+      "id": "arch-015",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "deep",
+      "eval": {
+        "frequency": 3,
+        "centrality": 3,
+        "practicality": 3,
+        "discrimination": 3
+      },
+      "question": "타입 세이프 내비게이션에서 `@Serializable data class ProductRoute(val id: Long, val ref: String? = null)`처럼 클래스를 route로 정의할 때, 이 클래스 정의가 내비게이션 인자로 해석되는 관례로 옳은 것은?",
+      "choices": [
+        "기본값이 있는 파라미터는 직렬화 대상에서 제외되므로 route 인자로 값을 전달할 수 없다",
+        "주 생성자의 프로퍼티가 선언 순서대로 인자가 되고, 기본값이 있는 프로퍼티는 생략 가능한(optional) 인자로 취급된다",
+        "@Transient를 붙인 프로퍼티도 인자 목록에는 포함되며, 전달한 값 대신 기본값이 강제될 뿐이다",
+        "@SerialName으로 직렬화 이름을 바꿔도 내비게이션 인자 이름에는 코드의 프로퍼티 이름이 그대로 쓰인다"
+      ],
+      "correctIndex": 1,
+      "explanation": "클래스 기반 route는 **kotlinx.serialization의 관례를 그대로 따른다**. 규칙을 정리하면: (1) **주 생성자 프로퍼티**가 선언 순서대로 내비게이션 인자가 된다. (2) **기본값이 있는 프로퍼티**는 optional 인자가 되어 `navigate(ProductRoute(id = 42))`처럼 생략하고 호출할 수 있다. (3) **`@Transient`** 프로퍼티는 직렬화에서 빠지므로 인자에서 제외된다(그래서 기본값이 필수다). (4) **`@SerialName`** 으로 이름을 바꾸면 인자 이름에도 반영된다. 이 관례 덕분에 문자열 route를 손으로 조립·파싱할 때 생기는 오타·타입 불일치가 컴파일 타임에 걸러지고, 빌드 타임 도구도 route 클래스 선언만 읽어 인자 스키마를 추출할 수 있다.\n\n①은 오답 — 기본값은 '제외'가 아니라 '생략 가능'으로 처리되며, 명시적으로 값을 넘기면 그 값이 전달된다. ③은 반대 — `@Transient`는 인자 목록에서 아예 빠진다. ④는 오답 — `@SerialName` 리네임은 인자 이름에 반영되는 것이 관례다.",
+      "keywords": [
+        "type-safe-navigation",
+        "kotlinx-serialization"
+      ],
+      "related": [
+        "arch-013"
+      ]
+    },
+    {
+      "id": "arch-016",
+      "type": "choice",
+      "difficulty": 2,
+      "coverage": "niche",
+      "eval": {
+        "frequency": 1,
+        "centrality": 2,
+        "practicality": 3,
+        "discrimination": 3
+      },
+      "question": "라이브러리의 공개 API 표면이나 멀티모듈 앱의 내비게이션 구조처럼 '의도치 않게 바뀌면 안 되는 구조'를 지키기 위한 dump/check 베이스라인 검증 패턴(예: binary-compatibility-validator의 apiDump/apiCheck)에 대한 설명으로 옳은 것은?",
+      "choices": [
+        "베이스라인 파일은 빌드 산출물이므로 저장소에 커밋하지 않고 CI 캐시에 보관하는 것이 원칙이다",
+        "check 실패는 코드에 버그가 있다는 뜻이므로, 베이스라인은 그대로 두고 코드를 이전 구조로 되돌리는 것이 표준 대응이다",
+        "구조 검증은 앱을 실제로 실행해야 가능하므로 계측 테스트 환경에서 런타임 탐색으로 수행된다",
+        "현재 구조를 사람이 읽을 수 있는 파일로 커밋해 두고, check 단계에서 코드로부터 재생성한 결과와 비교해 차이가 나면 빌드를 실패시킨다"
+      ],
+      "correctIndex": 3,
+      "explanation": "이 패턴은 **스냅샷 테스트를 코드 구조에 적용**한 것이다. 동작 방식: (1) dump 태스크가 현재 구조(공개 API 시그니처 목록, 내비게이션의 목적지·인자·엣지 목록 등)를 **사람이 읽을 수 있는 베이스라인 파일**로 생성하고 이를 저장소에 커밋한다. (2) check 태스크는 코드로부터 구조를 다시 추출해 베이스라인과 비교하고, 차이가 있으면 빌드를 실패시킨다. (3) check를 Gradle의 `check`에 연결해 두면 CI·PR에서 구조가 몰래 바뀌는 것을 자동으로 잡는다. (4) **의도된 변경**이라면 dump를 다시 실행해 베이스라인을 갱신해 커밋하고, 리뷰어는 베이스라인 파일의 diff로 구조 변화를 명시적으로 검토한다. 베이스라인이 텍스트로 커밋되어 있기에 PR diff에서 구조 변화가 리뷰 가능해진다는 것이 핵심 가치다.\n\n①은 오답 — 커밋하는 것 자체가 패턴의 요점이다(리뷰 가능한 diff, 기준점 고정). ②는 오답 — check 실패는 '의도 확인 요청'이지 버그 판정이 아니며, 의도된 변경은 베이스라인 갱신으로 수용한다. ③은 오답 — 추출과 비교는 빌드 타임 정적 작업이라 기기·런타임이 필요 없다.",
+      "keywords": [
+        "baseline-verification",
+        "modularization"
+      ],
+      "related": [
+        "arch-013",
+        "arch-010"
+      ]
+    }
+  ]
+}

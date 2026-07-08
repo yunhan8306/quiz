@@ -1,0 +1,88 @@
+{
+  "name": "android-quiz",
+  "title": "Android 기술 면접 퀴즈",
+  "domain": "Android 개발 (기술 면접 대비)",
+  "language": "ko",
+  "createdAt": "2026-07-07",
+  "weights": {
+    "frequency": 0.4,
+    "centrality": 0.25,
+    "practicality": 0.2,
+    "discrimination": 0.15
+  },
+  "sectionPrefixes": {
+    "android-core": {
+      "canonical": "acore",
+      "all": [
+        "acore",
+        "basics"
+      ]
+    },
+    "android-internals": {
+      "canonical": "asys",
+      "all": [
+        "asys"
+      ]
+    },
+    "kotlin-language": {
+      "canonical": "kt",
+      "all": [
+        "kt"
+      ]
+    },
+    "kotlin-advanced": {
+      "canonical": "ktadv",
+      "all": [
+        "ktadv"
+      ]
+    },
+    "coroutines": {
+      "canonical": "co",
+      "all": [
+        "co"
+      ]
+    },
+    "compose-ui": {
+      "canonical": "cui",
+      "all": [
+        "compose",
+        "cui"
+      ]
+    },
+    "compose-internals": {
+      "canonical": "cint",
+      "all": [
+        "cint"
+      ]
+    },
+    "architecture": {
+      "canonical": "arch",
+      "all": [
+        "arch"
+      ]
+    },
+    "network-data": {
+      "canonical": "net",
+      "all": [
+        "net"
+      ]
+    },
+    "quality": {
+      "canonical": "perf",
+      "all": [
+        "perf"
+      ]
+    }
+  },
+  "matchKeywords": [
+    "안드로이드",
+    "android",
+    "면접",
+    "kotlin",
+    "코틀린",
+    "compose",
+    "컴포즈",
+    "코루틴",
+    "coroutine"
+  ]
+}
