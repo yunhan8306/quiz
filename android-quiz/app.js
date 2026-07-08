@@ -70,11 +70,17 @@ async function init() {
     return;
   }
 
-  try {
-    const r = await fetch('/api/progress');
-    if (!r.ok) throw new Error();
-    state.progress = await r.json();
-  } catch (e) {
+  if (isLocalServerContext()) {
+    try {
+      const r = await fetch('/api/progress');
+      if (!r.ok) throw new Error();
+      state.progress = await r.json();
+    } catch (e) {
+      state.serverOk = false;
+      state.progress = loadLocalProgress();
+    }
+  } else {
+    // 정적 호스팅(GitHub Pages 등): 진행기록 서버가 원래 없음 → 브라우저 저장만 사용
     state.serverOk = false;
     state.progress = loadLocalProgress();
   }
@@ -114,9 +120,22 @@ function buildIndexes() {
   }
 }
 
+/* localhost에서만 진행기록 서버(/api)를 기대 — 정적 호스팅에선 서버가 없는 게 정상 */
+function isLocalServerContext() {
+  return ['localhost', '127.0.0.1', '::1', ''].includes(location.hostname);
+}
+
 function updateServerBadge() {
   const badge = document.getElementById('server-badge');
-  badge.textContent = state.serverOk ? '' : '⚠ 서버 미실행 · 브라우저에만 저장됨';
+  if (state.serverOk || !isLocalServerContext()) {
+    // 서버 연결됨(로컬) 또는 정적 호스팅(정상) → 경고 숨김
+    badge.textContent = '';
+    badge.classList.remove('warn');
+    return;
+  }
+  // 로컬인데 서버 미실행 → 파일 저장이 안 되므로 경고
+  badge.textContent = '⚠ 서버 미실행 · 브라우저에만 저장됨';
+  badge.classList.add('warn');
 }
 
 /* ============================== 진행 기록 ============================== */
@@ -163,6 +182,51 @@ function setResult(q, result) {
   saveProgress();
   const dot = document.querySelector(`#q-${cssEscape(q.id)} .status`);
   if (dot) { dot.className = 'status ' + result; dot.title = STATUS_LABEL[result]; }
+}
+
+/* ---------- 진행기록 백업/복원 ---------- */
+
+function exportProgress() {
+  const id = STORAGE_KEY.replace(/^quiz-progress:?/, '') || 'quiz';
+  const safe = id.replace(/[^a-zA-Z0-9_-]/g, '_') || 'quiz';
+  const date = new Date().toISOString().slice(0, 10);
+  const blob = new Blob([JSON.stringify(state.progress, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `progress-${safe}-${date}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function importProgress(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('형식 오류');
+      if (confirm('현재 진행기록을 가져온 파일 내용으로 덮어씁니다. 계속할까요?')) {
+        state.progress = data;
+        saveProgress();
+        render();
+      }
+    } catch (_) {
+      alert('가져오기 실패: 올바른 진행기록 JSON 파일이 아닙니다.');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function resetProgress() {
+  if (!confirm('모든 진행기록을 삭제합니다. 되돌릴 수 없어요. 계속할까요?')) return;
+  state.progress = {};
+  saveProgress();
+  render();
 }
 
 /* ============================== 라우팅 ============================== */
@@ -237,9 +301,19 @@ function renderHome() {
     <div class="home-head">
       <h1>Android 기술 면접 퀴즈</h1>
       <p class="dim">총 ${total.total}문제 · ${total.done}문제 풀이 · 맞음 ${total.correct} / 애매 ${total.partial} / 틀림 ${total.wrong}</p>
+      <div class="data-tools">
+        <button id="export-progress" class="tool-btn" title="진행기록을 JSON 파일로 저장">⬇ 내보내기</button>
+        <label class="tool-btn" for="import-progress" title="JSON 파일에서 진행기록 불러오기">⬆ 가져오기</label>
+        <input id="import-progress" type="file" accept="application/json,.json" hidden>
+        <button id="reset-progress" class="tool-btn danger" title="모든 진행기록 삭제">↺ 초기화</button>
+      </div>
     </div>
     <div class="section-grid">${cards}</div>
     ${reviewHtml}`;
+
+  document.getElementById('export-progress').addEventListener('click', exportProgress);
+  document.getElementById('import-progress').addEventListener('change', importProgress);
+  document.getElementById('reset-progress').addEventListener('click', resetProgress);
 }
 
 /* ============================== 섹션 화면 ============================== */

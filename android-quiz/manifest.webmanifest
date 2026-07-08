@@ -1,0 +1,13 @@
+{
+  "name": "Android 기술 면접 퀴즈",
+  "short_name": "Android Quiz",
+  "description": "Android · Kotlin · Compose · Coroutine 기술 면접 대비 퀴즈",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#10141c",
+  "theme_color": "#10141c",
+  "icons": [
+    { "src": "icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any maskable" }
+  ]
+}
