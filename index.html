@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quiz — 학습 퀴즈 모음</title>
+  <style>
+    :root {
+      --bg: #10141c; --surface: #1a2030; --surface-2: #212a3e;
+      --border: #2c3750; --text: #e6ebf5; --dim: #8b96ad;
+      --accent: #5b9cff; --accent-soft: rgba(91, 156, 255, 0.14);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+      line-height: 1.6; -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 64px 20px 80px; }
+    header { margin-bottom: 40px; }
+    h1 { font-size: 28px; margin: 0 0 8px; letter-spacing: -0.02em; }
+    .sub { color: var(--dim); margin: 0; font-size: 15px; }
+    .grid { display: grid; gap: 16px; }
+    .card {
+      display: block; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px 24px; text-decoration: none; color: inherit;
+      transition: border-color .15s, background .15s, transform .15s;
+    }
+    .card:hover { border-color: var(--accent); background: var(--surface-2); transform: translateY(-2px); }
+    .card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+    .emoji { font-size: 24px; }
+    .card h2 { font-size: 18px; margin: 0; letter-spacing: -0.01em; }
+    .card p { margin: 4px 0 0; color: var(--dim); font-size: 14px; }
+    .meta { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .tag {
+      font-size: 12px; color: var(--accent); background: var(--accent-soft);
+      border-radius: 999px; padding: 3px 11px; font-weight: 600;
+    }
+    .soon { opacity: .5; cursor: default; }
+    .soon:hover { transform: none; border-color: var(--border); background: var(--surface); }
+    footer { margin-top: 48px; color: var(--dim); font-size: 13px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>📚 학습 퀴즈</h1>
+      <p class="sub">분야별 학습 퀴즈 모음. 원하는 분야를 골라 시작하세요.</p>
+    </header>
+
+    <div class="grid">
+      <a class="card" href="android-quiz/">
+        <div class="card-top">
+          <span class="emoji">🤖</span>
+          <h2>Android 기술 면접 퀴즈</h2>
+        </div>
+        <p>Android · Kotlin · Compose · Coroutine 기술 면접 대비</p>
+        <div class="meta">
+          <span class="tag">197문제</span>
+          <span class="tag">10섹션</span>
+        </div>
+      </a>
+
+      <div class="card soon">
+        <div class="card-top">
+          <span class="emoji">➕</span>
+          <h2>새 분야 준비 중</h2>
+        </div>
+        <p>다른 분야 퀴즈가 이곳에 추가됩니다.</p>
+      </div>
+    </div>
+
+    <footer>진행기록은 사용하는 브라우저에 저장됩니다.</footer>
+  </div>
+</body>
+</html>
