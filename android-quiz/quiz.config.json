@@ -1,7 +1,7 @@
 {
   "name": "android-quiz",
-  "title": "Android 기술 면접 퀴즈",
-  "domain": "Android 개발 (기술 면접 대비)",
+  "title": "Android 기술 학습 퀴즈",
+  "domain": "Android 개발 (기술 학습)",
   "language": "ko",
   "createdAt": "2026-07-07",
   "weights": {
@@ -77,7 +77,7 @@
   "matchKeywords": [
     "안드로이드",
     "android",
-    "면접",
+    "학습",
     "kotlin",
     "코틀린",
     "compose",

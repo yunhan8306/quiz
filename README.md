@@ -6,7 +6,7 @@
 
 | 폴더 | 분야 | 문제 수 |
 |------|------|---------|
-| [android-quiz](android-quiz/) | Android 기술 면접 | 197문제 / 10섹션 |
+| [android-quiz](android-quiz/) | Android 기술 학습 | 197문제 / 10섹션 |
 
 각 퀴즈는 의존성 0 정적 웹앱입니다. 로컬 실행은 각 폴더 README를 참고하세요
 (예: `cd android-quiz && python3 server.py` → http://localhost:8765).

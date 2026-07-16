@@ -299,7 +299,7 @@ function renderHome() {
 
   app.innerHTML = `
     <div class="home-head">
-      <h1>Android 기술 면접 퀴즈</h1>
+      <h1>Android 기술 학습 퀴즈</h1>
       <p class="dim">총 ${total.total}문제 · ${total.done}문제 풀이 · 맞음 ${total.correct} / 애매 ${total.partial} / 틀림 ${total.wrong}</p>
       <div class="data-tools">
         <button id="export-progress" class="tool-btn" title="진행기록을 JSON 파일로 저장">⬇ 내보내기</button>

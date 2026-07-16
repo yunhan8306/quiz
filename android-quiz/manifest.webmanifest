@@ -1,7 +1,7 @@
 {
-  "name": "Android 기술 면접 퀴즈",
+  "name": "Android 기술 학습 퀴즈",
   "short_name": "Android Quiz",
-  "description": "Android · Kotlin · Compose · Coroutine 기술 면접 대비 퀴즈",
+  "description": "Android · Kotlin · Compose · Coroutine 기술 학습 퀴즈",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",

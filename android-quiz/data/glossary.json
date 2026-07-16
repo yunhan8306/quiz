@@ -727,7 +727,7 @@
         "@Serializable",
         "kotlinx-serialization"
       ],
-      "definition": "컴파일러 플러그인이 @Serializable 클래스의 시리얼라이저를 컴파일 시점에 생성하는 Kotlin 공식 직렬화 라이브러리. 런타임 리플렉션이 없어 R8 축소에 안전하고 Kotlin Multiplatform 모든 타겟에서 동작하며, 기본값과 non-null 타입 같은 Kotlin 의미가 (역)직렬화 과정에서 보존된다. 런타임 리플렉션으로 생성자를 우회하는 Gson과의 대비가 대표적인 면접 포인트다.",
+      "definition": "컴파일러 플러그인이 @Serializable 클래스의 시리얼라이저를 컴파일 시점에 생성하는 Kotlin 공식 직렬화 라이브러리. 런타임 리플렉션이 없어 R8 축소에 안전하고 Kotlin Multiplatform 모든 타겟에서 동작하며, 기본값과 non-null 타입 같은 Kotlin 의미가 (역)직렬화 과정에서 보존된다. 런타임 리플렉션으로 생성자를 우회하는 Gson과의 대비가 대표적인 비교 포인트다.",
       "related": [
         "k2-compiler",
         "expect-actual"
