@@ -1,0 +1,281 @@
+{
+ "id": "uikit-interop",
+ "title": "UIKit 핵심·SwiftUI 연동",
+ "description": "UIViewController 생명주기, 뷰 시스템·responder chain, Auto Layout 개념, UIHostingController/UIViewRepresentable",
+ "questions": [
+  {
+   "id": "uikit-001",
+   "type": "choice",
+   "difficulty": 1,
+   "coverage": "core",
+   "eval": {
+    "frequency": 5,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 2
+   },
+   "question": "UIKit 기반 앱에서 탭 전환으로 화면이 사용자에게 다시 표시될 때마다 화면 노출 로그를 보내려 한다. 코드를 넣기에 가장 적절한 위치와 그 이유는?",
+   "choices": [
+    "viewDidLoad — 화면이 사용자에게 표시될 때마다 시스템이 매번 다시 호출하므로",
+    "viewDidAppear — 전환이 끝나 뷰가 실제로 화면에 나타난 뒤, 다시 표시될 때마다 반복 호출되므로",
+    "이니셜라이저(init) — 뷰 컨트롤러가 생성되는 시점이 곧 화면에 표시되는 시점이므로",
+    "viewWillAppear — 뷰가 화면에 완전히 나타난 것이 보장된 이후에 한 번씩 호출되므로"
+   ],
+   "correctIndex": 1,
+   "explanation": "**viewDidLoad**는 뷰 계층이 메모리에 처음 로드된 직후, 뷰 컨트롤러 생명주기 동안 **한 번**만 호출된다. 반면 **viewWillAppear → (전환 애니메이션) → viewDidAppear**는 화면에 표시될 때마다 반복 호출되므로, '노출될 때마다' 실행돼야 하는 로그 전송은 viewDidAppear가 적합하다. ① viewDidLoad는 탭을 오가도 다시 불리지 않아 첫 진입 로그만 남는다. ③ init 시점에는 뷰가 로드조차 되지 않았다 — `view` 프로퍼티에 처음 접근할 때 비로소 로드가 일어나는 지연 로딩 구조다. ④는 viewWillAppear와 viewDidAppear의 시점을 뒤바꾼 설명으로, viewWillAppear는 뷰가 나타나기 '직전'에 불리므로 '완전히 나타난 후'라는 근거가 틀렸다. 참고로 확정된 레이아웃 크기가 필요한 코드라면 viewDidLayoutSubviews(한 생명주기에 여러 번 호출될 수 있음)에 두어야 한다.",
+   "keywords": [
+    "vc-lifecycle"
+   ],
+   "related": [
+    "uikit-009"
+   ]
+  },
+  {
+   "id": "uikit-002",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 4,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "UIView의 frame과 bounds의 차이에 대한 설명으로 옳은 것은?",
+   "choices": [
+    "bounds가 슈퍼뷰 좌표계 기준의 위치·크기이고, frame이 뷰 자신의 좌표계 기준 위치·크기다",
+    "회전 등 transform을 적용해도 frame과 bounds의 size는 서로 동일하게 유지되고 origin만 달라진다",
+    "frame은 슈퍼뷰 좌표계에서의 위치·크기이고 bounds는 자신의 좌표계 기준이며, UIScrollView는 bounds의 origin을 이동시켜 스크롤을 구현한다",
+    "bounds의 origin을 바꾸면 frame.origin을 바꿀 때와 마찬가지로 뷰 자신이 슈퍼뷰 안에서 이동한다"
+   ],
+   "correctIndex": 2,
+   "explanation": "**frame**은 슈퍼뷰 좌표계에서 본 뷰의 위치·크기이고, **bounds**는 뷰 자신의 좌표계에서 본 값이다(origin 기본값 (0,0)). 정답의 핵심은 bounds.origin의 의미다: 이 값을 바꾸면 뷰 자신이 움직이는 게 아니라 뷰가 보여주는 콘텐츠 '창'이 이동한다. UIScrollView의 contentOffset이 내부적으로 bounds.origin을 조작하는 방식으로 구현되어 있는 것이 대표 사례다. ①은 두 좌표계 기준을 반대로 뒤집었다. ②는 transform을 무시한 설명 — 예컨대 45° 회전을 적용하면 frame은 회전된 뷰를 감싸는 최소 사각형(bounding box)이 되어 size가 bounds.size보다 커진다. 이 때문에 공식 문서도 transform이 identity가 아닐 때는 frame 값을 신뢰하지 말라고 안내한다. ④는 bounds.origin 변경을 frame.origin 변경과 혼동한 흔한 오해다 — bounds.origin을 바꾸면 뷰 자신은 슈퍼뷰 안에서 그대로 있고, 뷰가 보여주는 콘텐츠 창이 이동해 서브뷰들이 반대 방향으로 밀려 보인다.",
+   "keywords": [
+    "frame-bounds"
+   ],
+   "related": [
+    "uikit-007"
+   ]
+  },
+  {
+   "id": "uikit-003",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 4,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 2
+   },
+   "question": "UITableView의 dequeueReusableCell(withIdentifier:) 기반 셀 재사용 메커니즘에 대한 설명으로 옳은 것은?",
+   "choices": [
+    "화면에 보이는 개수 남짓의 셀 인스턴스만 유지하고, 화면 밖으로 나간 셀을 재사용 큐에 넣었다가 같은 identifier 요청이 오면 꺼내서 재구성한다",
+    "모든 row마다 셀 인스턴스를 하나씩 만들어 내부 배열에 캐시해 두고, dequeue는 해당 row에 대응하는 셀을 그대로 돌려준다",
+    "dequeue로 반환된 셀은 라벨 텍스트·이미지 등 이전 콘텐츠가 프레임워크에 의해 전부 초기 상태로 리셋되어 있다",
+    "reuseIdentifier는 디버깅용 이름표에 가깝고, 서로 다른 identifier로 등록된 셀들도 하나의 공용 큐에서 섞여 재사용된다"
+   ],
+   "correctIndex": 0,
+   "explanation": "UITableView는 **화면에 보이는 만큼 + 여유분**의 셀만 만들고, 스크롤로 화면을 벗어난 셀을 identifier별 재사용 큐에 반납했다가 dequeue 요청 시 다시 꺼내 준다. 수천 row라도 셀 인스턴스는 십수 개 수준이라 메모리와 셀 생성 비용이 크게 절약된다 — ②처럼 row마다 인스턴스를 캐시한다면 재사용 메커니즘이 존재할 이유가 없다. ③이 흔한 함정인데, 프레임워크는 dequeue 시 셀의 콘텐츠를 초기화해 주지 않는다. `prepareForReuse()`도 선택·하이라이트처럼 콘텐츠와 무관한 상태를 재설정하는 용도이고, 라벨 텍스트나 이미지 같은 콘텐츠는 그대로 남는다. 그래서 `cellForRowAt`에서 모든 표시 값을 다시 설정하지 않으면 이전 row의 잔상이 보이는 버그가 생긴다. ④ reuseIdentifier는 재사용 큐를 구분하는 키라서, 서로 다른 identifier의 셀은 서로 다른 큐에서 관리되어 섞이지 않는다.",
+   "keywords": [
+    "cell-reuse"
+   ],
+   "related": [
+    "uikit-010"
+   ]
+  },
+  {
+   "id": "uikit-004",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "SwiftUI에서 UIViewRepresentable로 UIKit 뷰를 감쌀 때 makeUIView와 updateUIView의 역할 분담으로 옳은 것은?",
+   "choices": [
+    "makeUIView는 SwiftUI가 body를 다시 계산할 때마다 호출되므로, 비용이 큰 초기화 코드는 updateUIView 쪽으로 옮기는 것이 좋다",
+    "updateUIView는 UIKit 뷰에서 사용자 이벤트가 발생했을 때 호출되어, 그 값을 SwiftUI 바인딩으로 되돌려 주는 통로다",
+    "updateUIView가 호출될 때마다 기존 UIView는 버려지고 새 인스턴스로 교체되므로, UIKit 뷰의 내부 상태는 갱신 간에 유지되지 않는다",
+    "makeUIView는 표현 뷰가 처음 만들어질 때 한 번 호출되어 UIView를 생성하고, updateUIView는 SwiftUI 상태가 바뀔 때마다 호출되어 변화를 기존 UIView에 반영한다"
+   ],
+   "correctIndex": 3,
+   "explanation": "UIViewRepresentable의 계약은 이렇다: **makeUIView는 이 표현 뷰가 렌더 트리에 처음 들어갈 때 한 번** 호출되어 UIView 인스턴스를 만들고, 이후 **SwiftUI 상태가 바뀔 때마다 updateUIView가 같은 인스턴스를 인자로** 호출되어 변경분을 반영한다. SwiftUI의 struct 뷰 값은 body 재평가마다 새로 만들어지지만, 그 뒤에 있는 UIView는 뷰의 아이덴티티가 유지되는 동안 재사용된다. ①은 두 메서드의 호출 빈도를 뒤집은 설명 — 무거운 초기화는 오히려 makeUIView에 두는 것이 맞다. ②는 Coordinator의 역할과 바꿔치기한 것으로, UIKit → SwiftUI 방향(델리게이트 콜백 등)의 전달은 updateUIView가 아니라 Coordinator가 담당한다. ③처럼 갱신마다 인스턴스가 교체된다면 텍스트필드의 커서 위치 같은 UIKit 내부 상태가 상태 변경 때마다 날아가 버릴 것이다.",
+   "keywords": [
+    "ui-view-representable"
+   ],
+   "related": [
+    "uikit-005",
+    "uikit-006"
+   ]
+  },
+  {
+   "id": "uikit-005",
+   "type": "choice",
+   "difficulty": 1,
+   "coverage": "core",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 2
+   },
+   "question": "UIKit 기반 앱의 한 화면 일부를 SwiftUI 뷰로 새로 작성해 기존 UIKit 뷰 계층 안에 넣으려 한다. 표준적인 방법은?",
+   "choices": [
+    "UIViewRepresentable을 채택한 타입으로 SwiftUI 뷰를 감싼 뒤 addSubview로 추가한다",
+    "SwiftUI 뷰를 UIHostingController에 담아 child view controller로 추가하고, 그 view를 원하는 위치에 배치한다",
+    "SwiftUI 뷰의 body 프로퍼티를 UIView로 다운캐스팅해 UIKit 계층에 직접 추가한다",
+    "SwiftUI 뷰도 UIView를 상속하므로 인스턴스를 만들어 addSubview에 바로 전달한다"
+   ],
+   "correctIndex": 1,
+   "explanation": "SwiftUI 뷰 계층을 UIKit 세계에 넣는 공식 브리지는 **UIHostingController**다. SwiftUI 루트 뷰를 담은 UIViewController이므로, 화면 일부에 넣을 때는 view controller containment API(`addChild` → `view.addSubview` → `didMove(toParent:)`)로 자식 컨트롤러로 붙이고, 화면 전체를 대체한다면 그냥 push/present 하면 된다. ①은 방향이 반대다 — UIViewRepresentable은 UIKit 뷰를 SwiftUI '안에' 넣을 때 쓰는 도구이지, SwiftUI 뷰를 UIKit에 노출하는 용도가 아니다. ③과 ④가 성립하지 않는 이유는 SwiftUI의 View가 UIView 서브클래스가 아니라 View 프로토콜을 채택한 경량 struct, 즉 '화면에 대한 설명값'이기 때문이다. body는 또 다른 View 값을 돌려줄 뿐 UIView로 캐스팅할 실체가 아니며, 설명값을 실제 렌더링 객체로 바꾸는 일은 호스팅 컨트롤러가 내부에서 수행한다.",
+   "keywords": [
+    "ui-hosting-controller"
+   ],
+   "related": [
+    "uikit-004"
+   ]
+  },
+  {
+   "id": "uikit-006",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 4
+   },
+   "question": "UIViewRepresentable의 makeCoordinator()로 만드는 Coordinator의 역할과 수명에 대한 설명으로 옳은 것은?",
+   "choices": [
+    "델리게이트·타깃-액션 같은 UIKit 콜백을 대신 받아 SwiftUI 쪽(바인딩 등)으로 전달하는 클래스 인스턴스로, 표현 뷰가 살아 있는 동안 하나가 유지된다",
+    "updateUIView가 호출될 때마다 새로 생성되어, 그 시점의 최신 SwiftUI 상태를 스냅숏으로 보관하는 일회성 객체다",
+    "화면 전환 경로를 중앙에서 관리하는 내비게이션 계층의 객체로, NavigationStack의 path 상태와 자동으로 동기화된다",
+    "representable struct가 델리게이트 프로토콜을 직접 채택할 수 있기 때문에, Coordinator는 코드를 정리하기 위한 선택적 편의 장치에 가깝다"
+   ],
+   "correctIndex": 0,
+   "explanation": "UIKit의 델리게이트·데이터소스·타깃-액션은 대부분 **NSObjectProtocol 기반의 class 인스턴스**를 요구하는데, representable 자체는 갱신 때마다 새 값으로 복사되는 struct라 이 역할을 맡을 수 없다. 그래서 SwiftUI는 **makeCoordinator()를 makeUIView보다 먼저 한 번 호출**해 참조 타입 브리지를 만들고, 표현 뷰가 렌더 트리에 살아 있는 동안 같은 인스턴스를 `context.coordinator`로 계속 제공한다. Coordinator가 델리게이트 콜백을 받아 바인딩에 값을 써 주면 UIKit → SwiftUI 방향의 데이터 흐름이 완성된다. ②는 수명을 뒤집은 설명 — 매 갱신마다 새로 만들면 델리게이트 연결이 계속 끊겨 성립할 수 없는 구조다. ③은 아키텍처 패턴의 'Coordinator(화면 전환 조정자)'와 이름만 같은 별개 개념이다. ④ struct는 NSObject 기반 델리게이트 프로토콜을 채택할 수 없으므로 Coordinator는 편의 장치가 아니라 구조적으로 필요한 부품이다.",
+   "keywords": [
+    "representable-coordinator",
+    "ui-view-representable"
+   ],
+   "related": [
+    "uikit-004"
+   ]
+  },
+  {
+   "id": "uikit-007",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 4
+   },
+   "question": "UIKit에서 터치 이벤트를 처리할 객체를 찾고 전달하는 과정에 대한 설명으로 옳은 것은?",
+   "choices": [
+    "isUserInteractionEnabled가 false인 뷰도 hit-testing 후보에는 그대로 포함되며, 이벤트를 전달받은 뒤에 처리를 건너뛸지를 스스로 결정한다",
+    "responder chain은 이벤트를 윈도우 → 부모 → 자식 방향으로 내려보내고, 가장 깊은 자식 뷰가 처리하지 못하면 이벤트는 그 자리에서 소멸한다",
+    "hit-testing은 윈도우에서 시작해 뷰 계층을 내려가며 터치 지점의 가장 깊은 뷰를 찾고, 그 뷰가 처리하지 않으면 responder chain을 따라 슈퍼뷰·뷰 컨트롤러 방향으로 거슬러 올라간다",
+    "alpha가 1.0 미만인 반투명 뷰는 hit-testing에서 제외되므로, 그 위를 터치하면 이벤트가 뒤에 있는 뷰로 곧바로 전달된다"
+   ],
+   "correctIndex": 2,
+   "explanation": "터치가 발생하면 **hit-testing**이 먼저 실행된다: window에서 시작해 `hitTest(_:with:)`가 서브뷰들을(나중에 추가된, 즉 화면상 위에 있는 것부터) 재귀 탐색해 터치 지점을 포함하는 **가장 깊은 뷰**를 찾는다. 이 뷰가 이벤트의 1차 수신자가 되고, 처리하지 않으면 **responder chain**을 따라 위로 — superview → (그 뷰를 관리하는) UIViewController → window → UIApplication 순으로 — 전달된다. ②는 체인의 방향을 반대로 설명했다: 계층을 내려가는 단계는 hit-testing이고, responder chain은 올라가는 경로이며 이벤트가 그 자리에서 소멸하지도 않는다. ①과 ④는 hit-testing 제외 조건에 대한 오해다. `isHidden == true`, `isUserInteractionEnabled == false`, `alpha < 0.01`인 뷰는 서브트리째 후보에서 아예 빠진다 — 0.5처럼 단순히 반투명한 정도로는 제외되지 않고, 상호작용이 꺼진 뷰는 '받고 무시'가 아니라 처음부터 대상이 아니다.",
+   "keywords": [
+    "hit-testing",
+    "responder-chain"
+   ],
+   "related": [
+    "uikit-002",
+    "uikit-008"
+   ]
+  },
+  {
+   "id": "uikit-008",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 2,
+    "discrimination": 3
+   },
+   "question": "UIView와 CALayer의 관계에 대한 설명으로 옳은 것은?",
+   "choices": [
+    "CALayer는 UIView의 경량 서브클래스로, 뷰의 기능 중 그리기에 관련된 부분만 물려받은 타입이다",
+    "모든 UIView는 자신을 뒤에서 그려 주는 CALayer를 하나 가지며, 뷰는 터치 처리·Auto Layout 등 상호작용을, 레이어는 콘텐츠 렌더링과 애니메이션을 담당한다",
+    "CALayer도 UIResponder를 상속하므로 responder chain에 참여해 터치 이벤트를 직접 처리할 수 있다",
+    "메모리 절약을 위해 형제 관계에 있는 UIView 여러 개가 하나의 CALayer를 공유하도록 설계되어 있다"
+   ],
+   "correctIndex": 1,
+   "explanation": "UIKit의 뷰는 **layer-backed**다: 모든 UIView는 생성 시 자신의 backing **CALayer**를 하나 가지며(`view.layer`), 뷰가 그 레이어의 delegate가 된다. 핵심은 역할 분담이다 — UIView는 UIResponder를 상속해 **터치 등 이벤트 처리와 Auto Layout·계층 관리**를 맡고, CALayer는 **콘텐츠의 실제 렌더링·기하 정보·Core Animation 애니메이션**을 맡는다. cornerRadius, shadow, border 같은 시각 속성이 layer에 정의되어 있는 이유가 이것이다. ①은 상속 관계에 대한 오해 — CALayer는 NSObject의 서브클래스로 UIView와 상속 관계가 없고, 오히려 UIView가 CALayer를 소유하고 감싸는 쪽이다. ③ CALayer는 UIResponder 계열이 아니어서 터치를 직접 받을 수 없으며, 레이어 영역별 터치 판정이 필요하면 뷰 차원에서 처리해야 한다. ④ backing layer는 뷰와 1:1 관계이고 공유되지 않는다 — 한 레이어 아래에 별도의 sublayer들을 추가하는 것과는 다른 이야기다.",
+   "keywords": [
+    "calayer"
+   ],
+   "related": [
+    "uikit-007"
+   ]
+  },
+  {
+   "id": "uikit-009",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "niche",
+   "eval": {
+    "frequency": 2,
+    "centrality": 2,
+    "practicality": 3,
+    "discrimination": 4
+   },
+   "question": "Auto Layout 제약의 constant를 바꾼 뒤 그 변화를 애니메이션으로 보여주려 한다. setNeedsLayout / layoutIfNeeded의 동작과 올바른 사용법은?",
+   "choices": [
+    "setNeedsLayout이 보류 중인 레이아웃을 호출 지점에서 동기적으로 수행하는 메서드이고, layoutIfNeeded가 갱신을 다음 런루프 사이클로 미루는 예약 메서드다",
+    "레이아웃을 갱신하고 싶다면 layoutSubviews를 직접 호출하는 것이 가장 확실한 방법이며, 애니메이션 블록 안에서도 layoutIfNeeded 대신 이 방식이 권장된다",
+    "constant를 바꾸면 시스템이 그 즉시 동기적으로 프레임을 다시 계산해 반영하므로, 애니메이션 블록 안에는 constant를 바꾸는 코드만 넣어도 프레임 변화가 보간된다",
+    "setNeedsLayout은 '갱신 필요' 표시만 남겨 다음 업데이트 사이클에 layoutSubviews가 불리게 하고, layoutIfNeeded는 보류된 레이아웃을 즉시 수행하므로 애니메이션 블록 안에서 layoutIfNeeded를 호출한다"
+   ],
+   "correctIndex": 3,
+   "explanation": "Auto Layout 갱신은 호출 즉시가 아니라 **런루프의 업데이트 사이클**에서 일괄 처리된다. `setNeedsLayout()`은 뷰에 '갱신 필요' 표시만 남기고 바로 반환하는 **비동기 예약**이고(여러 번 불려도 한 사이클로 병합됨), `layoutIfNeeded()`는 보류 중인 레이아웃이 있으면 **그 자리에서 동기적으로** layoutSubviews까지 수행한다. 애니메이션이 이 차이를 드러낸다: constant만 바꾸면 프레임 변화는 다음 사이클에, 즉 애니메이션 블록 밖에서 적용되므로, `UIView.animate` 블록 안에서 `layoutIfNeeded()`를 호출해 프레임 변경이 블록 '안'에서 일어나게 해야 보간된다. ①은 두 메서드의 동작을 정확히 뒤집었다. ② `layoutSubviews()`는 시스템이 호출해 주는 오버라이드 지점이지 직접 호출해서는 안 되는 메서드다. ③ constant 변경은 즉시 프레임에 반영되지 않으므로, 블록에 변경 코드만 넣으면 애니메이션 없이 화면이 점프한다.",
+   "keywords": [
+    "layout-cycle"
+   ],
+   "related": [
+    "uikit-001"
+   ]
+  },
+  {
+   "id": "uikit-010",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "niche",
+   "eval": {
+    "frequency": 3,
+    "centrality": 2,
+    "practicality": 4,
+    "discrimination": 4
+   },
+   "question": "UITableView에서 셀마다 비동기로 이미지를 내려받아 표시했더니, 빠르게 스크롤할 때 엉뚱한 셀에 다른 아이템의 이미지가 잠깐 나타난다. 가장 근본적인 원인과 대응은?",
+   "choices": [
+    "셀이 재사용되어 이전 인덱스에서 시작한 다운로드의 완료 콜백이 뒤늦게 도착해 현재 콘텐츠를 덮어쓰기 때문 — 완료 시점에 셀이 여전히 같은 아이템을 표시 중인지 확인하거나 prepareForReuse에서 요청을 취소한다",
+    "백그라운드 스레드에서 UIImageView를 갱신한 것이 원인 — 이미지 설정 코드를 DispatchQueue.main.async로 감싸 메인 큐에서 실행하면 증상이 사라진다",
+    "UITableViewCell이 참조 타입이라 셀 인스턴스들 사이에 이미지 뷰가 공유되는 것이 원인 — 셀 콘텐츠를 값 타입 기반 구성으로 재작성해 공유를 끊어야 한다",
+    "reuseIdentifier가 하나뿐이라 서로 다른 row의 셀이 한 큐에서 뒤섞이는 것이 원인 — row마다 고유한 identifier를 부여해 재사용 풀을 분리한다"
+   ],
+   "correctIndex": 0,
+   "explanation": "원인은 **셀 재사용과 비동기 완료 시점의 어긋남**이다. row A에서 시작한 다운로드가 끝나기 전에 셀이 재사용 큐로 갔다가 row B에 재배정되면, 뒤늦게 도착한 A의 완료 콜백이 캡처해 둔 같은 셀 인스턴스의 imageView를 덮어써 B 위에 A의 이미지가 나타난다. 대응은 콜백 실행 시점에 유효성을 다시 확인하는 것 — 셀에 기록해 둔 URL/아이템 id를 비교하거나 `tableView.indexPath(for: cell)`로 현재 위치를 확인하고, `prepareForReuse()`에서 진행 중인 요청 취소와 imageView 초기화를 함께 해 주면 안전하다. ②는 그럴듯하지만 다른 문제의 처방이다 — UI 갱신을 메인 큐에서 해야 하는 것은 맞지만, 메인 큐에서 실행해도 '엉뚱한 셀을 덮어쓰는' 레이스는 그대로 남는다. ③ 셀 인스턴스 간에 이미지 뷰가 공유되는 일은 없으며 참조 타입 여부는 이 증상과 무관하다. ④는 재사용 자체를 무력화해 row 수만큼 셀이 쌓이는 메모리 문제를 새로 만든다.",
+   "keywords": [
+    "cell-reuse"
+   ],
+   "related": [
+    "uikit-003"
+   ]
+  }
+ ]
+}

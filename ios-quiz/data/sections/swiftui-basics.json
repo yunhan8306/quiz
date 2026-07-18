@@ -1,0 +1,391 @@
+{
+ "id": "swiftui-basics",
+ "title": "SwiftUI 기초",
+ "description": "뷰와 modifier, 스택 레이아웃, List/ForEach, NavigationStack, Form, 제스처",
+ "questions": [
+  {
+   "id": "sui-001",
+   "type": "choice",
+   "difficulty": 1,
+   "coverage": "core",
+   "eval": {
+    "frequency": 4,
+    "centrality": 4,
+    "practicality": 2,
+    "discrimination": 2
+   },
+   "question": "UIKit의 명령형 방식과 비교할 때, SwiftUI가 채택한 선언형 UI 패러다임에 대한 설명으로 가장 적절한 것은?",
+   "choices": [
+    "뷰 계층을 직접 조작하는 명령을 순서대로 실행해 화면을 원하는 상태로 만들어 간다",
+    "상태가 바뀌면 개발자가 갱신이 필요한 뷰를 직접 찾아 수동으로 다시 그려 준다",
+    "현재 상태에서 UI가 어떤 모습이어야 하는지 기술하면, 상태 변화에 따른 화면 갱신은 프레임워크가 수행한다",
+    "UI 구조는 스토리보드 같은 시각 편집기로 구성하고 코드는 이벤트 처리에 집중한다"
+   ],
+   "correctIndex": 2,
+   "explanation": "SwiftUI는 **선언형 UI** 프레임워크다. 개발자는 '현재 상태에서 UI가 어떤 모습이어야 하는가'를 `body`에 기술하고, 상태가 바뀌면 프레임워크가 이전 화면과의 차이를 계산해 필요한 부분만 갱신한다. `addSubview`나 `label.text = ...` 같은 명령을 순서대로 실행해 뷰 계층을 직접 조작하는 UIKit의 명령형 방식과 대비되는 핵심 차이다.\n\n- ①·②는 명령형(UIKit) 방식의 설명이다. 선언형에서는 개발자가 '무엇을 갱신할지'를 고르지 않는다 — 상태를 바꾸면 무엇이 다시 그려질지는 프레임워크가 판단한다.\n- ④ 스토리보드는 UIKit 시대의 시각적 도구일 뿐 선언형 패러다임의 본질과 무관하다. SwiftUI는 코드로 UI를 선언하며, 프리뷰는 그 코드를 시각화해 줄 뿐이다.",
+   "keywords": [
+    "declarative-ui"
+   ],
+   "related": [
+    "sui-002"
+   ]
+  },
+  {
+   "id": "sui-002",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 3,
+    "centrality": 4,
+    "practicality": 2,
+    "discrimination": 3
+   },
+   "question": "SwiftUI 뷰의 `body`가 구체 타입 대신 `some View`를 반환하도록 선언된 이유로 가장 적절한 것은?",
+   "choices": [
+    "복잡한 구체 뷰 타입을 호출자에게 숨기되, 컴파일러는 실제 타입을 알아 정적 타입 정보가 유지되게 하기 위해",
+    "런타임에 서로 다른 뷰 타입을 자유롭게 담아 반환할 수 있는 컨테이너 타입이 필요하기 때문",
+    "뷰를 참조 타입으로 감싸 여러 화면이 같은 인스턴스를 공유할 수 있게 하기 위해",
+    "타입 검사를 런타임으로 미뤄 뷰 코드의 컴파일 시간을 줄이기 위해"
+   ],
+   "correctIndex": 0,
+   "explanation": "`some View`는 **불투명 반환 타입**(opaque return type)이다. `body`가 실제로 반환하는 타입은 `VStack<TupleView<(Text, Image)>>`처럼 중첩이 깊어 직접 쓰기 어렵고 구현을 바꿀 때마다 달라진다. `some View`는 호출자에게 'View를 준수하는 어떤 하나의 타입'이라고만 알리고 구체 타입은 컴파일러만 알게 한다. 반환 경로마다 다른 타입을 돌려줄 수는 없고 항상 같은 하나의 구체 타입이어야 하며, 이 정적 타입 정보가 유지되기 때문에 SwiftUI가 뷰 트리 구조를 효율적으로 비교·갱신할 수 있다.\n\n- ② 런타임에 아무 뷰 타입이나 담는 것은 `any View`(existential)의 특성이다. `some`은 오히려 '하나의 고정된 타입'을 컴파일 타임에 보장하는 반대 방향의 도구다.\n- ③ SwiftUI 뷰는 struct(값 타입)이며 인스턴스 공유가 목적이 아니다.\n- ④ 타입 검사는 여전히 컴파일 타임에 이뤄진다.",
+   "keywords": [
+    "opaque-return-type"
+   ],
+   "related": [
+    "sui-001",
+    "sui-010"
+   ]
+  },
+  {
+   "id": "sui-003",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "`Text(\"Hi\")`에 `.padding()`을 먼저, `.background(Color.red)`를 나중에 적용했다. 화면에 나타나는 결과로 옳은 것은?",
+   "choices": [
+    "modifier는 마지막에 한꺼번에 적용되므로 순서를 바꿔도 결과는 같다",
+    "패딩으로 넓어진 영역 전체가 빨간색으로 칠해진다",
+    "텍스트 크기만큼만 빨간색이 되고 그 바깥에는 투명한 여백이 남는다",
+    "컴파일러가 레이아웃 modifier를 색상 modifier보다 먼저 오도록 재배열해 적용한다"
+   ],
+   "correctIndex": 1,
+   "explanation": "**뷰 모디파이어**는 원본 뷰를 감싼 새로운 뷰를 반환하므로, 적용 순서가 곧 감싸는 순서다. `.padding()`이 먼저 오면 텍스트 주위에 여백이 더해진 더 큰 뷰가 만들어지고, 그다음 `.background(Color.red)`가 그 전체 영역(여백 포함)을 빨간색으로 칠한다. 반대로 `.background(...).padding()` 순서면 텍스트 크기만큼만 빨갛게 칠해진 뒤 그 바깥에 투명한 여백이 붙는다. 순서에 따라 결과가 달라지는 것은 modifier가 매번 새 뷰를 만들어 체이닝된다는 구조에서 나오는 자연스러운 귀결이다.\n\n- ① modifier는 선언한 순서대로 즉시 뷰를 감싸며, 한꺼번에 모아서 적용되지 않는다.\n- ③은 반대 순서(`.background` → `.padding`)를 적용했을 때의 결과다.\n- ④ 컴파일러는 modifier 순서를 재배열하지 않는다. 순서는 개발자가 의도한 그대로 반영된다.",
+   "keywords": [
+    "view-modifier"
+   ],
+   "related": [
+    "sui-008"
+   ]
+  },
+  {
+   "id": "sui-004",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 4,
+    "centrality": 5,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "ForEach로 동적 목록을 만들 때 각 데이터에 안정적인 고유 id(Identifiable)를 요구하는 이유로 가장 적절한 것은?",
+   "choices": [
+    "id가 없으면 컴파일은 되지만 행이 데이터 순서와 무관하게 뒤섞여 렌더링되기 때문",
+    "id가 UITableView 셀 재사용 풀에서 셀을 꺼내는 재사용 식별자로 쓰이기 때문",
+    "id가 배열 인덱스와 어긋나면 해당 행 뷰가 해제되지 않아 메모리 누수가 생기기 때문",
+    "데이터 변경 시 어떤 행이 추가·삭제·이동됐는지 판별해 각 행의 상태와 애니메이션을 유지하기 위해"
+   ],
+   "correctIndex": 3,
+   "explanation": "SwiftUI는 데이터가 바뀌면 이전 목록과 새 목록을 **id 기준으로 비교(diff)**해 어떤 행이 삽입·삭제·이동됐는지 판단한다. id가 안정적이어야 같은 데이터에 대응하는 행 뷰의 **뷰 아이덴티티**가 유지되고, 그 행에 붙어 있는 @State 같은 상태와 삽입·삭제 애니메이션이 올바르게 동작한다. 배열 인덱스처럼 요소가 이동하면 값이 바뀌는 것을 id로 쓰면, 상태가 엉뚱한 행에 붙거나 애니메이션이 어긋나는 전형적인 버그가 생긴다. Identifiable은 이 안정적 id를 타입 차원에서 요구하는 프로토콜이다.\n\n- ① id가 부적절해도 렌더링 순서는 데이터 순서를 따른다. 무작위로 뒤섞이지 않는다.\n- ② 재사용 식별자(reuse identifier)는 UIKit의 셀 재사용 개념이다. ForEach의 id는 diff를 위한 것이지 재사용 풀 키가 아니다.\n- ③ 잘못된 id의 증상은 메모리 누수가 아니라 상태·애니메이션 오류다.",
+   "keywords": [
+    "identifiable",
+    "view-identity"
+   ],
+   "related": [
+    "sui-014"
+   ]
+  },
+  {
+   "id": "sui-005",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 2
+   },
+   "question": "iOS 16+ `NavigationStack`에서 코드로 화면 전환(push/pop)을 제어하는 방식에 대한 설명으로 옳은 것은?",
+   "choices": [
+    "NavigationPath 같은 경로 상태를 바인딩하고, 경로에 값을 추가·제거하는 것으로 push와 pop을 제어한다",
+    "NavigationView와 전환 애니메이션만 다를 뿐, 경로를 상태로 제어하는 수단은 제공하지 않는다",
+    "navigationDestination(for:)에 등록된 목적지 뷰들이 미리 전부 생성되어 스택에 대기한다",
+    "내부의 UINavigationController를 꺼내 pushViewController/popViewController를 호출한다"
+   ],
+   "correctIndex": 0,
+   "explanation": "NavigationStack(iOS 16+)의 핵심은 **내비게이션 경로가 상태로 표현**된다는 점이다. `NavigationStack(path: $path)`처럼 `NavigationPath`(또는 Hashable 값 배열)를 바인딩하면, path에 값을 append하는 것이 push, 마지막 값을 제거하는 것이 pop이 된다. 경로가 값이므로 저장·복원(딥링크 대응)이나 '루트로 돌아가기'(경로 비우기)도 상태 조작만으로 구현된다. 각 값 타입이 어떤 화면으로 이어지는지는 `navigationDestination(for:)`가 선언적으로 매핑한다.\n\n- ② 반대다. NavigationView 시절에는 `isActive` 바인딩 같은 우회 수단뿐이었고, 값 기반 경로 제어가 바로 NavigationStack의 핵심 개선점이다.\n- ③ 목적지 뷰는 해당 값이 실제로 push될 때 생성된다. 미리 전부 만들어 두지 않는다.\n- ④ UINavigationController를 직접 조작하는 것은 UIKit 방식이며 SwiftUI에서는 상태 변경이 곧 전환 명령이다.",
+   "keywords": [
+    "navigation-stack",
+    "navigation-path"
+   ],
+   "related": [
+    "sui-006"
+   ]
+  },
+  {
+   "id": "sui-006",
+   "type": "choice",
+   "difficulty": 1,
+   "coverage": "core",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 2
+   },
+   "question": "`.sheet(isPresented: $showing)`으로 모달 시트를 표시할 때의 동작으로 옳은 것은?",
+   "choices": [
+    "present 메서드 호출로 시트를 띄우며, Bool 값은 전환 애니메이션 사용 여부를 지정한다",
+    "값이 true가 될 때 한 번 표시되며, 사용자가 스와이프로 닫아도 값은 true로 유지된다",
+    "Bool 상태와 시트 표시가 양방향으로 동기화되어, 사용자가 시트를 닫으면 값도 false로 바뀐다",
+    "시트가 떠 있는 동안 아래 화면의 뷰는 렌더 트리에서 제거되었다가 닫히면 다시 생성된다"
+   ],
+   "correctIndex": 2,
+   "explanation": "SwiftUI의 **시트 표시**는 상태의 함수다. `isPresented`에 바인딩된 Bool이 true면 시트가 떠 있는 상태, false면 내려간 상태이며 이 동기화는 **양방향**이다. 코드에서 값을 true로 바꾸면 시트가 올라오고, 사용자가 시트를 아래로 스와이프해 닫으면 SwiftUI가 바인딩 값을 false로 되돌려 주므로 상태와 화면이 어긋나지 않는다. '표시하라'는 명령이 아니라 '떠 있어야 하는 상태인가'를 선언하는 것이 선언형다운 지점이다.\n\n- ① `present` 메서드를 직접 호출하는 것은 UIKit(UIViewController)의 방식이다. SwiftUI에서는 상태 변경이 곧 표시/해제를 의미한다.\n- ② 스와이프로 닫히면 바인딩도 false로 갱신된다. true로 남는다면 상태와 UI가 불일치하게 되는데, SwiftUI는 이를 허용하지 않는다.\n- ④ 시트가 떠 있어도 아래 화면의 뷰는 렌더 트리에 그대로 유지되며 상태도 보존된다.",
+   "keywords": [
+    "sheet-presentation"
+   ],
+   "related": [
+    "sui-005",
+    "sui-012"
+   ]
+  },
+  {
+   "id": "sui-007",
+   "type": "choice",
+   "difficulty": 1,
+   "coverage": "core",
+   "eval": {
+    "frequency": 2,
+    "centrality": 2,
+    "practicality": 2,
+    "discrimination": 1
+   },
+   "question": "`HStack { Text(\"A\"); Spacer(); Text(\"B\") }`에서 `Spacer()`의 동작으로 가장 적절한 것은?",
+   "choices": [
+    "두 텍스트 사이에 시스템 기본값의 고정 간격을 추가한다",
+    "가로 방향의 남은 공간을 최대한 차지하며 늘어나 두 텍스트를 양쪽 끝으로 밀어낸다",
+    "자신 뒤에 오는 Text(\"B\")를 레이아웃에서 제외해 화면에 그리지 않는다",
+    "HStack의 정렬 기준을 중앙 정렬에서 leading 정렬로 바꾼다"
+   ],
+   "correctIndex": 1,
+   "explanation": "**Spacer**는 자신이 속한 스택의 주축(main axis) 방향으로 남은 공간을 최대한 차지하며 늘어나는 유연한 공백 뷰다. HStack 안에서는 가로로, VStack 안에서는 세로로 늘어난다. 예시 코드에서는 두 텍스트가 먼저 필요한 만큼 크기를 가져가고, Spacer가 나머지 가로 공간을 전부 차지해 결과적으로 A는 왼쪽 끝, B는 오른쪽 끝에 붙는다. 남은 공간이 부족하면 Spacer는 최소 길이까지 줄어드는데, 기본 최소 길이(`minLength: nil`)는 0이 아니라 시스템 기본 간격이며, `Spacer(minLength: 0)`처럼 직접 지정해 바꿀 수 있다.\n\n- ① 형제 뷰 사이의 고정 간격은 스택의 `spacing` 파라미터나 `.padding()`이 담당한다. Spacer는 고정 간격이 아니라 가용 공간에 따라 변하는 가변 공간이다.\n- ③ Spacer는 공간을 차지할 뿐 다른 뷰를 렌더링에서 제외하지 않는다.\n- ④ 스택의 정렬 기준은 `alignment` 파라미터가 담당하며, Spacer는 주축 방향 공간 배분에만 관여한다.",
+   "keywords": [
+    "spacer",
+    "stack-layout"
+   ],
+   "related": [
+    "sui-008"
+   ]
+  },
+  {
+   "id": "sui-008",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 3,
+    "centrality": 4,
+    "practicality": 3,
+    "discrimination": 4
+   },
+   "question": "SwiftUI 레이아웃 시스템에서 부모 뷰와 자식 뷰가 크기와 위치를 결정하는 과정으로 옳은 것은?",
+   "choices": [
+    "자식이 먼저 원하는 크기를 부모에게 요구하고, 부모는 요구받은 크기에 맞춰 자신의 크기를 조정한다",
+    "부모가 자식의 크기를 일방적으로 지정하며, 자식은 지정된 크기를 거부할 수 없다",
+    "오토레이아웃처럼 제약 조건들을 연립해 풀어 모든 뷰의 크기를 동시에 계산한다",
+    "부모가 크기를 제안하면 자식이 자기 크기를 스스로 결정해 보고하고, 부모가 자식의 위치를 정한다"
+   ],
+   "correctIndex": 3,
+   "explanation": "SwiftUI 레이아웃은 3단계 협상이다. (1) 부모가 자식에게 사용할 수 있는 크기를 **제안**(propose)하고, (2) 자식은 제안을 참고해 **자기 크기를 스스로 결정**해 보고하며, (3) 부모는 보고받은 크기를 존중한 채 자식을 자기 좌표계 안에 **배치**한다. 크기의 최종 결정권이 자식에게 있다는 것이 핵심이다. Text는 제안보다 작게, 도형은 제안을 꽉 채워 응답할 수 있고, `frame` modifier도 크기를 강제하는 것이 아니라 '다른 크기를 제안하는 새 부모 뷰'를 만드는 것이다.\n\n- ①은 방향이 반대다. 레이아웃 제안은 부모에서 시작해 트리를 따라 내려간다.\n- ②는 자식의 자기결정권을 부정하므로 오답이다. 부모는 자식이 보고한 크기를 바꿀 수 없고 위치만 정한다.\n- ③ 제약 조건을 연립 방정식으로 푸는 것은 UIKit 오토레이아웃의 방식이며, SwiftUI는 제안-응답의 단방향 협상으로 동작한다.",
+   "keywords": [
+    "layout-proposal"
+   ],
+   "related": [
+    "sui-007",
+    "sui-003"
+   ]
+  },
+  {
+   "id": "sui-009",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 4,
+    "discrimination": 3
+   },
+   "question": "`onAppear`를 UIKit의 `viewDidLoad`처럼 '한 번만 실행되는 초기화 지점'으로 사용하면 문제가 생길 수 있는 이유는?",
+   "choices": [
+    "탭 전환이나 내비게이션 복귀 등으로 뷰가 화면에 다시 나타날 때마다 재호출될 수 있기 때문",
+    "상태가 바뀌어 body가 재평가될 때마다 onAppear도 함께 호출되기 때문",
+    "onAppear는 뷰가 화면에서 사라질 때 호출되는 훅이라 초기화 시점으로 쓸 수 없기 때문",
+    "onAppear 클로저 안에서는 @State 변경이 금지되어 초기화 코드를 넣을 수 없기 때문"
+   ],
+   "correctIndex": 0,
+   "explanation": "`onAppear`는 '뷰가 화면(렌더 트리)에 나타난 시점'마다 실행되는 **뷰 생명주기** 훅이다. 인스턴스 생성 후 한 번만 불리는 `viewDidLoad`와 달리, TabView에서 다른 탭에 갔다가 돌아오거나 내비게이션 스택에서 뒤로 돌아오는 등 뷰가 다시 나타나는 상황마다 재실행될 수 있다. 네트워크 요청이나 분석 이벤트를 여기에 그대로 두면 중복 실행되는 버그로 이어지므로, 1회 실행이 필요하면 @State 플래그로 가드하거나 뷰 수명에 맞는 다른 수단(`.task` 등)을 검토해야 한다.\n\n- ② body 재평가와 onAppear 호출은 별개다. 뷰가 계속 화면에 있는 한, 상태 변화로 body가 다시 계산되어도 onAppear는 다시 불리지 않는다.\n- ③은 `onDisappear`와 뒤바꾼 설명이다.\n- ④ onAppear 안에서의 상태 변경은 허용되며 오히려 흔한 패턴이다.",
+   "keywords": [
+    "view-lifecycle"
+   ],
+   "related": [
+    "sui-011"
+   ]
+  },
+  {
+   "id": "sui-010",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 2,
+    "discrimination": 3
+   },
+   "question": "VStack의 후행 클로저 안에 여러 뷰를 콤마나 return 없이 나열해도 하나의 뷰로 컴파일되는 이유는?",
+   "choices": [
+    "클로저가 나열된 뷰들을 [any View] 배열로 만들어 반환하기 때문",
+    "클로저에 @ViewBuilder가 적용되어, 나열된 뷰들이 TupleView 같은 하나의 뷰 타입으로 조립되기 때문",
+    "Swift 클로저는 마지막 표현식들을 자동으로 튜플로 묶어 반환하는 언어 규칙이 있기 때문",
+    "VStack이 런타임에 리플렉션으로 클로저 내부의 뷰 선언을 수집하기 때문"
+   ],
+   "correctIndex": 1,
+   "explanation": "VStack 등 컨테이너의 이니셜라이저는 content 클로저 파라미터에 **@ViewBuilder** 애트리뷰트를 붙여 받는다. @ViewBuilder는 Swift의 result builder로, 클로저 안에 나열된 뷰 표현식들을 컴파일 타임에 `buildBlock` 호출로 변환해 `TupleView<(Text, Image, ...)>` 같은 **하나의 뷰 타입**으로 조립한다. if/else 분기는 `_ConditionalContent`로, 옵셔널 분기는 Optional 뷰로 변환되는 등 제어문까지 타입으로 표현된다. 덕분에 뷰 트리의 구조가 반환 타입에 그대로 드러나고, SwiftUI는 이 정적 구조를 활용해 효율적으로 갱신 대상을 비교한다.\n\n- ① 배열이 아니라 각 뷰의 타입이 보존되는 튜플 형태다. `[any View]`처럼 타입을 지우면 구조 비교에 쓰이는 정적 정보가 사라진다.\n- ③ Swift 클로저에 그런 언어 규칙은 없다. result builder가 적용된 클로저에서만 일어나는 변환이다.\n- ④ 런타임 리플렉션이 아니라 컴파일 타임 코드 변환이다.",
+   "keywords": [
+    "view-builder"
+   ],
+   "related": [
+    "sui-002"
+   ]
+  },
+  {
+   "id": "sui-011",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "뷰가 나타날 때 비동기 네트워크 요청을 시작하는 용도로 `onAppear`보다 `.task`가 권장되는 주된 이유는?",
+   "choices": [
+    ".task의 클로저는 백그라운드 스레드 실행이 보장되어 메인 스레드를 점유하지 않기 때문",
+    "onAppear 안에서는 async 함수를 호출할 방법이 없기 때문",
+    "작업이 뷰 수명에 묶여, 뷰가 사라지면 진행 중인 Task가 자동으로 취소되기 때문",
+    ".task가 응답을 자동으로 캐시해 같은 요청의 중복 전송을 막아 주기 때문"
+   ],
+   "correctIndex": 2,
+   "explanation": "**.task 모디파이어**는 뷰가 나타날 때 비동기 작업을 시작하고, 뷰가 사라지면(해당 아이덴티티가 렌더 트리에서 제거되면) 그 Task를 **자동으로 취소**해 주는, 뷰 생명주기와 구조적 동시성을 잇는 modifier다. 사용자가 이미 화면을 떠났는데도 네트워크 응답을 기다렸다가 상태를 건드리는 낭비와 부작용을 프레임워크 차원에서 방지한다. `onAppear`에서 직접 `Task { }`를 만들면 이 취소를 개발자가 스스로 관리해야 한다.\n\n- ① .task의 클로저는 뷰의 액터 컨텍스트(보통 MainActor)를 상속한다. 백그라운드 실행이 보장되는 것이 아니라, await 지점에서 스레드를 양보하기 때문에 UI가 막히지 않는 것이다.\n- ② onAppear에서도 `Task { await ... }`로 async 함수를 호출할 수 있다. 다만 수명·취소 관리가 수동이 된다는 차이가 있을 뿐이다.\n- ④ 응답 캐싱은 .task의 기능이 아니다. 캐싱은 URLCache 등 별도 계층의 몫이다.",
+   "keywords": [
+    "task-modifier",
+    "view-lifecycle"
+   ],
+   "related": [
+    "sui-009"
+   ]
+  },
+  {
+   "id": "sui-012",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "niche",
+   "eval": {
+    "frequency": 2,
+    "centrality": 2,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "`.sheet(item: $selectedUser) { user in ... }` 형태의 옵셔널 기반 시트 표시에 대한 설명으로 옳은 것은?",
+   "choices": [
+    "item이 nil이어도 시트는 표시되며, 클로저에는 옵셔널 값이 그대로 전달된다",
+    "isPresented 방식과 달리 사용자가 스와이프로 시트를 닫는 동작이 차단된다",
+    "item의 타입은 Equatable만 준수하면 시트 표시에 사용할 수 있다",
+    "Identifiable한 item이 nil에서 값으로 바뀌면 시트가 표시되고, 클로저는 언래핑된 값을 받는다"
+   ],
+   "correctIndex": 3,
+   "explanation": "`.sheet(item:)`은 옵셔널 상태 기반의 **시트 표시** 패턴이다. item 바인딩이 nil이면 시트가 없는 상태, 값이 생기면 시트가 표시되는 상태이며, content 클로저는 **언래핑된 non-옵셔널 값**을 받아 시트 내용을 구성한다. 시트가 닫히면 item은 다시 nil로 돌아간다. '어떤 항목을 선택했는가'와 '시트가 떠 있는가'를 상태 하나로 표현하므로, `isPresented` Bool과 별도의 선택 상태를 따로 두는 조합보다 두 상태가 어긋날 위험이 없다. item 타입은 Identifiable을 준수해야 하며, 시트가 떠 있는 동안 id가 다른 값으로 바뀌면 시스템이 기존 시트를 내리고 새 항목의 시트로 교체한다.\n\n- ① item이 nil이면 시트 자체가 표시되지 않고, 클로저에 nil이 전달되는 일도 없다.\n- ② 스와이프로 닫는 동작은 isPresented 방식과 동일하게 허용된다(제한하려면 별도 modifier가 필요).\n- ③ 요구되는 준수는 Equatable이 아니라 Identifiable이다.",
+   "keywords": [
+    "sheet-presentation",
+    "identifiable"
+   ],
+   "related": [
+    "sui-006"
+   ]
+  },
+  {
+   "id": "sui-013",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "niche",
+   "eval": {
+    "frequency": 1,
+    "centrality": 2,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "부모 뷰와 자식 뷰가 각각 탭 제스처를 갖고 있을 때, 겹치는 영역을 탭하면 일어나는 기본 동작과 이를 바꾸는 방법으로 옳은 것은?",
+   "choices": [
+    "기본적으로 부모의 제스처가 먼저 인식되며, 자식에게 우선권을 주려면 자식에 gesture()를 중복 적용한다",
+    "기본적으로 자식의 제스처가 우선하며, 부모에 highPriorityGesture()를 쓰면 부모가 우선권을 갖는다",
+    "기본적으로 두 제스처가 동시에 인식되며, 한쪽만 인식되게 하려면 simultaneousGesture()를 쓴다",
+    "같은 종류의 제스처가 겹치면 컴파일 오류가 발생하므로 한쪽 제스처를 제거해야 한다"
+   ],
+   "correctIndex": 1,
+   "explanation": "겹친 영역에서 **제스처 우선순위**의 기본값은 '더 안쪽(자식) 뷰의 제스처 우선'이다. 카드 뷰 전체에 탭 제스처가 있고 그 안의 버튼에도 탭이 있으면, 버튼 영역을 탭했을 때는 버튼 쪽만 반응한다. 이 기본값을 바꾸는 도구가 두 가지다. 부모에 `highPriorityGesture()`로 제스처를 붙이면 부모의 제스처가 자식보다 먼저 인식되고, `simultaneousGesture()`로 붙이면 부모와 자식의 제스처가 **동시에 모두** 인식된다.\n\n- ①은 기본 우선순위를 반대로 설명했다. 기본값은 자식 우선이며, `gesture()`를 여러 번 적용하는 것은 우선권 부여와 무관하다.\n- ③도 뒤집힌 설명이다. 기본 동작은 동시 인식이 아니라 자식 단독 인식이고, `simultaneousGesture()`는 오히려 동시 인식을 허용하는 쪽이다.\n- ④ 겹치는 제스처는 정상적인 UI 패턴이며 컴파일 오류가 나지 않는다. 어느 쪽이 반응할지는 런타임의 우선순위 규칙이 정한다.",
+   "keywords": [
+    "gesture-priority"
+   ],
+   "related": []
+  },
+  {
+   "id": "sui-014",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "niche",
+   "eval": {
+    "frequency": 2,
+    "centrality": 2,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "ScrollView 안에 수천 개의 행을 표시할 때 VStack 대신 LazyVStack을 사용하는 이유로 가장 적절한 것은?",
+   "choices": [
+    "행 뷰를 화면에 보일 즈음에야 생성하므로 초기 생성 비용과 메모리 사용이 줄어들기 때문",
+    "화면을 벗어난 행 뷰를 UITableView처럼 재사용 풀에 넣어 재활용하기 때문",
+    "VStack은 담을 수 있는 자식 개수에 제한이 있어 수천 개의 행을 표현할 수 없기 때문",
+    "ForEach가 지연 컨테이너 안에서 사용되도록 설계되어 VStack에서는 동작하지 않기 때문"
+   ],
+   "correctIndex": 0,
+   "explanation": "**지연 스택**(LazyVStack/LazyHStack)의 lazy는 자식 뷰의 **지연 생성**을 뜻한다. 일반 VStack은 담긴 자식 뷰를 한 번에 전부 생성해 레이아웃하므로, 행이 수천 개면 첫 표시 시점에 그만큼의 생성 비용과 메모리를 치른다. LazyVStack은 스크롤되어 화면에 보일 즈음에야 해당 행의 뷰를 만들기 때문에 큰 목록에서 초기 표시가 빠르고 메모리 사용이 적다. ScrollView + LazyVStack 조합이 커스텀 목록 UI의 기본형인 이유다.\n\n- ② lazy 컨테이너는 생성을 미룰 뿐, UIKit의 UITableView처럼 화면 밖 셀을 재사용 풀로 돌려 재활용하는 메커니즘은 아니다(SwiftUI에서 셀 재사용에 가까운 최적화는 List의 내부 구현이 담당한다).\n- ③ VStack에 자식 개수 제한은 없다. @ViewBuilder의 표현식 개수 제한은 별개 문제이며 ForEach는 표현식 하나로 취급된다.\n- ④ ForEach는 VStack, List 등 어떤 컨테이너에서도 쓸 수 있다.",
+   "keywords": [
+    "lazy-stack"
+   ],
+   "related": [
+    "sui-004"
+   ]
+  }
+ ]
+}

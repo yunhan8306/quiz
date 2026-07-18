@@ -1,0 +1,39 @@
+{
+  "name": "ios-quiz",
+  "title": "iOS 기술 면접 퀴즈",
+  "domain": "iOS 개발 (기술 면접 대비, Swift/SwiftUI 중심)",
+  "language": "ko",
+  "createdAt": "2026-07-17",
+  "weights": {
+    "frequency": 0.4,
+    "centrality": 0.25,
+    "practicality": 0.2,
+    "discrimination": 0.15
+  },
+  "sectionPrefixes": {
+    "swift-basics": { "canonical": "sw", "all": ["sw"] },
+    "swift-advanced": { "canonical": "swadv", "all": ["swadv"] },
+    "memory-management": { "canonical": "mem", "all": ["mem"] },
+    "concurrency": { "canonical": "conc", "all": ["conc"] },
+    "swiftui-basics": { "canonical": "sui", "all": ["sui"] },
+    "swiftui-state": { "canonical": "state", "all": ["state"] },
+    "swiftui-internals": { "canonical": "suint", "all": ["suint"] },
+    "uikit-interop": { "canonical": "uikit", "all": ["uikit"] },
+    "data-networking": { "canonical": "net", "all": ["net"] },
+    "architecture-testing": { "canonical": "arch", "all": ["arch"] }
+  },
+  "matchKeywords": [
+    "ios",
+    "아이오에스",
+    "swift",
+    "스위프트",
+    "swiftui",
+    "스위프트유아이",
+    "uikit",
+    "xcode",
+    "애플",
+    "apple",
+    "iphone",
+    "아이폰"
+  ]
+}

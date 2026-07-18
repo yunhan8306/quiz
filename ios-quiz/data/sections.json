@@ -1,0 +1,14 @@
+{
+ "sections": [
+  "swift-basics",
+  "swift-advanced",
+  "memory-management",
+  "concurrency",
+  "swiftui-basics",
+  "swiftui-state",
+  "swiftui-internals",
+  "uikit-interop",
+  "data-networking",
+  "architecture-testing"
+ ]
+}

@@ -1,0 +1,457 @@
+{
+ "id": "swift-advanced",
+ "title": "Swift 심화",
+ "description": "제네릭, 프로토콜 지향 프로그래밍, 타입 시스템, 컬렉션·문자열 내부, enum 고급, mutating",
+ "questions": [
+  {
+   "id": "swadv-001",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 3,
+    "centrality": 4,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "제네릭 함수 `func largest<T>(in array: [T]) -> T?` 안에서 요소들을 `>` 연산자로 비교하려 하자 컴파일 에러가 났다. 올바른 해결 방법은?",
+   "choices": [
+    "`T`를 `Any`로 바꾸고 런타임에 타입을 확인한 뒤 비교한다",
+    "`<T: Comparable>`처럼 타입 제약을 걸어 T가 비교 연산을 지원함을 컴파일러에 보장한다",
+    "제네릭은 컴파일 시점에 타입을 알 수 없으므로 비교가 필요한 함수는 제네릭으로 만들 수 없다",
+    "함수 본문에서 요소를 `as! Int`로 다운캐스트하면 컴파일러가 비교를 허용한다"
+   ],
+   "correctIndex": 1,
+   "explanation": "제약 없는 제네릭 타입 파라미터에 대해 컴파일러는 아무것도 보장할 수 없으므로 `>` 같은 연산을 허용하지 않는다. `<T: Comparable>`처럼 **제네릭 타입 제약**을 걸면 T가 Comparable의 요구사항을 만족한다는 사실이 컴파일 시점에 증명되어 비교가 가능해진다. `where` 절을 쓰면 `where T.Element: Equatable` 같은 연관 타입 조건 등 더 복잡한 제약도 표현할 수 있다.\n\n① `Any`로 바꾸면 타입 안전성을 잃고 런타임 캐스팅이 필요해져 제네릭을 쓰는 이유 자체가 사라진다. ③은 반대다 — 제네릭 타입은 **컴파일 시점에** 결정되며, 제약을 통해 비교·해싱 등 필요한 능력을 얼마든지 요구할 수 있다. ④ 강제 다운캐스트는 `Int`가 아닌 타입이 들어오는 순간 크래시하는 안티패턴이며, 에러의 근본 원인(능력 미보장)을 해결하지 못한다.",
+   "keywords": [
+    "generic-constraint"
+   ],
+   "related": [
+    "swadv-010",
+    "swadv-013"
+   ]
+  },
+  {
+   "id": "swadv-002",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 4,
+    "centrality": 4,
+    "practicality": 2,
+    "discrimination": 4
+   },
+   "question": "SwiftUI의 `var body: some View`에서 `some` 키워드가 의미하는 것은?",
+   "choices": [
+    "호출자가 어떤 View 타입이든 골라 넘길 수 있다는 뜻으로, 제네릭 매개변수와 같은 역할이다",
+    "여러 View 타입 중 하나를 런타임 조건에 따라 골라 반환할 수 있는 동적 타입이다",
+    "반환 타입이 하나의 구체 타입으로 컴파일 시점에 고정되지만, 그 이름을 외부에 감춘다",
+    "AnyView처럼 타입 소거를 수행해 어떤 뷰든 담을 수 있는 박스로 감싸 반환한다"
+   ],
+   "correctIndex": 2,
+   "explanation": "`some`은 **불투명 타입(opaque type)**이다. 구현부가 반환할 구체 타입은 하나로 정해져 있고 컴파일러는 그것을 정확히 알지만, 호출자에게는 \"View를 준수하는 어떤 타입\"이라는 사실만 노출된다. 즉 타입은 컴파일 시점에 고정되고 **이름만 감춰진다**. 덕분에 body가 `TupleView<(Text, Image)>` 같은 복잡한 조합 타입을 반환해도 시그니처를 바꿀 필요가 없고, SwiftUI는 정적 타입 구조를 그대로 활용해 뷰 트리를 효율적으로 비교할 수 있다.\n\n① 방향이 반대다 — 제네릭은 **호출자**가 타입을 정하지만, `some`은 **구현부**가 정한다. ② 분기마다 다른 타입을 반환하는 것은 허용되지 않는다(모든 return이 같은 구체 타입이어야 함). 동적 성격은 existential(`any`)의 특징이다. ④ AnyView 같은 타입 소거와 달리 `some`은 박싱 비용 없이 정적 타입 정보를 유지한다.",
+   "keywords": [
+    "opaque-type"
+   ],
+   "related": [
+    "swadv-003"
+   ]
+  },
+  {
+   "id": "swadv-003",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 3,
+    "centrality": 4,
+    "practicality": 3,
+    "discrimination": 4
+   },
+   "question": "프로토콜을 타입으로 쓸 때의 `any`(existential)와 `some`(opaque type)에 대한 설명으로 옳은 것은?",
+   "choices": [
+    "`any`는 서로 다른 구체 타입을 한 변수에 담을 수 있지만 박싱에 따른 간접 비용이 있고, `some`은 하나의 구체 타입으로 고정되는 대신 컴파일러 최적화에 유리하다",
+    "`some`은 런타임에 타입이 결정되고 `any`는 컴파일 타임에 결정되므로, 성능이 중요한 코드에서는 `any`를 쓰는 편이 유리하다",
+    "둘은 표기법만 다를 뿐 컴파일러가 생성하는 코드는 동일하므로, 어느 쪽을 쓰든 성능과 표현력에는 차이가 없다",
+    "`any`는 클래스가 채택한 프로토콜에, `some`은 구조체가 채택한 프로토콜에 쓰도록 대상 타입 종류에 따라 용도가 구분되어 있다"
+   ],
+   "correctIndex": 0,
+   "explanation": "`any P`는 **existential 타입**으로, P를 준수하는 어떤 값이든 existential 컨테이너에 담는다. 배열에 서로 다른 구체 타입을 섞어 담는 등 유연성이 크지만, 값이 크면 힙 할당이 생기고 메서드 호출이 위트니스 테이블을 거치는 간접 비용이 있다. 반면 `some P`는 컴파일 시점에 단일 구체 타입으로 고정되는 **불투명 타입**이라 박싱이 없고 정적 최적화(인라이닝, 특수화)가 가능하다. 그래서 \"이질적인 값을 담아야 하면 `any`, 타입이 하나로 충분하면 `some`/제네릭\"이 일반적인 선택 기준이다.\n\n②는 반대로 뒤집었다 — 런타임에 실제 타입이 달라질 수 있는 쪽이 `any`이고, 성능은 대체로 `some`이 유리하다. ③ 컴파일 결과가 다르다. `any`는 컨테이너를 통한 간접 접근 코드가 생성된다. ④ 그런 구분은 없다 — 둘 다 struct·class·enum 어느 쪽이 채택한 프로토콜에든 쓸 수 있다.",
+   "keywords": [
+    "existential-type",
+    "opaque-type",
+    "witness-table"
+   ],
+   "related": [
+    "swadv-002",
+    "swadv-010"
+   ]
+  },
+  {
+   "id": "swadv-004",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 4,
+    "centrality": 4,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "뷰모델이 네트워크 서비스를 직접 참조하는 대신 프로토콜 타입에 의존하게 설계하는(프로토콜 지향 접근) 가장 큰 이유는?",
+   "choices": [
+    "프로토콜로 선언하면 컴파일러가 테스트용 목(mock) 객체 구현을 자동으로 생성해 주기 때문",
+    "프로토콜 타입 값은 참조 카운팅이 일어나지 않아 테스트 실행 속도가 빨라지기 때문",
+    "프로토콜은 클래스 상속과 달리 저장 프로퍼티를 직접 가질 수 있어 상태 검증이 쉬워지기 때문",
+    "테스트에서 실제 네트워크 없이 같은 프로토콜을 준수하는 대역(테스트 더블)을 주입할 수 있기 때문"
+   ],
+   "correctIndex": 3,
+   "explanation": "**프로토콜 지향 프로그래밍**의 핵심 실무 가치는 의존성의 '이음새(seam)'를 만드는 것이다. 뷰모델이 `URLSession` 같은 구체 타입 대신 `protocol DataFetching { func fetch() async throws -> Data }` 같은 추상에 의존하면, 프로덕션에서는 실제 구현을, 테스트에서는 고정 응답을 돌려주는 **테스트 더블**을 주입할 수 있다. 네트워크·디스크 같은 외부 요인 없이 빠르고 결정적인 단위 테스트가 가능해지고, 구현 교체(캐싱 레이어 추가 등)도 호출부 수정 없이 이뤄진다.\n\n① 컴파일러는 목 구현을 만들어 주지 않는다 — 직접 작성하거나 별도 도구를 써야 한다. ② 프로토콜 타입이라고 참조 카운팅이 사라지지 않으며(클래스 인스턴스를 담으면 그대로 카운팅됨) 그것이 목적도 아니다. ③은 반대다 — 프로토콜은 저장 프로퍼티를 가질 수 없고, 요구사항 선언과 (계산 프로퍼티·메서드 위주의) 익스텐션 기본 구현만 제공한다.",
+   "keywords": [
+    "protocol-oriented-programming",
+    "test-double"
+   ],
+   "related": [
+    "swadv-009"
+   ]
+  },
+  {
+   "id": "swadv-005",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 4,
+    "centrality": 5,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "동적으로 변하는 배열을 `ForEach(items.indices, id: \\.self)`처럼 배열 인덱스를 id로 삼아 표시할 때 발생할 수 있는 문제는?",
+   "choices": [
+    "Int 인덱스는 Hashable을 채택하지 않아 `id: \\.self`를 쓰면 컴파일 에러가 난다",
+    "요소를 삽입·삭제하면 같은 인덱스가 다른 요소를 가리키게 되어, 행에 붙은 상태나 애니메이션이 엉뚱한 요소에 적용될 수 있다",
+    "매 렌더링마다 리스트 전체가 새 인스턴스로 복제되어 메모리 사용량이 요소 수에 비례해 두 배로 늘어난다",
+    "인덱스 기반 ForEach는 정적 범위로 취급되어 데이터 개수가 바뀌어도 뷰에 반영되지 않는다"
+   ],
+   "correctIndex": 1,
+   "explanation": "ForEach의 id는 각 데이터에 대한 **뷰 아이덴티티**를 정한다. SwiftUI는 이 id로 \"이전 렌더링의 어떤 행이 지금의 어떤 행과 같은 것인지\"를 판단해 상태(@State), 애니메이션, 트랜지션을 이어 붙인다. 인덱스를 id로 쓰면 아이덴티티가 '몇 번째 위치'에 묶이므로, 맨 앞 요소를 삭제했을 때 SwiftUI는 \"마지막 행 하나가 사라졌다\"고 해석한다 — 나머지 행들의 내용만 한 칸씩 밀려 바뀐 것으로 보여, 행에 붙어 있던 상태·애니메이션이 다른 데이터에 적용되는 버그가 생긴다. 그래서 요소 자체의 안정적이고 고유한 식별자(**Identifiable**의 `id`)를 쓰는 것이 원칙이다.\n\n① `Int`는 Hashable을 채택하므로 컴파일은 잘 된다 — 문제는 런타임 의미론이다. ③ 그런 복제 동작은 없다. ④ `ForEach(0..<5)`처럼 상수 리터럴 범위를 id 없이 쓸 때의 제약을 과장한 것으로, `indices`에 `id: \\.self`를 붙이면 갱신 자체는 된다.",
+   "keywords": [
+    "identifiable",
+    "view-identity"
+   ],
+   "related": []
+  },
+  {
+   "id": "swadv-006",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 3,
+    "centrality": 4,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "struct의 메서드가 자신의 프로퍼티를 변경하려면 `mutating` 키워드가 필요한 이유는?",
+   "choices": [
+    "struct를 힙에 재할당하도록 표시해 참조 타입처럼 여러 곳에서 공유할 수 있게 만들기 위해",
+    "mutating은 컴파일러 최적화 힌트일 뿐이며, 생략해도 프로퍼티 변경 자체는 가능하다",
+    "값 타입 메서드는 기본적으로 self를 바꿀 수 없으므로, self를 통째로 새 값으로 교체하는 것을 허용한다고 표시하기 위해",
+    "여러 스레드가 같은 struct에 접근할 때 프로퍼티 변경에 락을 걸어 데이터 경쟁을 막기 위해"
+   ],
+   "correctIndex": 2,
+   "explanation": "값 타입의 메서드는 기본적으로 `self`가 불변이다. `mutating`을 붙이면 컴파일러가 `self`를 `inout` 매개변수처럼 다뤄, 메서드가 끝날 때 변경된 새 값을 원래 저장 위치에 다시 써 넣는다. 개념적으로 \"프로퍼티를 고친다\"기보다 \"**self 전체를 새 값으로 교체한다**\"에 가깝고, 실제로 mutating 메서드 안에서는 `self = OtherValue(...)`처럼 자기 자신을 통째로 재할당하는 것도 가능하다. 이 **값 의미론** 때문에 `let`으로 선언된 인스턴스에서는 mutating 메서드를 호출할 수 없다 — 저장 위치에 다시 쓸 수 없기 때문이다.\n\n① struct가 mutating 때문에 힙 공유 참조로 바뀌는 일은 없다 — 복사·독립이라는 값 타입 성질은 그대로다. ② 최적화 힌트가 아니라 언어 규칙이다. 생략하면 프로퍼티 변경 코드는 컴파일 에러가 난다. ④ mutating은 동시성 보호와 무관하다 — 락이나 격리를 제공하는 것은 actor 같은 별도 메커니즘이다.",
+   "keywords": [
+    "mutating-method",
+    "value-semantics"
+   ],
+   "related": [
+    "swadv-007"
+   ]
+  },
+  {
+   "id": "swadv-007",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "화면 상태를 `enum LoadState { case loading; case loaded([Item]); case failed(Error) }`처럼 연관 값을 가진 enum으로 모델링할 때 얻는 이점은?",
+   "choices": [
+    "각 상태에 필요한 데이터가 해당 케이스에만 붙어 있어, '로딩 중인데 에러도 있는' 같은 모순된 조합이 타입 수준에서 표현 불가능해진다",
+    "enum은 참조 타입이라 상태를 바꾸면 이를 관찰하는 모든 뷰에 변경이 자동으로 전파된다",
+    "옵셔널 프로퍼티 여러 개를 두는 방식과 상태 공간의 크기는 같지만, 문법이 더 간결해진다",
+    "각 케이스에 raw value를 함께 지정할 수 있어 상태를 저장소에 바로 직렬화할 수 있다"
+   ],
+   "correctIndex": 0,
+   "explanation": "enum은 **합 타입(sum type)**이다 — 가능한 상태의 수가 케이스들의 '합'이 된다. 반면 `var items: [Item]?; var error: Error?; var isLoading: Bool`처럼 프로퍼티를 나열한 struct는 **곱 타입**이라 상태 공간이 각 프로퍼티 경우의 수의 '곱'으로 폭발하고, `isLoading == true`인데 `error`도 있는 식의 모순 조합이 코드로 표현 가능해진다. **연관 값** enum은 데이터를 케이스에 귀속시켜 이런 불가능한 상태를 컴파일러가 원천 차단하게 하고, `switch`의 완전성 검사 덕에 새 상태를 추가하면 처리 누락 지점을 컴파일 에러로 알 수 있다.\n\n② enum은 값 타입이다. 변경 전파는 @Observable 같은 관찰 메커니즘의 몫이지 enum의 성질이 아니다. ③이 바로 핵심을 놓친 오해다 — 합 타입은 상태 공간 자체를 줄인다. 문법 취향의 문제가 아니다. ④ 연관 값을 가진 enum은 raw value를 가질 수 없다 — 두 기능은 상호 배타적이다.",
+   "keywords": [
+    "associated-value",
+    "sum-type"
+   ],
+   "related": [
+    "swadv-014",
+    "swadv-015"
+   ]
+  },
+  {
+   "id": "swadv-008",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 4
+   },
+   "question": "`@State private var text = \"\"`로 선언된 프로퍼티에 대해 `$text`로 접근할 때 얻는 것은?",
+   "choices": [
+    "래퍼가 감싸고 있는 실제 문자열 값(wrappedValue)",
+    "래퍼 인스턴스 자체, 즉 `State<String>` 구조체",
+    "래퍼가 캐시해 둔 직전 값으로, 변경 감지 비교에 사용된다",
+    "래퍼가 노출하는 projectedValue인 `Binding<String>`"
+   ],
+   "correctIndex": 3,
+   "explanation": "프로퍼티 래퍼가 붙은 선언은 컴파일러에 의해 세 가지 접근 경로로 전개된다. `text`는 래퍼의 **wrappedValue**(실제 값), `_text`는 래퍼 인스턴스 자체(`State<String>`), 그리고 `$text`는 래퍼가 **projectedValue** 프로퍼티로 노출하기로 선택한 부가 값이다. `@State`의 projectedValue는 `Binding<String>`이므로, `TextField(\"\", text: $text)`처럼 하위 뷰에 읽기·쓰기 통로를 넘길 수 있다. projectedValue의 타입과 의미는 래퍼마다 다르다 — 정의하지 않은 래퍼는 `$` 접근 자체가 불가능하다.\n\n①은 `$` 없이 `text`로 접근할 때 얻는 것이다. ②는 `$`가 아니라 밑줄 접두사 `_text`가 가리키는 대상이다(이니셜라이저에서 `_text = State(initialValue:)`로 직접 초기화할 때 쓰는 경로). ③ 그런 '이전 값 캐시' 규약은 프로퍼티 래퍼에 존재하지 않는다 — 변경 비교는 각 래퍼·프레임워크의 내부 구현 문제다.",
+   "keywords": [
+    "property-wrapper",
+    "projected-value"
+   ],
+   "related": []
+  },
+  {
+   "id": "swadv-009",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 2,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 5
+   },
+   "question": "`protocol P`가 `a()`를 요구사항으로 선언하고, `extension P`가 `a()`의 기본 구현과 (요구사항에 없는) `b()`를 제공한다. `struct S: P`가 `a()`와 `b()`를 모두 자체 구현했을 때, `let p: any P = S()`에서 `p.a()`와 `p.b()`를 호출하면?",
+   "choices": [
+    "둘 다 `S`의 구현이 호출된다 — 채택한 타입이 제공한 구현이 기본 구현보다 우선하기 때문",
+    "`a()`는 `S`의 구현, `b()`는 익스텐션의 구현이 호출된다 — `a`는 프로토콜 요구사항이라 동적으로, `b`는 요구사항이 아니라서 정적으로 디스패치되기 때문",
+    "둘 다 익스텐션의 기본 구현이 호출된다 — existential 타입으로 선언하면 기본 구현이 타입의 구현을 가리기 때문",
+    "`a()`는 익스텐션의 구현, `b()`는 `S`의 구현이 호출된다 — 요구사항으로 선언된 메서드는 기본 구현이 우선하기 때문"
+   ],
+   "correctIndex": 1,
+   "explanation": "프로토콜 **요구사항**으로 선언된 메서드는 **위트니스 테이블**을 통해 동적으로 디스패치된다. `a()`는 요구사항이므로 런타임에 실제 타입 `S`의 구현이 조회되어 호출된다. 반면 `b()`는 요구사항이 아니라 익스텐션에만 존재하는 메서드다. 이런 메서드는 위트니스 테이블에 자리가 없어 **정적 디스패치**되며, 호출 지점의 컴파일 타임 타입이 `any P`이므로 익스텐션 구현이 선택된다 — `S`가 같은 이름의 메서드를 구현했어도 무시된다(섀도잉). 이는 \"기본 구현을 재정의했는데 안 먹힌다\"는 고전적 함정의 원인이며, 커스터마이징 가능해야 하는 메서드는 반드시 프로토콜 본문에 요구사항으로 선언해야 하는 이유다.\n\n①은 가장 흔한 기대지만 `b()`에 대해서는 틀렸다 — 요구사항 여부가 디스패치 방식을 가른다. ③ 요구사항 메서드까지 기본 구현이 가리지는 않는다 — `a()`는 `S`의 구현이 호출된다. ④는 규칙을 정반대로 뒤집었다.",
+   "keywords": [
+    "protocol-extension",
+    "witness-table",
+    "static-dispatch"
+   ],
+   "related": [
+    "swadv-004",
+    "swadv-010"
+   ]
+  },
+  {
+   "id": "swadv-010",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 2,
+    "centrality": 3,
+    "practicality": 2,
+    "discrimination": 4
+   },
+   "question": "프로토콜 제약이 걸린 Swift 제네릭 함수가 컴파일·실행되는 방식에 대한 설명으로 옳은 것은?",
+   "choices": [
+    "호출 시점마다 런타임 리플렉션으로 값의 타입을 조사해 이름이 일치하는 메서드를 찾아 호출한다",
+    "Java 제네릭처럼 컴파일 후 타입 정보가 소거되어, 런타임에는 모든 타입 파라미터가 Any로 동작한다",
+    "기본적으로 위트니스 테이블을 통해 요구사항 구현을 찾아 호출하며, 컴파일러가 특수화로 구체 타입 전용 버전을 생성해 최적화할 수 있다",
+    "제네릭 인자는 existential 박스에 담겨 전달되므로, `any` 타입을 쓰는 것과 성능 특성이 같다"
+   ],
+   "correctIndex": 2,
+   "explanation": "Swift 제네릭의 기본 구현 모델은 하나의 컴파일된 함수 본문이 타입별 메타데이터와 **위트니스 테이블**(프로토콜 요구사항 → 실제 구현의 매핑 테이블)을 함께 전달받아 동작하는 방식이다. 여기에 더해 컴파일러는 호출 지점에서 구체 타입을 알 수 있으면 **특수화(specialization)** 최적화로 그 타입 전용 버전을 생성해 테이블 간접 호출을 없애고 인라이닝까지 할 수 있다. 즉 \"유연한 단일 본문 + 필요 시 구체화\"의 이중 전략이다.\n\n① 리플렉션 기반 이름 조회가 아니다 — 요구사항과 구현의 연결은 컴파일 시점에 위트니스 테이블로 확정된다. ②는 타 언어 개념의 오적용이다. Swift는 타입 소거를 하지 않으며 런타임에도 타입 메타데이터가 유지된다. ④ 제네릭은 값을 existential 박스에 담지 않는다 — 값이 제 타입 그대로 전달되며, 박싱 비용이 드는 쪽은 `any`다. 이 차이가 제네릭이 대체로 더 빠른 이유다.",
+   "keywords": [
+    "witness-table",
+    "generic-specialization"
+   ],
+   "related": [
+    "swadv-001",
+    "swadv-003",
+    "swadv-009"
+   ]
+  },
+  {
+   "id": "swadv-011",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 4
+   },
+   "question": "Swift String이 `str[3]` 같은 정수 서브스크립트를 제공하지 않는 이유는?",
+   "choices": [
+    "사용자가 인식하는 문자(grapheme cluster)가 가변 길이라, 정수 인덱싱이 암시하는 O(1) 접근을 보장할 수 없기 때문",
+    "String이 클래스로 구현되어 있어 서브스크립트로 접근할 때마다 참조 카운팅 오버헤드가 발생하는 것을 막기 위해서",
+    "String이 UTF-16 고정 폭 인코딩으로 저장되어 정수 인덱스로는 UTF-8 기반 문자를 정확히 표현할 수 없기 때문",
+    "API를 안전하게 보이려는 설계 정책일 뿐이며, 내부적으로는 배열처럼 O(1) 정수 접근이 이미 구현되어 있기 때문"
+   ],
+   "correctIndex": 0,
+   "explanation": "Swift의 `Character`는 **확장 그래핌 클러스터** — 사용자가 '한 글자'로 인식하는 단위(결합 문자, 국기·가족 이모지 등)다. 한 Character가 차지하는 바이트 수가 제각각이므로, n번째 문자의 위치는 문자열 시작부터 경계를 세어야만 알 수 있다(O(n)). Swift 표준 라이브러리는 \"첨자 접근은 O(1)\"이라는 관례를 지키기 위해 정수 대신 **String.Index**라는 불투명 인덱스 타입을 쓰게 하고, 위치 이동 비용을 `index(_:offsetBy:)` 호출로 명시적으로 드러낸다. String이 `RandomAccessCollection`이 아니라 `BidirectionalCollection`인 것도 같은 이유다.\n\n② String은 struct(값 타입)이며, 인덱싱 제한은 참조 카운팅과 무관하다. ③ 사실관계가 뒤엉켰다 — Swift 5부터 String의 네이티브 저장은 UTF-8이고, 애초에 UTF-16도 고정 폭이 아니다(서로게이트 페어 존재). ④는 흔한 오해다 — 정책이 아니라 그래핌 단위 O(1) 접근이 원리적으로 불가능한 것이다.",
+   "keywords": [
+    "grapheme-cluster",
+    "string-index"
+   ],
+   "related": [
+    "swadv-012"
+   ]
+  },
+  {
+   "id": "swadv-012",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 2,
+    "centrality": 2,
+    "practicality": 3,
+    "discrimination": 4
+   },
+   "question": "매우 큰 String에서 잘라낸 Substring을 모델 객체의 프로퍼티로 장기 보관하려 한다. 이때 알아야 할 동작과 권장 관례는?",
+   "choices": [
+    "Substring은 만들어질 때 필요한 부분만 복사한 독립 값이므로, 그대로 보관해도 메모리 부담이 없다",
+    "Substring은 원본을 참조 타입으로 붙들어 retain cycle을 만들 수 있으므로 weak 프로퍼티로 보관해야 한다",
+    "원본 String이 먼저 해제되면 Substring이 해제된 메모리를 가리켜 크래시하므로, 원본의 스코프 안에서만 써야 한다",
+    "Substring은 원본 String의 저장 버퍼를 공유하며 버퍼 전체를 살려 두므로, 장기 보관할 값은 `String(...)`으로 새로 만들어 복사한다"
+   ],
+   "correctIndex": 3,
+   "explanation": "`Substring`은 성능을 위해 원본 String의 저장 버퍼를 **복사 없이 공유**하는 슬라이스 타입이다. 파싱처럼 짧은 구간에서 수많은 부분 문자열을 만들 때는 탁월하지만, Substring이 살아 있는 동안 **원본 버퍼 전체**가 메모리에 유지된다는 대가가 있다. 10MB 문자열에서 잘라낸 10글자 Substring을 모델에 보관하면 10MB가 통째로 잡혀 있는 셈이다. 그래서 표준 라이브러리는 반환 타입을 String이 아닌 Substring으로 구분해 두었고, 스코프를 벗어나 오래 보관할 값은 `String(substring)`으로 필요한 부분만 복사해 원본과의 연결을 끊는 것이 관례다.\n\n①은 정반대다 — 즉시 복사하지 않는 것이 Substring의 존재 이유다. ② Substring은 값 타입이며 retain cycle 개념이 적용되지 않는다. ③ 크래시는 나지 않는다 — Substring이 버퍼의 소유권을 함께 쥐고 있어(ARC) 원본 변수가 사라져도 버퍼는 유지된다. 문제는 안전성이 아니라 메모리 점유다.",
+   "keywords": [
+    "substring"
+   ],
+   "related": [
+    "swadv-011",
+    "swadv-016"
+   ]
+  },
+  {
+   "id": "swadv-013",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 2,
+    "centrality": 3,
+    "practicality": 2,
+    "discrimination": 3
+   },
+   "question": "커스텀 타입의 인스턴스를 `for-in` 루프에서 순회할 수 있게 만드는 최소 요건은?",
+   "choices": [
+    "Sequence를 채택하고, `makeIterator()`가 반환하는 IteratorProtocol 준수 타입이 `next()`로 요소를 차례로 내놓게 한다",
+    "Collection을 채택해 startIndex·endIndex와 서브스크립트까지 구현해야 for-in이 동작한다",
+    "Iterable을 채택하고 `iterator()` 메서드를 구현하면 컴파일러가 루프 코드를 생성한다",
+    "IteratorProtocol 하나만 채택하면 for-in이 인스턴스의 `next()`를 직접 호출해 순회한다"
+   ],
+   "correctIndex": 0,
+   "explanation": "`for-in`이 요구하는 것은 **Sequence** 준수뿐이다. 컴파일러는 루프를 `makeIterator()` 호출과 반복적인 `next()` 호출로 전개한다 — `next()`가 `nil`을 반환하면 순회가 끝난다. 즉 최소 구현은 (1) 요소를 하나씩 내놓는 **IteratorProtocol** 준수 타입, (2) 그것을 반환하는 `makeIterator()` 두 가지다. 참고로 타입이 IteratorProtocol을 준수하면서 Sequence 채택을 함께 선언하면 `makeIterator()`는 자기 자신을 반환하는 기본 구현으로 자동 제공된다. Sequence는 단 한 번만 순회 가능해도 무방하다는 점(단일 패스 허용)도 특징이다.\n\n② Collection은 다중 순회 보장·인덱스 접근·`count` 등을 더한 상위 요구사항으로, for-in만을 위해서는 과한 요건이다. ③ `Iterable`/`iterator()`는 Java·Kotlin의 개념이다 — Swift에는 존재하지 않는다. ④ IteratorProtocol 채택만으로는 부족하다 — for-in은 Sequence 준수를 요구하며, Sequence 채택 선언이 있어야 기본 `makeIterator()`도 활성화된다.",
+   "keywords": [
+    "sequence-protocol",
+    "iterator-protocol"
+   ],
+   "related": [
+    "swadv-001"
+   ]
+  },
+  {
+   "id": "swadv-014",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "niche",
+   "eval": {
+    "frequency": 1,
+    "centrality": 2,
+    "practicality": 2,
+    "discrimination": 3
+   },
+   "question": "`enum Expr { case number(Int); indirect case add(Expr, Expr) }`처럼 자기 자신을 연관 값으로 갖는 enum에 `indirect`가 필요한 이유는?",
+   "choices": [
+    "재귀 케이스를 컴파일러가 무한 루프로 판단해 금지하므로, indirect가 재귀 깊이 제한을 해제해 주기 때문",
+    "값 타입이 자신을 직접 내장하면 크기를 유한하게 결정할 수 없으므로, indirect가 연관 값을 힙에 간접 저장하게 해 크기를 고정하기 때문",
+    "enum은 본래 참조 타입이라 재귀가 자유롭지만, indirect가 값 의미론으로 전환해 복사 동작을 강제하기 때문",
+    "indirect는 재귀 구조임을 알리는 문서화용 표시일 뿐, 메모리 표현에는 아무 영향이 없기 때문"
+   ],
+   "correctIndex": 1,
+   "explanation": "값 타입의 크기는 컴파일 시점에 확정되어야 하는데, enum이 자기 자신을 연관 값으로 **직접** 내장하면 `Expr의 크기 = Expr의 크기 + α`라는 무한 재귀가 되어 크기를 계산할 수 없다. `indirect`는 해당 케이스의 연관 값을 인라인 대신 **힙에 할당하고 참조로 가리키는** 표현으로 바꿔, enum 자체의 크기를 포인터 수준으로 고정시킨다. 케이스 단위(`indirect case`)로도, enum 전체(`indirect enum`)로도 붙일 수 있으며, 간접 저장이 되어도 복사·독립이라는 값 의미론은 겉보기 동작으로 유지된다. 수식 트리, 연결 리스트, JSON 같은 재귀적 자료 구조를 enum으로 모델링할 때 쓰는 도구다.\n\n① 컴파일러가 막는 것은 무한 루프가 아니라 '크기 미확정'이며, 재귀 깊이 제한 같은 개념도 아니다. ③은 반대다 — enum은 원래 값 타입이고, indirect는 내부 표현에 간접층을 더할 뿐이다. ④ 문서화 표시가 아니라 메모리 표현을 실제로 바꾸는 키워드다.",
+   "keywords": [
+    "indirect-enum",
+    "associated-value"
+   ],
+   "related": [
+    "swadv-007",
+    "swadv-015"
+   ]
+  },
+  {
+   "id": "swadv-015",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "niche",
+   "eval": {
+    "frequency": 1,
+    "centrality": 2,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "switch 문에서 `@unknown default`를 사용하는 목적은?",
+   "choices": [
+    "일반 default와 동작은 같지만 점프 테이블을 쓰도록 유도하는 성능 최적화 어노테이션이다",
+    "런타임에 알 수 없는 케이스를 만나면 해당 분기를 건너뛰게 해 크래시를 방지하는 안전장치다",
+    "케이스가 추가될 수 있는 non-frozen enum을 다룰 때, 알려진 케이스를 빠뜨리면 컴파일러가 경고하게 하면서 미래의 새 케이스는 이 분기로 받게 한다",
+    "자신이 정의한 enum에 붙여, 나중에 케이스를 추가해도 경고조차 없이 기존 switch 문이 그대로 유효하게 만든다"
+   ],
+   "correctIndex": 2,
+   "explanation": "SDK가 제공하는 enum(예: Foundation·UIKit의 열거형)은 **non-frozen**일 수 있다 — 라이브러리의 다음 버전에서 케이스가 추가될 수 있다는 뜻이다. 일반 `default`로 처리하면 컴파일은 되지만, 새로 추가된 케이스는 물론 **지금 존재하는데 깜빡 빠뜨린 케이스**까지 조용히 default로 흘러들어 실수를 감춘다. `@unknown default`는 이 딜레마를 푼다 — 컴파일 시점에 알려진 모든 케이스를 나열했는지 **완전성 검사를 유지**해 누락 시 경고를 내면서도, 런타임에 미래 버전이 보낸 새 케이스가 오면 이 분기가 받아낸다. 즉 '현재의 엄격함'과 '미래 호환성'을 동시에 얻는 장치다.\n\n① 성능과 무관한 완전성 검사 도구다. ② 분기를 건너뛰는 것이 아니라 이 분기가 **실행**되며, 크래시 방지가 아니라 컴파일 타임 검증 유지가 본질이다. ④는 방향이 반대다 — @unknown default는 나열하지 않은 케이스가 생기면 **경고를 내는** 장치이지 경고를 없애는 장치가 아니며, 자기 모듈 안의 enum은 컴파일러가 모든 케이스를 알고 있어 본래의 대상 상황(SDK 경계 너머의 non-frozen enum)도 아니다.",
+   "keywords": [
+    "unknown-default"
+   ],
+   "related": [
+    "swadv-007",
+    "swadv-014"
+   ]
+  },
+  {
+   "id": "swadv-016",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "niche",
+   "eval": {
+    "frequency": 1,
+    "centrality": 2,
+    "practicality": 3,
+    "discrimination": 4
+   },
+   "question": "`let arr = [10, 20, 30, 40]` 에서 `let slice = arr[2...]` 로 슬라이스를 만든 뒤 `slice[0]` 에 접근하면 어떻게 되는가?",
+   "choices": [
+    "`30`이 반환된다 — 슬라이스는 0부터 다시 인덱싱되는 독립된 배열로 만들어지기 때문",
+    "컴파일 에러가 난다 — ArraySlice는 정수 서브스크립트를 제공하지 않기 때문",
+    "`nil`이 반환된다 — 슬라이스의 범위 밖 접근은 옵셔널로 안전하게 처리되기 때문",
+    "런타임에 크래시한다 — 슬라이스는 원본의 인덱스를 공유해 유효 인덱스가 2...3이므로 0은 범위 밖이기 때문"
+   ],
+   "correctIndex": 3,
+   "explanation": "`ArraySlice`는 원본 배열의 저장소를 복사 없이 공유하는 뷰이며, 인덱스 체계도 **원본과 공유**한다. `arr[2...]`의 유효 인덱스는 0부터가 아니라 **2...3**이다 — `slice.startIndex`는 2, `slice[2]`가 `30`이다. 따라서 `slice[0]`은 범위 밖 접근으로 런타임에 트랩(크래시)된다. 인덱스 공유는 슬라이스에서 찾은 위치를 원본에 그대로 적용할 수 있게 하려는 설계지만, \"컬렉션은 0부터\"라는 습관과 충돌하는 대표적 함정이다. 안전한 관례는 하드코딩된 0 대신 `slice.startIndex`·`slice.first`를 쓰거나, 인덱스를 리셋한 독립 복사본이 필요하면 `Array(slice)`로 새 배열을 만드는 것이다.\n\n①은 가장 흔한 기대지만 슬라이스는 재인덱싱된 독립 배열이 아니다. ② ArraySlice도 Collection이므로 정수 인덱스 서브스크립트는 컴파일된다 — 문제는 런타임 범위다. ③ 배열 계열의 범위 밖 서브스크립트는 옵셔널이 아니라 트랩으로 처리된다(옵셔널 반환은 Dictionary 키 조회의 동작이다).",
+   "keywords": [
+    "array-slice"
+   ],
+   "related": [
+    "swadv-012"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,402 @@
+{
+ "id": "data-networking",
+ "title": "데이터·네트워킹",
+ "description": "URLSession, Codable/CodingKeys, UserDefaults/Keychain, SwiftData/CoreData 영속성",
+ "questions": [
+  {
+   "id": "net-001",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 2
+   },
+   "question": "URLSession을 만들 때 지정하는 URLSessionConfiguration의 세 가지 기본 구성(default / ephemeral / background)에 대한 설명으로 옳은 것은?",
+   "choices": [
+    "default 구성은 성능을 위해 응답 캐시나 쿠키를 어디에도 저장하지 않는다",
+    "background 구성 세션은 앱이 포그라운드에 있는 동안에만 전송을 이어갈 수 있다",
+    "ephemeral 구성은 캐시·쿠키·자격 증명을 디스크에 기록하지 않고 메모리에서만 유지한다",
+    "세션 생성 후 구성 객체의 프로퍼티를 바꾸면 이미 만들어진 세션에도 즉시 반영된다"
+   ],
+   "correctIndex": 2,
+   "explanation": "URLSessionConfiguration은 세션의 캐시·쿠키·타임아웃·백그라운드 동작 등을 결정한다. **default**는 디스크 기반 URLCache·쿠키 저장소·자격 증명 저장을 사용하고, **ephemeral**은 같은 구성 요소를 디스크에 쓰지 않고 메모리에서만 유지해 세션이 사라지면 흔적이 남지 않는다(프라이빗 브라우징 성격의 기능에 적합). **background**는 전송을 시스템에 위임해 앱이 suspend·종료되어도 업로드·다운로드가 이어진다.\n\n① default는 캐시를 저장하지 않는 것이 아니라 디스크 캐시를 적극 사용하는 구성이다. ② background는 오히려 앱이 실행 중이 아닐 때도 전송을 계속하기 위한 구성이므로 반대다. ④ 구성 객체는 세션 생성 시점에 **복사**되므로, 이후 프로퍼티를 바꿔도 기존 세션에는 반영되지 않는다 — 다른 동작이 필요하면 새 세션을 만들어야 한다.",
+   "keywords": [
+    "url-session-configuration",
+    "urlsession"
+   ],
+   "related": [
+    "net-002",
+    "net-009"
+   ]
+  },
+  {
+   "id": "net-002",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 4,
+    "centrality": 4,
+    "practicality": 4,
+    "discrimination": 3
+   },
+   "question": "SwiftUI 화면에서 `let (data, _) = try await URLSession.shared.data(from: url)` 로 JSON을 받아 표시하려 한다. 이 async 방식이 completion handler 기반 dataTask와 다른 점으로 옳은 것은?",
+   "choices": [
+    "실패가 throw로 전달되고, 이 호출을 감싼 Task를 취소하면 진행 중인 요청도 함께 취소된다",
+    "응답을 기다리는 동안 호출한 스레드를 점유(블로킹)한 채 대기한다",
+    "dataTask와 마찬가지로 resume()을 호출해야 실제 요청이 시작된다",
+    "결과가 별도의 델리게이트 큐 클로저로 전달되므로 UI 갱신 전 메인 큐 전환 코드가 필요하다"
+   ],
+   "correctIndex": 0,
+   "explanation": "`URLSession.shared.data(from:)` 같은 async API는 Swift 동시성과 통합되어 있다. 실패는 completion의 `Error?` 파라미터 대신 **throw**로 전달되어 do-catch로 다루고, 이 호출을 감싼 Task가 취소되면 협조적 취소가 전파되어 진행 중인 네트워크 요청도 취소된다(URLError.cancelled 등으로 표면화).\n\n② await는 스레드를 블로킹하지 않는다 — 함수가 suspend되는 동안 그 스레드는 다른 작업을 수행할 수 있으며, 이것이 동기 대기와의 결정적 차이다. ③ resume()은 completion 기반 dataTask에 필요한 절차이고, async 메서드는 호출 즉시 요청이 시작된다. ④ 콜백 클로저가 없으므로 델리게이트 큐 문제 자체가 사라진다. @MainActor 컨텍스트(SwiftUI 뷰의 .task 등)에서 호출했다면 await 이후에도 같은 액터로 복귀하므로 별도의 메인 큐 전환 코드가 필요 없다.",
+   "keywords": [
+    "urlsession"
+   ],
+   "related": [
+    "net-001",
+    "net-009"
+   ]
+  },
+  {
+   "id": "net-003",
+   "type": "choice",
+   "difficulty": 1,
+   "coverage": "core",
+   "eval": {
+    "frequency": 4,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 2
+   },
+   "question": "서버 JSON의 키 이름과 Swift 프로퍼티 이름이 다를 때 사용하는 CodingKeys 열거형에 대한 설명으로 옳은 것은?",
+   "choices": [
+    "CodingKeys를 선언하면 컴파일러 자동 합성이 중단되어 init(from:)과 encode(to:)를 직접 구현해야 한다",
+    "키 이름 매핑은 JSONDecoder의 keyDecodingStrategy로만 가능하며 CodingKeys는 인코딩 순서를 지정하는 용도다",
+    "CodingKeys는 런타임 리플렉션으로 키를 치환하므로 매핑이 많을수록 디코딩 비용이 크게 늘어난다",
+    "프로퍼티와 직렬화 키의 대응을 정의하며, 열거형에서 뺀 프로퍼티는 인코딩·디코딩 대상에서 제외된다"
+   ],
+   "correctIndex": 3,
+   "explanation": "CodingKeys는 String raw value를 갖는 중첩 열거형으로, **프로퍼티 이름 ↔ 직렬화 키**의 대응을 정의한다. `case userName = \"user_name\"`처럼 raw value로 JSON 키를 지정하고, 열거형에서 뺀 프로퍼티는 인코딩·디코딩에서 제외된다(디코딩에서 빼려면 해당 프로퍼티에 기본값이 있어야 한다).\n\n① CodingKeys를 정의해도 init(from:)·encode(to:)의 **자동 합성은 유지**된다. 합성이 사라지는 것은 이 메서드들을 직접 구현할 때다. ② keyDecodingStrategy(.convertFromSnakeCase 등)는 snake_case처럼 규칙적인 변환에 편리한 별도 수단일 뿐이고, 임의의 키 매핑은 CodingKeys가 담당한다. ③ CodingKeys는 컴파일 타임에 처리되는 정적 매핑이므로 리플렉션 비용 같은 것은 발생하지 않는다.",
+   "keywords": [
+    "coding-keys",
+    "codable"
+   ],
+   "related": [
+    "net-008",
+    "net-012",
+    "net-014"
+   ]
+  },
+  {
+   "id": "net-004",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 4,
+    "centrality": 3,
+    "practicality": 4,
+    "discrimination": 3
+   },
+   "question": "앱에서 세 가지 데이터를 저장해야 한다: 자동 로그인용 인증 토큰, 다크 모드 on/off 설정값, 수천 건 규모의 게시글 오프라인 캐시. 저장소 선택으로 가장 적절한 것은?",
+   "choices": [
+    "세 가지 모두 Keychain에 저장해 암호화와 저장 방식을 일원화한다",
+    "토큰은 Keychain, 설정값은 UserDefaults, 게시글 캐시는 SwiftData 같은 데이터베이스에 저장한다",
+    "토큰은 UserDefaults에 Data로 변환해 넣으면 Keychain과 동등한 수준으로 보호된다",
+    "게시글 캐시도 UserDefaults에 넣는 것이 조회 속도 면에서 데이터베이스보다 유리하다"
+   ],
+   "correctIndex": 1,
+   "explanation": "저장소는 데이터의 **성격**으로 고른다. 인증 토큰 같은 비밀 값은 시스템이 암호화해 관리하는 Keychain에, 다크 모드 같은 가벼운 설정은 UserDefaults에, 수천 건 규모의 구조화 데이터는 쿼리·정렬·부분 로드가 가능한 SwiftData/Core Data에 두는 것이 표준적인 배치다.\n\n① Keychain은 소량의 비밀 데이터용으로 설계된 저장소라 대량 레코드의 저장·검색에는 부적합하고, 조건 검색 같은 기능도 없다. ③ UserDefaults는 plist 파일로 **평문 저장**되므로 탈옥 기기나 백업 추출 등으로 내용이 노출될 수 있다. Data로 변환하는 것은 표현 형식만 바꿀 뿐 암호화가 아니어서 토큰 보관에 쓰면 안 된다. ④ UserDefaults는 시작 시 전체 plist를 메모리에 올리는 구조라 대량 데이터에 성능·메모리 면에서 불리하고, 인덱스 기반 조회나 조건 검색도 불가능하다.",
+   "keywords": [
+    "keychain",
+    "user-defaults"
+   ],
+   "related": [
+    "net-007",
+    "net-013"
+   ]
+  },
+  {
+   "id": "net-005",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "REST API 설계에서 HTTP 메서드의 멱등성(idempotency)에 대한 설명으로 옳은 것은?",
+   "choices": [
+    "PUT은 같은 요청을 여러 번 보내도 서버 상태가 한 번 보냈을 때와 같아지도록 정의된 멱등 메서드다",
+    "POST도 멱등이므로 네트워크 오류 시 결제 생성 요청을 그대로 재전송해도 중복 위험이 없다",
+    "GET은 요청 바디로 서버 상태를 변경하는 표준 수단으로 정의되어 있다",
+    "PATCH는 리소스 전체를 새 표현으로 교체하고, PUT은 일부 필드만 수정한다"
+   ],
+   "correctIndex": 0,
+   "explanation": "멱등성은 '같은 요청을 여러 번 수행해도 서버 상태가 한 번 수행했을 때와 같다'는 성질이다. HTTP 명세상 GET·PUT·DELETE는 멱등, POST는 비멱등으로 정의된다. PUT은 지정한 리소스를 주어진 표현으로 통째로 교체하므로 몇 번을 보내도 결과가 같고, 그래서 네트워크 오류 시 비교적 안전하게 재시도할 수 있다.\n\n② POST는 '새 리소스 생성'처럼 호출할 때마다 부수 효과가 누적될 수 있는 비멱등 메서드다. 결제처럼 중복이 치명적인 요청은 클라이언트가 멱등 키(idempotency key)를 함께 보내 서버가 중복을 걸러내게 하는 별도 장치가 필요하다. ③ GET은 서버 상태를 변경하지 않는 안전(safe) 메서드여야 하며, 요청 바디 사용도 관례상 피한다. ④는 두 메서드를 반대로 설명했다 — 전체 교체가 PUT, 부분 수정이 PATCH다.",
+   "keywords": [
+    "idempotency"
+   ],
+   "related": [
+    "net-006",
+    "net-010"
+   ]
+  },
+  {
+   "id": "net-006",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "core",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "HTTPS(TLS) 통신의 동작 방식에 대한 설명으로 옳은 것은?",
+   "choices": [
+    "핸드셰이크 이후의 애플리케이션 데이터는 서버의 공개키(비대칭 암호)로 직접 암호화해 전송한다",
+    "핸드셰이크에서 서버 인증서 검증과 키 교환을 거친 뒤, 실제 데이터는 협상된 대칭키로 암호화한다",
+    "HTTPS는 서버 신원 보증이 목적이며 전송 구간의 데이터 암호화는 포함하지 않는다",
+    "iOS의 ATS(App Transport Security)는 평문 HTTP를 기본 허용하고 HTTPS 적용은 앱이 선택하는 방식이다"
+   ],
+   "correctIndex": 1,
+   "explanation": "TLS는 **비대칭 + 대칭 암호의 하이브리드**다. 핸드셰이크 단계에서 클라이언트가 서버 인증서를 신뢰 체인으로 검증해 신원을 확인하고, 키 교환(현대 TLS에서는 ECDHE 계열)으로 세션용 대칭키를 합의한다. 이후 실제 애플리케이션 데이터는 이 대칭키로 암호화한다 — 대칭 암호가 비대칭 연산보다 훨씬 빠르기 때문에 성능과 보안을 함께 얻는 구조다.\n\n① 공개키로 데이터 전체를 암호화하지 않는다. 비대칭 연산은 느려서 신원 확인과 키 합의 단계에 쓰인다. ③ HTTPS는 신원 보증에 더해 전송 구간의 기밀성(암호화)과 무결성 검증까지 제공한다. ④는 반대다 — iOS의 ATS는 기본적으로 HTTPS(TLS 1.2 이상)를 강제하며, 평문 HTTP가 필요하면 Info.plist에 예외 도메인을 명시하는 opt-out 방식이다.",
+   "keywords": [
+    "tls-handshake",
+    "app-transport-security"
+   ],
+   "related": [
+    "net-005"
+   ]
+  },
+  {
+   "id": "net-007",
+   "type": "choice",
+   "difficulty": 1,
+   "coverage": "core",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 2
+   },
+   "question": "SwiftData로 영속 모델을 정의하고 SwiftUI 뷰에서 사용하는 기본 구조로 옳은 것은?",
+   "choices": [
+    "@Model은 struct에 붙여 값 타입 그대로 저장하는 매크로다",
+    "목록 조회에는 @FetchRequest를 쓰고, @Query는 Core Data 전용 프로퍼티 래퍼다",
+    "@Model 인스턴스는 생성하는 순간 자동으로 저장소에 들어가므로 ModelContext 없이도 영속화된다",
+    "@Model을 클래스에 붙여 모델을 정의하고, 앱에 modelContainer를 설정한 뒤 뷰에서 @Query로 조회한다"
+   ],
+   "correctIndex": 3,
+   "explanation": "SwiftData의 기본 3요소는 **@Model(모델 정의) → ModelContainer(저장소 설정) → @Query(뷰에서 조회)**다. @Model 매크로를 클래스에 붙이면 저장 프로퍼티가 영속 속성으로 관리되고 변경 추적이 자동으로 붙는다. 앱(또는 특정 씬)에 `.modelContainer(for:)`를 설정하면 environment로 ModelContext가 주입되고, 뷰에서는 @Query로 조건·정렬을 지정해 목록을 읽으면 데이터 변경 시 뷰가 자동 갱신된다.\n\n① @Model은 참조 의미론과 변경 추적이 필요하므로 **클래스 전용**이며 struct에는 붙일 수 없다. ② 관계가 반대다 — @FetchRequest가 Core Data용이고, @Query가 SwiftData용이다. ③ 인스턴스 생성만으로는 영속화되지 않는다. `modelContext.insert(_:)`로 컨텍스트에 등록해야 저장 대상이 된다.",
+   "keywords": [
+    "swift-data",
+    "model-context"
+   ],
+   "related": [
+    "net-004"
+   ]
+  },
+  {
+   "id": "net-008",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 3,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 4
+   },
+   "question": "서버 JSON이 `{\"user\": {\"profile\": {\"name\": \"Kim\"}}}`처럼 중첩되어 있는데, 이를 name 프로퍼티 하나만 가진 평평한 Swift 타입으로 디코드하려 한다. 적절한 방법은?",
+   "choices": [
+    "CodingKeys의 raw value에 \"user.profile.name\" 같은 키 경로를 적으면 자동으로 따라 들어간다",
+    "keyDecodingStrategy를 .convertFromSnakeCase로 설정하면 중첩 구조가 평탄화된다",
+    "init(from:)을 직접 구현해 nestedContainer(keyedBy:forKey:)로 내부 계층에 접근한다",
+    "중첩 JSON은 계층마다 대응하는 별도 Codable 타입을 만들지 않고는 디코드할 방법이 없다"
+   ],
+   "correctIndex": 2,
+   "explanation": "JSON 계층과 Swift 타입 구조가 다를 때는 `init(from decoder:)`를 직접 구현한다. 최상위 `container(keyedBy:)`에서 시작해 `nestedContainer(keyedBy:forKey:)`로 중첩 객체 안으로 한 단계씩 들어가면, 중간 계층 타입을 만들지 않고도 깊숙한 값을 꺼내 평평한 타입에 담을 수 있다. 이때 각 계층의 키를 표현하는 CodingKeys 열거형을 계층별로 하나씩 정의해 사용한다.\n\n① CodingKeys의 raw value는 **한 계층의 키 이름**일 뿐, \"a.b.c\" 같은 키 경로 문법은 지원되지 않는다. ② convertFromSnakeCase는 snake_case를 camelCase로 바꾸는 **이름 변환** 전략이지 구조를 바꾸는 기능이 아니다. ④ 중간 타입을 계층마다 만드는 것은 편한 방법 중 하나일 뿐이며, 중첩 컨테이너를 쓰면 중간 타입 없이도 디코드할 수 있으므로 '방법이 없다'는 과잉 일반화다.",
+   "keywords": [
+    "nested-container",
+    "codable"
+   ],
+   "related": [
+    "net-003"
+   ]
+  },
+  {
+   "id": "net-009",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 2,
+    "centrality": 2,
+    "practicality": 3,
+    "discrimination": 4
+   },
+   "question": "대용량 파일 다운로드를 사용자가 홈으로 나가 앱이 suspend된 뒤에도 계속 진행하려 한다. 올바른 접근은?",
+   "choices": [
+    "Task.detached로 다운로드를 실행하면 앱 프로세스가 suspend되어도 태스크가 계속 실행된다",
+    "URLSessionConfiguration.background 세션을 쓰면 시스템이 앱 밖에서 전송을 대행하며, 결과는 델리게이트 콜백으로 받는다",
+    "background 세션에서도 completion handler 클로저 API를 그대로 쓸 수 있어 델리게이트 구현이 필요 없다",
+    "beginBackgroundTask를 호출해 두면 일반 세션의 다운로드도 시간 제한 없이 계속된다"
+   ],
+   "correctIndex": 1,
+   "explanation": "앱 프로세스가 suspend되면 그 안에서 도는 코드도 전부 멈춘다. 그래서 background 구성 세션은 전송 자체를 **시스템의 별도 데몬에 위임**한다. 앱이 suspend되거나 종료돼도 다운로드가 이어지고, 완료되면 시스템이 앱을 백그라운드에서 깨워 `urlSession(_:downloadTask:didFinishDownloadingTo:)` 같은 델리게이트 메서드로 결과를 전달한다.\n\n① Task.detached는 구조적 동시성 계층에서 분리될 뿐 여전히 **앱 프로세스 안**에서 실행되므로, 프로세스가 suspend되면 함께 멈춘다. ③ background 세션은 completion handler·async 편의 API를 지원하지 않고 델리게이트 기반 사용을 요구한다 — 앱이 종료됐다가 다시 실행될 수 있어 클로저를 보존할 방법이 없기 때문이다. ④ beginBackgroundTask는 수십 초 수준의 짧은 유예 시간을 얻는 API로, 대용량 전송을 보장하는 수단이 아니다.",
+   "keywords": [
+    "background-session",
+    "urlsession"
+   ],
+   "related": [
+    "net-001",
+    "net-002"
+   ]
+  },
+  {
+   "id": "net-010",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 2,
+    "centrality": 3,
+    "practicality": 3,
+    "discrimination": 4
+   },
+   "question": "HTTP 캐시 재검증에 쓰이는 ETag와 조건부 요청의 동작으로 옳은 것은?",
+   "choices": [
+    "보관해 둔 ETag를 If-None-Match 헤더로 보내면, 리소스가 그대로일 때 서버가 바디 없는 304로 응답해 캐시 재사용을 지시한다",
+    "ETag는 클라이언트가 임의로 생성해 서버에 등록을 요청하는 캐시 식별자다",
+    "304 응답에는 갱신된 리소스 전체가 실려 와 클라이언트의 로컬 캐시를 덮어쓴다",
+    "URLSession은 HTTP 캐시 헤더를 해석하지 않으므로 조건부 요청 로직을 앱 코드로 직접 구현해야 한다"
+   ],
+   "correctIndex": 0,
+   "explanation": "ETag는 **서버가** 리소스의 버전을 식별하려고 응답 헤더에 실어 주는 검증자다. 클라이언트는 이를 캐시와 함께 보관했다가 재요청 시 `If-None-Match` 헤더로 되돌려 보낸다. 리소스가 변하지 않았으면 서버는 바디 없이 `304 Not Modified`만 응답하고, 클라이언트는 보관 중인 캐시를 그대로 쓴다 — 전송량과 파싱 비용을 크게 줄이는 재검증(revalidation) 메커니즘이다.\n\n② ETag의 생성 주체는 서버다. 클라이언트는 받은 값을 그대로 되돌려 보낼 뿐이다. ③ 304는 '변경 없음' 신호이므로 바디가 비어 있다는 점이 핵심이다. 갱신본 전체가 내려오는 경우는 200 응답이다. ④ URLSession은 URLCache를 통해 Cache-Control·ETag 등 표준 캐시 헤더를 해석하며, 기본 캐시 정책에서 조건부 요청과 304 처리를 상당 부분 자동으로 수행한다.",
+   "keywords": [
+    "etag"
+   ],
+   "related": [
+    "net-005",
+    "net-011"
+   ]
+  },
+  {
+   "id": "net-011",
+   "type": "choice",
+   "difficulty": 2,
+   "coverage": "deep",
+   "eval": {
+    "frequency": 3,
+    "centrality": 2,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "리스트 스크롤 성능을 위해 이미지 메모리 캐시를 만들 때, Dictionary 대신 NSCache를 쓰는 이유로 옳은 것은?",
+   "choices": [
+    "NSCache는 항목을 디스크에도 기록해 앱을 재시작해도 캐시가 유지되기 때문이다",
+    "NSCache는 struct 같은 값 타입을 키와 값으로 바로 저장할 수 있기 때문이다",
+    "NSCache는 메모리 경고가 와도 개발자가 명시적으로 비우기 전까지 항목을 보존해 주기 때문이다",
+    "메모리 압박 시 시스템이 항목을 자동으로 제거할 수 있고, 여러 스레드에서 동시에 접근해도 안전하기 때문이다"
+   ],
+   "correctIndex": 3,
+   "explanation": "NSCache는 캐시 용도에 맞춘 두 가지 특성이 Dictionary와 다르다. 첫째, 시스템 **메모리 압박 시 항목을 자동으로 퇴출(evict)**한다 — countLimit·totalCostLimit으로 상한 힌트를 줄 수도 있다. 둘째, 내부적으로 동기화되어 있어 여러 스레드에서 별도의 락 없이 읽고 써도 안전하다. 이미지처럼 '다시 만들 수 있지만 만들기 비싼 데이터'를 담기에 적합한 이유다.\n\n① NSCache는 순수 메모리 캐시라 앱 종료 시 내용이 사라진다. 디스크 계층이 필요하면 URLCache나 파일 저장을 별도로 조합해야 한다. ② Objective-C 기반이라 키와 값 모두 클래스(AnyObject) 타입이어야 하며, String 키를 쓰려면 NSString으로 다뤄야 한다. ③은 Dictionary의 동작이다 — NSCache의 항목은 언제든 비워질 수 있으므로 '있으면 재사용하고 없으면 다시 만든다'는 전제로 다뤄야 한다.",
+   "keywords": [
+    "nscache"
+   ],
+   "related": [
+    "net-010"
+   ]
+  },
+  {
+   "id": "net-012",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "niche",
+   "eval": {
+    "frequency": 2,
+    "centrality": 2,
+    "practicality": 3,
+    "discrimination": 4
+   },
+   "question": "@Observable을 붙인 클래스를 JSONEncoder로 인코딩했더니 JSON 키가 \"_name\"처럼 언더스코어가 붙어 출력된다. 원인과 해결책으로 옳은 것은?",
+   "choices": [
+    "JSONEncoder의 keyEncodingStrategy 기본값이 키 앞에 언더스코어를 붙이므로 전략을 .useDefaultKeys로 바꾼다",
+    "@Observable 매크로가 저장 프로퍼티를 언더스코어 백킹 필드로 재작성하기 때문이며, CodingKeys로 원하는 키 이름을 매핑해 해결한다",
+    "클래스 타입은 자동 합성 대신 리플렉션(Mirror)으로 인코딩되어 내부 필드 이름이 그대로 노출되는 것이다",
+    "@Observable 타입은 Codable을 채택할 수 없으므로 별도 DTO struct를 만들어 우회해야 한다"
+   ],
+   "correctIndex": 1,
+   "explanation": "@Observable 매크로는 프로퍼티 단위 관찰을 넣기 위해 저장 프로퍼티를 `_name` 형태의 백킹 필드로 재작성하고 원래 이름은 연산 프로퍼티로 바꾼다. Codable 자동 합성은 **저장 프로퍼티** 기준으로 동작하므로, 인코딩 결과에 매크로가 만든 `_name` 키가 그대로 노출된다. 해결은 CodingKeys로 백킹 필드에 원래 키를 매핑하는 것이다: `enum CodingKeys: String, CodingKey { case _name = \"name\" }`처럼 적으면 입출력 JSON이 깨끗해진다.\n\n① keyEncodingStrategy의 기본값이 이미 .useDefaultKeys(프로퍼티 이름 그대로)이고, 언더스코어를 붙이는 전략은 존재하지 않는다 — 원인은 인코더가 아니라 매크로의 코드 재작성이다. ③ 클래스라서가 아니다. @Observable이 없는 일반 클래스는 struct와 똑같이 깔끔한 키로 합성되며, Codable 합성은 리플렉션을 쓰지 않는다. ④ @Observable 타입도 Codable 채택이 가능하며, CodingKeys 정리로 DTO 없이 해결된다.",
+   "keywords": [
+    "observable-macro",
+    "coding-keys"
+   ],
+   "related": [
+    "net-003"
+   ]
+  },
+  {
+   "id": "net-013",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "niche",
+   "eval": {
+    "frequency": 1,
+    "centrality": 2,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "FileManager로 documents 디렉터리에 민감한 데이터를 쓸 때 write 옵션으로 .completeFileProtection을 지정하면 얻는 효과는?",
+   "choices": [
+    "해당 파일이 iCloud 백업 대상에서 제외된다",
+    "파일이 시스템 영역에 저장되어 앱을 삭제해도 데이터가 유지된다",
+    "기기가 잠겨 있는 동안 파일이 암호화된 상태로 유지되어, 잠금 해제 상태에서만 내용을 읽을 수 있다",
+    "쓰기 시점에 해시를 기록해 변조 여부를 검증하는 옵션으로, 내용 암호화와는 무관하다"
+   ],
+   "correctIndex": 2,
+   "explanation": "iOS 데이터 보호(Data Protection)는 파일을 기기 잠금 상태와 연동된 클래스 키로 암호화하는 시스템 기능이다. `.completeFileProtection`(NSFileProtectionComplete)은 가장 강한 등급으로, 기기가 잠기면 해당 파일의 복호화 키 접근이 차단되어 잠금 해제 전까지 내용을 읽을 수 없다. 잠금 중에도 백그라운드에서 파일 접근이 필요한 앱이라면 completeUnlessOpen 같은 완화된 등급을 검토해야 한다.\n\n① iCloud 백업 제외는 URLResourceValues의 isExcludedFromBackup으로 지정하는 별개의 설정이다. ② 앱 샌드박스 안의 파일은 보호 등급과 무관하게 앱 삭제 시 함께 삭제된다 — 앱 삭제 후에도 남을 수 있는 것은 Keychain 항목 쪽의 특성이다. ④ 이 옵션의 본질은 무결성 검증이 아니라 **암호화**이며, 해시 기록 같은 동작은 없다.",
+   "keywords": [
+    "data-protection"
+   ],
+   "related": [
+    "net-004"
+   ]
+  },
+  {
+   "id": "net-014",
+   "type": "choice",
+   "difficulty": 3,
+   "coverage": "niche",
+   "eval": {
+    "frequency": 2,
+    "centrality": 1,
+    "practicality": 3,
+    "discrimination": 3
+   },
+   "question": "JSONDecoder의 dateDecodingStrategy를 .iso8601로 설정했는데 서버가 보낸 \"2026-07-17T09:30:00.123Z\" 값에서 dataCorrupted 에러가 난다. 원인은?",
+   "choices": [
+    "내장 .iso8601 전략은 소수점 이하 초를 파싱하지 못하므로, .withFractionalSeconds를 켠 ISO8601DateFormatter 기반 커스텀 전략이 필요하다",
+    "UTC를 뜻하는 접미사 Z가 ISO 8601 표준 표기가 아니어서 시간대 오프셋(+00:00)으로 바꿔야 한다",
+    ".iso8601은 인코딩 전용 전략이므로 디코딩에는 .secondsSince1970을 지정해야 한다",
+    "Date 타입이 초 단위까지 표현하는 구조라 밀리초가 포함된 값은 어떤 전략으로도 디코드할 수 없다"
+   ],
+   "correctIndex": 0,
+   "explanation": "JSONDecoder의 내장 `.iso8601` 전략은 ISO8601DateFormatter의 기본 옵션 수준(초 단위까지)의 형식을 처리하며, `.123` 같은 **소수점 이하 초(fractional seconds)가 붙으면 파싱에 실패**해 dataCorrupted를 던진다. 실무 서버가 밀리초를 포함해 보내는 경우가 많아 자주 만나는 함정이다. 해결은 `.custom` 전략에서 `formatOptions`에 `.withInternetDateTime`과 `.withFractionalSeconds`를 지정한 ISO8601DateFormatter로 직접 파싱하는 것이다.\n\n② Z는 UTC를 뜻하는 정식 ISO 8601 표기로 문제의 원인이 아니다. ③ .iso8601은 인코딩·디코딩 양쪽에 쓰이는 전략이다. .secondsSince1970은 숫자 타임스탬프용이라 이 문자열 형식에는 적용조차 되지 않는다. ④ Date는 내부적으로 기준 시각으로부터의 초를 Double로 표현하므로 서브초 정밀도를 충분히 담을 수 있다 — 한계는 타입이 아니라 파서 옵션에 있다.",
+   "keywords": [
+    "date-decoding-strategy",
+    "codable"
+   ],
+   "related": [
+    "net-003"
+   ]
+  }
+ ]
+}
