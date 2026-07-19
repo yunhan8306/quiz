@@ -1,0 +1,13 @@
+{
+  "name": "PO 직무 학습 퀴즈",
+  "short_name": "PO Quiz",
+  "description": "Product Owner 직무 학습 퀴즈 — 제품 발견 · 전략 · 스크럼 · 지표",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#10141c",
+  "theme_color": "#10141c",
+  "icons": [
+    { "src": "icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any maskable" }
+  ]
+}

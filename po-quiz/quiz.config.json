@@ -1,0 +1,23 @@
+{
+  "name": "po-quiz",
+  "title": "PO 직무 학습 퀴즈",
+  "domain": "Product Owner / Product Management (직무 학습)",
+  "language": "ko",
+  "createdAt": "2026-07-18",
+  "weights": {
+    "frequency": 0.4,
+    "centrality": 0.25,
+    "practicality": 0.2,
+    "discrimination": 0.15
+  },
+  "sectionPrefixes": {
+    "discovery": { "canonical": "disc", "all": ["disc"] },
+    "strategy": { "canonical": "strat", "all": ["strat"] },
+    "agile-scrum": { "canonical": "scrum", "all": ["scrum"] },
+    "prioritization": { "canonical": "prio", "all": ["prio"] },
+    "metrics": { "canonical": "met", "all": ["met"] },
+    "research": { "canonical": "res", "all": ["res"] },
+    "collaboration": { "canonical": "collab", "all": ["collab"] }
+  },
+  "matchKeywords": ["PO", "product owner", "프로덕트 오너", "PM", "product manager", "프로덕트 매니저", "제품", "프로덕트", "기획", "스크럼", "scrum", "애자일", "agile", "디스커버리", "discovery", "백로그", "backlog"]
+}

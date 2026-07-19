@@ -1,0 +1,1332 @@
+{
+  "terms": [
+    {
+      "id": "aarrr",
+      "term": "AARRR(해적 지표)",
+      "aliases": [
+        "해적 지표",
+        "Pirate Metrics"
+      ],
+      "definition": "획득(Acquisition)–활성화(Activation)–유지(Retention)–추천(Referral)–매출(Revenue)의 다섯 단계로 사용자 여정을 깔때기처럼 나눠 측정하는 프레임워크. 어느 단계에서 사용자가 새는지 진단하는 데 쓴다.",
+      "related": [
+        "retention"
+      ]
+    },
+    {
+      "id": "ab-test",
+      "term": "A/B 테스트",
+      "aliases": [
+        "A/B test",
+        "스플릿 테스트"
+      ],
+      "definition": "사용자 트래픽을 무작위로 나눠 기존안(대조군)과 새 안(실험군)에 노출시키고 지표 차이로 효과를 검증하는 실험 기법. 결과 판정에는 통계적 유의성과 가드레일 지표 확인이 함께 필요하다.",
+      "related": [
+        "statistical-significance",
+        "guardrail-metric",
+        "p-value"
+      ]
+    },
+    {
+      "id": "alignment-gap",
+      "term": "정렬 간극",
+      "aliases": [
+        "Alignment Gap",
+        "전략의 간극"
+      ],
+      "definition": "조직이 구성원에게 해 주기를 원하는 행동과 구성원이 실제로 하는 행동 사이의 차이. 지식 간극(알고 싶은 것 vs 실제 아는 것)·효과 간극(기대한 결과 vs 실제 결과)과 함께 스티븐 번게이가 정리한 '전략의 간극'을 이루며, 상세한 지시와 통제로 메우려 하면 자율이 죽어 오히려 커지고, 의도를 명확히 하고 방법을 위임할 때 줄어든다.",
+      "related": [
+        "strategic-context"
+      ]
+    },
+    {
+      "id": "assumption",
+      "term": "가정 (Assumption)",
+      "aliases": [
+        "Assumption",
+        "전제"
+      ],
+      "definition": "솔루션이 작동하려면 참이어야 하지만 아직 검증되지 않은 믿음. 스토리 맵의 각 단계에서 가정을 도출하고 위험한 것부터 작게 테스트하면, 만들고 나서야 실패를 확인하는 낭비를 줄일 수 있다.",
+      "related": [
+        "user-story-mapping"
+      ]
+    },
+    {
+      "id": "assumption-categories",
+      "term": "가정의 5가지 범주",
+      "aliases": [
+        "assumption testing",
+        "가정 검증",
+        "숨은 가정 식별"
+      ],
+      "definition": "솔루션 아이디어에 깔린 가정을 욕구성·실현 가능성·사용성·사업 유효성·윤리성의 다섯 범주로 나눠 드러내는 기법. 특히 윤리성 범주가 점검에서 가장 자주 누락된다.",
+      "related": [
+        "four-big-risks",
+        "continuous-discovery"
+      ]
+    },
+    {
+      "id": "bad-data",
+      "term": "나쁜 데이터",
+      "aliases": [
+        "나쁜 데이터 3유형"
+      ],
+      "definition": "고객 인터뷰에서 잘못된 확신을 만드는 세 가지 답변 유형 — 칭찬, 일반론·미래 가정 같은 뜬구름 답변, 상대가 던지는 아이디어. 구체적 과거 사실로 대화를 되돌려 걸러낸다.",
+      "related": [
+        "mom-test"
+      ]
+    },
+    {
+      "id": "build-trap",
+      "term": "빌드 트랩",
+      "aliases": [
+        "Build Trap",
+        "개발 함정"
+      ],
+      "definition": "고객에게 실현된 가치(아웃컴) 대신 기능 출시량 같은 산출물(아웃풋)로 성공을 측정하며, 왜 만드는지 묻지 않고 계속 만들기만 하는 조직 상태. 멜리사 페리가 'Escaping the Build Trap'에서 정식화한 개념이다.",
+      "related": [
+        "outcome-vs-output",
+        "value-exchange-system"
+      ]
+    },
+    {
+      "id": "business-outcome",
+      "term": "비즈니스 아웃컴",
+      "aliases": [
+        "business outcome",
+        "비즈니스 성과"
+      ],
+      "definition": "매출·이익·시장점유율처럼 사업 전체 수준에서 측정되는 성과. 여러 팀과 외부 요인이 얽혀 있어 한 제품팀이 직접 움직이기 어렵고 변화도 느리게 나타나므로, 팀 목표로는 프로덕트 아웃컴으로 번역해 부여한다.",
+      "related": [
+        "product-outcome",
+        "outcome"
+      ]
+    },
+    {
+      "id": "cac",
+      "term": "CAC(고객 획득 비용)",
+      "aliases": [
+        "CAC",
+        "고객 획득 비용"
+      ],
+      "definition": "고객 한 명을 데려오는 데 든 마케팅·영업 비용의 총합을 신규 고객 수로 나눈 값. LTV가 CAC를 충분히(통상 3배 이상) 넘어야 성장할수록 이익이 나는 구조가 된다.",
+      "related": [
+        "ltv",
+        "viral-coefficient"
+      ]
+    },
+    {
+      "id": "churn-rate",
+      "term": "이탈률(Churn)",
+      "aliases": [
+        "churn",
+        "churn rate",
+        "해지율"
+      ],
+      "definition": "일정 기간 동안 서비스를 떠나거나 구독을 해지한 고객의 비율. 구독 모델에서는 이탈률이 고객 생애 길이를 결정하므로 LTV와 직결된다.",
+      "related": [
+        "retention",
+        "ltv"
+      ]
+    },
+    {
+      "id": "commitment-and-advancement",
+      "term": "커밋먼트와 전진",
+      "aliases": [
+        "commitment and advancement",
+        "커밋먼트의 통화"
+      ],
+      "definition": "고객 미팅의 성공 기준. 상대가 시간·평판·돈 중 무언가 잃을 수 있는 것을 걸었는지(커밋먼트), 다음 단계로 나아갔는지(전진)로 판단하며, 칭찬은 검증 신호가 아니다.",
+      "related": [
+        "mom-test",
+        "zombie-lead"
+      ]
+    },
+    {
+      "id": "concierge-test",
+      "term": "컨시어지 테스트",
+      "aliases": [
+        "concierge test",
+        "안내인 테스트"
+      ],
+      "definition": "제품이 자동으로 해줄 일을 팀이 직접 수작업으로 대신 해주며 고객의 과업과 요구를 몸으로 배우는 기법. 고객도 사람이 처리한다는 것을 안다는 점에서 오즈의 마법사 테스트와 구별된다.",
+      "related": [
+        "usability-test",
+        "wizard-of-oz-test"
+      ]
+    },
+    {
+      "id": "continuous-discovery",
+      "term": "지속적 디스커버리",
+      "aliases": [
+        "continuous discovery",
+        "지속적인 제품 발견"
+      ],
+      "definition": "제품을 만드는 팀이 원하는 성과를 추구하며 최소 주 1회 고객 접점을 갖는 소규모·상시적 발견 활동. 분기별 대규모 리서치와 달리 매주의 의사결정에 최신 고객 학습을 연결한다.",
+      "related": [
+        "product-discovery",
+        "opportunity-solution-tree"
+      ]
+    },
+    {
+      "id": "continuous-interviewing",
+      "term": "지속적 인터뷰",
+      "aliases": [
+        "연속 인터뷰 습관",
+        "Continuous Interviewing"
+      ],
+      "definition": "매주 최소 한 명의 고객을 인터뷰하는 습관. 리크루팅을 자동화해 인터뷰가 특별 이벤트가 아니라 끊기지 않는 리듬이 되게 하는 것이 핵심이다.",
+      "related": [
+        "story-based-interview"
+      ]
+    },
+    {
+      "id": "cost-of-delay",
+      "term": "지연 비용 (Cost of Delay)",
+      "aliases": [
+        "CoD",
+        "지연 비용"
+      ],
+      "definition": "어떤 작업의 착수나 출시가 늦어질 때 단위 시간당 잃게 되는 가치. WSJF의 분자로 쓰이며, 사용자·비즈니스 가치, 시간 민감도, 리스크 감소·기회 창출 가치를 합쳐 상대 크기로 추정한다.",
+      "related": [
+        "wsjf"
+      ]
+    },
+    {
+      "id": "customer-discovery-program",
+      "term": "고객 발견 프로그램",
+      "aliases": [
+        "Customer Discovery Program",
+        "레퍼런스 고객 프로그램"
+      ],
+      "definition": "소수의 목표 고객을 모집해 디스커버리 단계부터 제품을 함께 다듬고, 출시 시점에 기꺼이 추천해 줄 레퍼런스 고객을 확보하는 기법. 특히 B2B 제품에서 제품·시장 적합성의 강력한 증거가 된다.",
+      "related": [
+        "value-test"
+      ]
+    },
+    {
+      "id": "customer-slicing",
+      "term": "고객 슬라이싱",
+      "aliases": [
+        "고객 세그먼트 좁히기",
+        "Customer Slicing"
+      ],
+      "definition": "넓은 고객 세그먼트를 인구통계뿐 아니라 동기·행동 기준으로 반복해서 쪼개어, 문제를 가장 절실히 겪고 접근하기 쉬우며 지불 의사가 있는 구체적 하위 그룹을 찾는 방법. 인터뷰 대상과 초기 공략 시장을 정하는 출발점이 된다.",
+      "related": [
+        "product-market-fit"
+      ]
+    },
+    {
+      "id": "daily-scrum",
+      "term": "일일 스크럼 (Daily Scrum)",
+      "aliases": [
+        "Daily Scrum",
+        "데일리 스탠드업"
+      ],
+      "definition": "개발자들이 매일 15분간 스프린트 목표 대비 진척을 검사하고 스프린트 백로그를 조정하는 이벤트. 보고회가 아니라 개발자들이 다음 하루의 계획을 스스로 세우는 자기관리 장치다.",
+      "related": [
+        "sprint-backlog",
+        "self-management",
+        "sprint-goal"
+      ]
+    },
+    {
+      "id": "data-informed",
+      "term": "데이터 참고(data-informed) 접근",
+      "aliases": [
+        "data-informed",
+        "데이터 인폼드"
+      ],
+      "definition": "데이터를 유일한 결정권자가 아니라 판단 근거의 하나로 삼아 비전·직관과 결합하는 의사결정 방식. 데이터가 시키는 대로만 최적화하는 데이터 주도 접근이 국소 최적(local optimum)에 갇히는 한계를 보완한다.",
+      "related": [
+        "vanity-metric"
+      ]
+    },
+    {
+      "id": "definition-of-done",
+      "term": "완료의 정의 (Definition of Done)",
+      "aliases": [
+        "DoD",
+        "Definition of Done"
+      ],
+      "definition": "증분이 제품 품질 기준을 충족한 상태를 공식적으로 기술한 것으로, 증분의 확약. 이를 충족하지 못한 작업은 증분이 될 수 없으며 릴리스나 스프린트 리뷰 제시 없이 제품 백로그로 되돌아간다.",
+      "related": [
+        "increment",
+        "sprint-review"
+      ]
+    },
+    {
+      "id": "empiricism",
+      "term": "경험주의 (Empiricism)",
+      "aliases": [
+        "Empiricism",
+        "경험적 프로세스 제어"
+      ],
+      "definition": "지식은 경험에서 나오고 의사결정은 관찰된 사실에 근거해야 한다는 스크럼의 이론적 토대. 투명성·검사·적응의 세 기둥으로 구현되며, 린 사고(낭비 제거)와 함께 스크럼을 떠받친다.",
+      "related": [
+        "three-pillars",
+        "scrum"
+      ]
+    },
+    {
+      "id": "empowered-product-team",
+      "term": "임파워드 제품팀",
+      "aliases": [
+        "empowered product team",
+        "권한 있는 제품팀",
+        "임파워드 팀"
+      ],
+      "definition": "해결할 고객·비즈니스 문제를 부여받아 해법을 스스로 찾고, 산출물이 아닌 성과(아웃컴)에 책임지는 제품팀. 비전과 전략이라는 맥락 안에서 자율을 갖는다는 점에서 무제한 자율과 구분된다.",
+      "related": [
+        "feature-team",
+        "missionary-team",
+        "high-integrity-commitment"
+      ]
+    },
+    {
+      "id": "empowered-team",
+      "term": "임파워드 팀",
+      "aliases": [
+        "Empowered Team",
+        "권한 위임 팀"
+      ],
+      "definition": "만들 기능을 지시받는 대신 해결할 문제를 부여받고, 해법을 스스로 결정하며 성과에 책임지는 제품팀. 자율이 작동하려면 리더의 전략적 콘텍스트 공유와 코칭이 전제된다.",
+      "related": [
+        "strategic-context",
+        "okr"
+      ]
+    },
+    {
+      "id": "experience-team",
+      "term": "경험팀",
+      "aliases": [
+        "experience team",
+        "고객 대면 경험팀"
+      ],
+      "definition": "사용자나 고객이 직접 만나는 화면·여정·경험을 담당하고 그 성과에 책임지는 팀. 플랫폼팀이 제공하는 공통 기반 위에서 빠르게 움직인다.",
+      "related": [
+        "platform-team"
+      ]
+    },
+    {
+      "id": "fake-door-test",
+      "term": "가짜 문 테스트 (Fake Door Test)",
+      "aliases": [
+        "페이크 도어",
+        "fake door demand test",
+        "수요 테스트"
+      ],
+      "definition": "기능이 없는 상태에서 진입 버튼이나 랜딩 페이지만 노출해, 사용자의 실제 클릭 행동으로 수요를 측정하는 가치 검증 기법. 말이 아닌 행동 데이터를 얻는 것이 목적이다.",
+      "related": [
+        "product-discovery",
+        "wizard-of-oz-test"
+      ]
+    },
+    {
+      "id": "feature-team",
+      "term": "기능팀",
+      "aliases": [
+        "feature team",
+        "피처팀"
+      ],
+      "definition": "로드맵에 정해진 기능 목록을 받아 설계·구현·출시까지만 책임지는 팀. 교차기능 구성이라도 해법을 결정할 권한과 성과 책임이 없다는 점에서 임파워드 제품팀과 구분된다.",
+      "related": [
+        "empowered-product-team",
+        "waiter-pm"
+      ]
+    },
+    {
+      "id": "four-big-risks",
+      "term": "4대 리스크",
+      "aliases": [
+        "four big risks",
+        "가치·사용성·실현 가능성·사업 유효성 리스크"
+      ],
+      "definition": "제품을 만들기 전에 검증해야 할 네 가지 위험: 가치(고객이 원하는가), 사용성(쓸 수 있는가), 실현 가능성(만들 수 있는가), 사업 유효성(사업에 부합하는가). 『Inspired』의 제품 발견 원칙의 핵심 축이다.",
+      "related": [
+        "product-discovery",
+        "assumption-categories"
+      ]
+    },
+    {
+      "id": "guardrail-metric",
+      "term": "가드레일 지표",
+      "aliases": [
+        "guardrail metric"
+      ],
+      "definition": "실험으로 목표 지표를 올리는 동안 나빠지면 안 되는 보호 지표(이탈률, 성능, 재방문율 등). 목표 지표의 개선이 다른 가치의 희생 위에서 이뤄지는 것을 막는 안전장치다.",
+      "related": [
+        "ab-test"
+      ]
+    },
+    {
+      "id": "high-integrity-commitment",
+      "term": "고신뢰 약속",
+      "aliases": [
+        "High-Integrity Commitment"
+      ],
+      "definition": "날짜 약속이 꼭 필요한 소수의 사안에 한해, 제품 발견으로 핵심 리스크를 검증한 뒤 실행할 팀이 직접 확인하고 하는 약속. '약속을 남발하지 않되 한 약속은 지킨다'는 원칙으로, 성과 중심 조직이 비즈니스 일정 요구와 공존하는 방법이다.",
+      "related": [
+        "outcome-based-roadmap"
+      ]
+    },
+    {
+      "id": "ideation",
+      "term": "아이디에이션",
+      "aliases": [
+        "ideation",
+        "아이디어 발산"
+      ],
+      "definition": "하나의 타깃 기회에 대해 다양한 솔루션 아이디어를 다량으로 내는 활동. 개인 발산과 그룹 공유를 분리해 반복함으로써 앵커링과 집단사고를 피하는 것이 핵심 원칙이다.",
+      "related": [
+        "opportunity-solution-tree",
+        "opportunity-space"
+      ]
+    },
+    {
+      "id": "increment",
+      "term": "증분 (Increment)",
+      "aliases": [
+        "Increment"
+      ],
+      "definition": "제품 목표를 향한 구체적 디딤돌로, 이전의 모든 증분과 통합되어 사용 가능함이 검증된 결과물. 한 스프린트에 여러 개가 만들어질 수 있고, 스프린트가 끝나기 전에도 이해관계자에게 인도할 수 있다.",
+      "related": [
+        "definition-of-done",
+        "sprint",
+        "sprint-review"
+      ]
+    },
+    {
+      "id": "jobs-to-be-done",
+      "term": "JTBD (Jobs to be Done)",
+      "aliases": [
+        "jobs to be done",
+        "고객이 해결하려는 일"
+      ],
+      "definition": "고객은 제품 자체가 아니라 해내야 할 일(job)을 처리하려고 제품을 '고용'한다는 관점. 니즈 파악의 출발점을 기능·스펙이 아니라 고객이 이루려는 진전에 둔다.",
+      "related": [
+        "opportunity-space",
+        "mom-test"
+      ]
+    },
+    {
+      "id": "kano-model",
+      "term": "Kano 모델",
+      "aliases": [
+        "카노 모델",
+        "Kano"
+      ],
+      "definition": "기능의 구현 수준과 고객 만족의 관계를 당연적(must-be)·성과(performance)·매력적(attractive)·무관심 품질 등으로 분류하는 모델. 품질 유형마다 투자 대비 만족 곡선이 다르며, 매력적 품질은 시간이 지나 시장 표준이 되면 당연적 품질로 이동하는 경향이 있다.",
+      "related": [
+        "rice-framework"
+      ]
+    },
+    {
+      "id": "leading-question",
+      "term": "유도 질문",
+      "aliases": [
+        "리딩 퀘스천"
+      ],
+      "definition": "질문 안에 기대하는 답이 암시되어 있어 상대의 답변을 특정 방향으로 몰아가는 질문. 인터뷰와 사용성 테스트에서 데이터의 신뢰도를 떨어뜨리는 대표적 원인이다.",
+      "related": [
+        "mom-test",
+        "usability-test"
+      ]
+    },
+    {
+      "id": "leap-of-faith-assumption",
+      "term": "리프 오브 페이스 가정",
+      "aliases": [
+        "leap-of-faith assumption",
+        "가장 위험한 가정"
+      ],
+      "definition": "아이디어가 성립하려면 참이어야 하지만 아직 증거가 없는 가정 중, 틀렸을 때 아이디어 전체가 무너지는 가장 위험한 가정. 검증은 이 가정부터 작고 빠른 테스트로 시작하고, 판정 기준은 테스트 전에 정의한다.",
+      "related": [
+        "ab-test"
+      ]
+    },
+    {
+      "id": "learning-bottleneck",
+      "term": "학습 병목",
+      "aliases": [
+        "learning bottleneck",
+        "고객 학습 병목"
+      ],
+      "definition": "고객 인터뷰 등에서 배운 것이 한 사람의 머릿속에만 남아 팀이 그의 기억과 해석에 의존하게 되는 상태. 인터뷰 전 질문 합의, 동행·역할 분담, 직후 노트 공유로 학습을 팀 프로세스로 만들어 방지한다.",
+      "related": [
+        "shared-understanding",
+        "product-trio"
+      ]
+    },
+    {
+      "id": "ltv",
+      "term": "LTV(고객 생애 가치)",
+      "aliases": [
+        "LTV",
+        "고객 생애 가치",
+        "CLV"
+      ],
+      "definition": "한 고객이 관계를 유지하는 동안 가져다주는 수익의 총합. 구독 모델에서는 흔히 고객당 월 수익을 월 이탈률로 나눠 근사하며, CAC와 비교해 단위 경제의 건강도를 판단한다.",
+      "related": [
+        "cac",
+        "churn-rate"
+      ]
+    },
+    {
+      "id": "missionary-team",
+      "term": "미셔너리 팀",
+      "aliases": [
+        "missionary",
+        "미셔너리 vs 용병",
+        "mercenary"
+      ],
+      "definition": "제품 비전을 믿고 고객 문제 해결에 내적으로 몰입하는 팀. 지시받은 것을 만들 뿐인 용병(mercenary)과 대비되는 개념으로, 강한 제품팀의 핵심 조건으로 꼽힌다.",
+      "related": [
+        "empowered-product-team",
+        "product-evangelism"
+      ]
+    },
+    {
+      "id": "mom-test",
+      "term": "맘 테스트",
+      "aliases": [
+        "The Mom Test",
+        "mom test",
+        "엄마 테스트"
+      ],
+      "definition": "자기 아이디어에 대한 의견 대신 상대의 삶과 과거의 구체적 행동을 묻도록 인터뷰 질문을 설계하는 원칙. 나에게 호의적인 엄마조차 거짓말할 수 없는 질문이면 통과다. 3원칙: 상대의 삶을 묻기, 과거의 구체적 사실 묻기, 말하기보다 듣기.",
+      "related": [
+        "bad-data",
+        "story-based-interview",
+        "leading-question"
+      ]
+    },
+    {
+      "id": "moscow-method",
+      "term": "MoSCoW 기법",
+      "aliases": [
+        "MoSCoW",
+        "모스크바 기법"
+      ],
+      "definition": "요구사항을 Must have, Should have, Could have, Won't have (this time)의 네 등급으로 나눠 릴리스 범위를 이해관계자와 합의하는 기법. Won't have는 폐기가 아니라 '이번 범위에서 제외'라는 명시적 합의로, 범위 팽창을 막는 장치다.",
+      "related": [
+        "rice-framework"
+      ]
+    },
+    {
+      "id": "mvp",
+      "term": "MVP (최소 실행 가능 제품)",
+      "aliases": [
+        "minimum viable product",
+        "최소 기능 제품"
+      ],
+      "definition": "가설을 검증하기 위해 최소 노력으로 최대 학습을 얻도록 설계한 실험 단위. '기능을 줄인 첫 출시 버전'이 아니라 학습 수단이라는 점이 본질이다.",
+      "related": [
+        "prototype",
+        "product-discovery"
+      ]
+    },
+    {
+      "id": "north-star-metric",
+      "term": "노스스타 지표",
+      "aliases": [
+        "North Star Metric",
+        "NSM"
+      ],
+      "definition": "사용자가 제품에서 얻는 핵심 가치를 반영하면서 장기 사업 성과와 연결되는, 조직 전체가 함께 보는 단일 지표. 이 값이 오르면 사용자 가치와 사업이 함께 성장한다고 믿을 수 있어야 한다.",
+      "related": [
+        "vanity-metric",
+        "okr"
+      ]
+    },
+    {
+      "id": "okr",
+      "term": "OKR",
+      "aliases": [
+        "Objectives and Key Results",
+        "목표와 핵심 결과"
+      ],
+      "definition": "정성적 방향을 담은 목표(Objective)와 그 달성 여부를 판정하는 측정 가능한 핵심 결과(Key Results)로 팀 목표를 관리하는 기법. 핵심 결과는 작업 목록이 아니라 결과 수치로 써야 아웃풋이 아닌 아웃컴에 팀을 정렬시킨다.",
+      "related": [
+        "outcome",
+        "north-star-metric"
+      ]
+    },
+    {
+      "id": "omtm",
+      "term": "OMTM (One Metric That Matters)",
+      "aliases": [
+        "One Metric That Matters",
+        "가장 중요한 한 가지 지표"
+      ],
+      "definition": "현 사업 단계에서 조직 전체가 집중할 단 하나의 핵심 지표. 목표선(도달해야 할 수치)을 함께 정해 실험 판정과 자원 배분의 초점을 만들며, 사업 단계가 바뀌면 지표도 함께 바뀐다. Lean Analytics의 핵심 규율이다.",
+      "related": [
+        "outcome-vs-output"
+      ]
+    },
+    {
+      "id": "opportunity-solution-tree",
+      "term": "기회 솔루션 트리 (Opportunity Solution Tree)",
+      "aliases": [
+        "OST",
+        "opportunity solution tree",
+        "기회 솔루션 트리"
+      ],
+      "definition": "원하는 성과(outcome)를 최상단에 두고 그 아래 고객 기회(니즈·페인포인트·욕구), 솔루션, 실험을 층위로 배치하는 Teresa Torres의 시각화 도구. 솔루션끼리 바로 비교하는 대신 한 번에 하나의 타깃 기회를 골라 그 안에서 솔루션을 비교하게 해 준다.",
+      "related": [
+        "outcome-vs-output"
+      ]
+    },
+    {
+      "id": "opportunity-space",
+      "term": "기회 공간 (Opportunity Space)",
+      "aliases": [
+        "기회",
+        "opportunity"
+      ],
+      "definition": "고객 인터뷰 등에서 발견한 니즈·페인포인트·욕구를 모아 구조화한 영역. 솔루션이나 팀 목표가 아닌 고객 관점의 진술만 들어가며, 큰 기회는 다룰 수 있는 크기로 쪼갠다.",
+      "related": [
+        "opportunity-solution-tree",
+        "outcome"
+      ]
+    },
+    {
+      "id": "outcome",
+      "term": "아웃컴(Outcome)",
+      "aliases": [
+        "outcome",
+        "성과",
+        "아웃컴",
+        "원하는 성과"
+      ],
+      "definition": "팀의 산출물이 만들어낸 고객 행동의 변화, 그리고 그로 인한 가치를 뜻한다. 기능을 얼마나 출시했는가(아웃풋)가 아니라 고객의 행동이 얼마나 달라졌는가로 성과를 측정한다.",
+      "related": [
+        "output",
+        "product-outcome",
+        "business-outcome"
+      ]
+    },
+    {
+      "id": "outcome-based-roadmap",
+      "term": "성과 중심 로드맵",
+      "aliases": [
+        "Outcome-based Roadmap",
+        "성과 기반 로드맵"
+      ],
+      "definition": "날짜가 박힌 기능 목록 대신, 달성할 비즈니스 성과와 대상 고객을 중심으로 일의 순서를 배열하는 로드맵 접근. 아이디어의 상당수가 실패한다는 전제를 받아들여, 기능은 성과를 위한 후보 해법으로 취급한다.",
+      "related": [
+        "high-integrity-commitment",
+        "outcome-vs-output"
+      ]
+    },
+    {
+      "id": "outcome-vs-output",
+      "term": "아웃컴 vs 아웃풋 (Outcome vs Output)",
+      "aliases": [
+        "Outcome vs Output",
+        "outcome",
+        "output",
+        "성과 vs 산출물",
+        "성과 대 산출물"
+      ],
+      "definition": "아웃풋은 팀이 만들어 낸 산출물(기능, 릴리스)이고, 아웃컴은 그로 인해 달라진 고객 행동과 비즈니스 성과다. 우선순위와 릴리스 범위 결정은 산출물의 양이 아니라 성과 달성 여부를 기준으로 삼아야 한다는 구분이다.",
+      "related": [
+        "user-story-mapping",
+        "omtm"
+      ]
+    },
+    {
+      "id": "output",
+      "term": "아웃풋(Output)",
+      "aliases": [
+        "output",
+        "산출물"
+      ],
+      "definition": "팀이 만들어낸 산출물 자체 — 출시한 기능, 릴리스, 문서 등. 아웃풋이 많아도 고객 행동 변화(아웃컴)로 이어지지 않으면 제품 성과라 볼 수 없다.",
+      "related": [
+        "outcome"
+      ]
+    },
+    {
+      "id": "p-value",
+      "term": "P값",
+      "aliases": [
+        "p-value",
+        "유의확률"
+      ],
+      "definition": "실제로는 차이가 없다고(귀무가설) 가정할 때, 관측된 수준 이상의 차이가 우연히 나타날 확률. 가설이 참일 확률이나 재현 확률을 뜻하지 않는다는 점이 가장 흔한 오독 포인트다.",
+      "related": [
+        "statistical-significance"
+      ]
+    },
+    {
+      "id": "pilot-team",
+      "term": "파일럿팀",
+      "aliases": [
+        "pilot team"
+      ],
+      "definition": "새로운 일하는 방식을 조직 전체에 퍼뜨리기 전에 먼저 시험하는 변화 수용도 높은 소수의 팀. 성공 사례를 만들어 저항을 줄이고, 실패 리스크를 한 팀 범위로 제한한다.",
+      "related": [
+        "empowered-product-team"
+      ]
+    },
+    {
+      "id": "platform-team",
+      "term": "플랫폼팀",
+      "aliases": [
+        "platform team"
+      ],
+      "definition": "결제·인증·공용 API·디자인 시스템처럼 여러 팀이 공통으로 쓰는 기반을 제품으로 제공하는 팀. 내부 개발자를 고객으로 둔 제품팀이며, 티켓 처리 조직이 아니라 권한 부여의 대상이다.",
+      "related": [
+        "experience-team",
+        "empowered-product-team"
+      ]
+    },
+    {
+      "id": "product-backlog",
+      "term": "제품 백로그 (Product Backlog)",
+      "aliases": [
+        "Product Backlog",
+        "백로그",
+        "프로덕트 백로그"
+      ],
+      "definition": "제품 개선에 필요한 것들을 담은, 창발적으로 진화하는 정렬된 목록. 스크럼 가이드 2020 기준 스크럼 팀이 수행하는 작업의 유일한 원천(single source)이며, 내용과 순서에 대한 책임은 프로덕트 오너에게 있다.",
+      "related": [
+        "product-backlog-refinement",
+        "product-owner"
+      ]
+    },
+    {
+      "id": "product-backlog-refinement",
+      "term": "제품 백로그 정제 (Refinement)",
+      "aliases": [
+        "백로그 정제",
+        "리파인먼트"
+      ],
+      "definition": "백로그 아이템을 더 작고 명확하게 쪼개고 상세화하는 지속적인 활동. 스크럼 가이드 2020 기준 공식 이벤트가 아니며, 아이템 크기 산정은 그 일을 수행할 개발자들이 한다.",
+      "related": [
+        "product-backlog"
+      ]
+    },
+    {
+      "id": "product-discovery",
+      "term": "제품 발견 (Product Discovery)",
+      "aliases": [
+        "프로덕트 디스커버리",
+        "discovery",
+        "디스커버리"
+      ],
+      "definition": "무엇을 만들지 결정하기 전에 아이디어의 리스크를 저비용 실험으로 검증하는 활동. 실행(delivery)과 병행되며, 만들 가치가 있다는 근거를 만드는 단계다.",
+      "related": [
+        "four-big-risks",
+        "continuous-discovery",
+        "prototype"
+      ]
+    },
+    {
+      "id": "product-evangelism",
+      "term": "제품 에반젤리즘",
+      "aliases": [
+        "product evangelism",
+        "에반젤리즘"
+      ],
+      "definition": "제품 비전과 학습 내용을 팀과 조직 안팎에 끊임없이 전파해 '왜 이 일을 하는가'에 대한 믿음과 열의를 유지시키는 활동. 일회성 발표가 아닌 PM의 상시 업무다.",
+      "related": [
+        "missionary-team",
+        "show-your-work"
+      ]
+    },
+    {
+      "id": "product-goal",
+      "term": "제품 목표 (Product Goal)",
+      "aliases": [
+        "Product Goal",
+        "프로덕트 골"
+      ],
+      "definition": "제품이 나아갈 장기 목표로, 스크럼 가이드 2020에서 제품 백로그의 확약(commitment)으로 규정된다. 백로그 아이템들은 제품 목표 달성에 기여하는 방향으로 정렬되며, 개별 요청의 수용 여부를 판단하는 기준선 역할을 한다.",
+      "related": [
+        "product-owner",
+        "product-backlog"
+      ]
+    },
+    {
+      "id": "product-kata",
+      "term": "프로덕트 카타 (Product Kata)",
+      "aliases": [
+        "product kata"
+      ],
+      "definition": "방향(목표) 이해 → 현재 상태 파악 → 다음 목표 설정 → 실험의 루프를 반복하며 목표와 현재의 격차를 학습으로 좁혀 가는 개선 프로세스. 토요타 카타를 제품 작업에 적용한 것이다.",
+      "related": [
+        "outcome",
+        "continuous-discovery"
+      ]
+    },
+    {
+      "id": "product-market-fit",
+      "term": "제품/시장 궁합",
+      "aliases": [
+        "Product/Market Fit",
+        "PMF",
+        "제품 시장 적합성"
+      ],
+      "definition": "제품이 특정 시장의 진짜 수요를 충족해 지속 성장의 근거가 확보된 상태. 스타트업 단계의 최우선 과제이며, 이를 찾은 뒤에는 성공을 반복·확장하는 것으로 조직의 과제가 바뀐다.",
+      "related": [
+        "startup-growth-five-stages"
+      ]
+    },
+    {
+      "id": "product-outcome",
+      "term": "프로덕트 아웃컴",
+      "aliases": [
+        "product outcome",
+        "제품 성과"
+      ],
+      "definition": "제품팀이 제품 개선으로 직접 영향을 줄 수 있는 고객 행동의 변화(예: 온보딩 완료율). 비즈니스 아웃컴으로 이어지는 중간 고리이자, 팀 목표를 설정하기에 적절한 수준이다.",
+      "related": [
+        "business-outcome",
+        "traction-metric",
+        "outcome"
+      ]
+    },
+    {
+      "id": "product-owner",
+      "term": "프로덕트 오너 (Product Owner)",
+      "aliases": [
+        "PO",
+        "Product Owner",
+        "제품 책임자"
+      ],
+      "definition": "스크럼에서 제품 가치 극대화에 책임(accountable)을 지는 단 한 사람. 제품 목표 수립과 제품 백로그 아이템의 생성·소통·정렬을 담당하며, 실무를 위임하더라도 결과의 책임은 남는다. 위원회가 아니며 조직은 그 결정을 존중해야 한다.",
+      "related": [
+        "product-backlog",
+        "product-goal"
+      ]
+    },
+    {
+      "id": "product-principles",
+      "term": "제품 원칙",
+      "aliases": [
+        "Product Principles"
+      ],
+      "definition": "제품이 어떤 가치를 우선하는지 명시한 선언으로, 트레이드오프 상황에서 팀들이 일관된 결정을 내리게 돕는 판단 기준. 제품 비전을 보완하며, 윤리적 기준을 반영하는 자리이기도 하다.",
+      "related": [
+        "product-vision"
+      ]
+    },
+    {
+      "id": "product-strategy",
+      "term": "제품 전략",
+      "aliases": [
+        "Product Strategy"
+      ],
+      "definition": "제품 비전에 도달하기 위해 어떤 시장·고객·문제를 어떤 순서로 공략할지 정한 경로. 상세 계획이 아니라 조직이 일관된 의사결정을 내리게 돕는 판단 프레임워크로 기능해야 한다.",
+      "related": [
+        "product-vision",
+        "strategic-intent"
+      ]
+    },
+    {
+      "id": "product-trio",
+      "term": "제품 트리오",
+      "aliases": [
+        "product trio",
+        "프로덕트 트리오"
+      ],
+      "definition": "PM·프로덕트 디자이너·엔지니어 세 역할이 한 팀으로 디스커버리 결정을 함께 내리는 협업 모델. 역할 간 핸드오프로 생기는 맥락 유실을 공동 의사결정으로 대체한다.",
+      "related": [
+        "shared-understanding",
+        "learning-bottleneck"
+      ]
+    },
+    {
+      "id": "product-vision",
+      "term": "제품 비전",
+      "aliases": [
+        "Product Vision"
+      ],
+      "definition": "수년 뒤(자료에 따라 2~5년 또는 3~10년) 고객에게 만들어 주고 싶은 미래를 고객 가치 중심으로 그린 지향점. 팀을 끌어당기는 설득의 도구이자 채용·전략·큰 의사결정의 기준이 된다.",
+      "related": [
+        "product-strategy",
+        "product-principles"
+      ]
+    },
+    {
+      "id": "prototype",
+      "term": "프로토타입",
+      "aliases": [
+        "prototype",
+        "시제품"
+      ],
+      "definition": "적은 비용으로 빠르게 배우기 위해 만드는 검증용 산출물. 『Inspired』는 용도에 따라 실현 가능성·사용자·라이브 데이터·혼합(하이브리드)의 네 유형으로 구분한다.",
+      "related": [
+        "mvp",
+        "four-big-risks"
+      ]
+    },
+    {
+      "id": "retention",
+      "term": "리텐션",
+      "aliases": [
+        "retention",
+        "유지율",
+        "고착도"
+      ],
+      "definition": "사용자가 일정 기간 후에도 제품으로 돌아와 계속 쓰는 비율. 제품이 반복 사용할 가치를 주는지 보여주는 핵심 신호로, 리텐션이 확보되기 전의 성장 투자는 새는 양동이에 물 붓기가 된다.",
+      "related": [
+        "churn-rate",
+        "aarrr"
+      ]
+    },
+    {
+      "id": "rice-framework",
+      "term": "RICE 프레임워크",
+      "aliases": [
+        "RICE",
+        "RICE 점수"
+      ],
+      "definition": "Reach(도달 규모), Impact(영향), Confidence(확신도), Effort(노력)로 기능 우선순위 점수를 내는 프레임워크. 앞의 세 요소를 곱한 값을 Effort로 나누기 때문에, 적은 노력으로 큰 효과를 내는 항목이 상위에 온다. Intercom에서 고안해 널리 퍼졌다.",
+      "related": [
+        "wsjf",
+        "moscow-method"
+      ]
+    },
+    {
+      "id": "scrum",
+      "term": "스크럼 (Scrum)",
+      "aliases": [
+        "Scrum",
+        "스크럼 프레임워크"
+      ],
+      "definition": "복잡한 문제에 대해 적응적인 해결책을 만들도록 돕는 경량 프레임워크. 스프린트라는 고정 주기 안에서 역할·이벤트·산출물의 최소 규칙만 정의하고, 나머지는 팀의 자기관리에 맡긴다.",
+      "related": [
+        "empiricism",
+        "sprint",
+        "self-management"
+      ]
+    },
+    {
+      "id": "scrum-team",
+      "term": "스크럼 팀",
+      "aliases": [
+        "Scrum Team"
+      ],
+      "definition": "제품 책임자·스크럼 마스터·개발자라는 세 가지 책임으로 구성된, 일반적으로 10명 이하의 단일 팀 단위(스크럼 가이드 2020 기준). 하위 팀이나 계층 없이 교차기능적·자기관리형으로 움직이며 제품 관련 모든 활동에 책임진다.",
+      "related": [
+        "self-management"
+      ]
+    },
+    {
+      "id": "self-management",
+      "term": "자기관리 (Self-management)",
+      "aliases": [
+        "Self-management",
+        "자기조직화",
+        "Self-organizing"
+      ],
+      "definition": "누가, 무엇을, 언제, 어떻게 할지를 스크럼 팀이 스스로 결정한다는 원칙. 스크럼 가이드 2020은 '자기조직화(self-organizing)' 표현을 '자기관리(self-managing)'로 바꾸며 팀 내부의 의사결정 권한을 더 강조했다.",
+      "related": [
+        "scrum",
+        "daily-scrum"
+      ]
+    },
+    {
+      "id": "shared-understanding",
+      "term": "공유된 이해",
+      "aliases": [
+        "shared understanding",
+        "공통의 이해"
+      ],
+      "definition": "문서가 아니라 대화와 시각화를 통해 팀원들의 머릿속 그림이 서로 맞춰진 상태. 스토리 매핑이 전제하는 핵심으로, 잘 쓴 문서 자체는 이를 보장하지 못한다.",
+      "related": [
+        "show-your-work",
+        "learning-bottleneck",
+        "six-pager"
+      ]
+    },
+    {
+      "id": "show-your-work",
+      "term": "작업 과정 공유하기",
+      "aliases": [
+        "Show Your Work",
+        "사고 과정 공유"
+      ],
+      "definition": "이해관계자에게 결론만 통보하지 않고 결정에 이른 사고 과정을 시각화해 보여주는 커뮤니케이션 방식. 이해관계자를 결론의 심판이 아닌 과정의 기여자로 만들어 신뢰와 지지를 얻는다.",
+      "related": [
+        "opportunity-solution-tree",
+        "stakeholder",
+        "shared-understanding"
+      ]
+    },
+    {
+      "id": "six-pager",
+      "term": "식스 페이저",
+      "aliases": [
+        "6-pager",
+        "six pager",
+        "서술형 내러티브"
+      ],
+      "definition": "제안을 여섯 장 이내의 완결된 서술형 문서로 쓰고 회의 시작 시 참석자가 함께 읽은 뒤 토론하는 아마존식 문서 문화. 슬라이드가 숨기기 쉬운 논리 비약을 드러내고 결정 근거를 기록으로 남긴다.",
+      "related": [
+        "shared-understanding",
+        "show-your-work"
+      ]
+    },
+    {
+      "id": "sprint",
+      "term": "스프린트 (Sprint)",
+      "aliases": [
+        "Sprint"
+      ],
+      "definition": "아이디어를 가치로 바꾸는 1개월 이하의 고정 길이 이벤트로, 다른 모든 스크럼 이벤트를 담는 컨테이너. 스프린트 중에는 스프린트 목표를 해치는 변경을 하지 않되, 배운 것에 따라 범위는 프로덕트 오너와 재협상할 수 있다.",
+      "related": [
+        "sprint-goal",
+        "scrum",
+        "increment"
+      ]
+    },
+    {
+      "id": "sprint-backlog",
+      "term": "스프린트 백로그 (Sprint Backlog)",
+      "aliases": [
+        "Sprint Backlog"
+      ],
+      "definition": "스프린트 목표(왜), 선정된 제품 백로그 아이템(무엇), 인도를 위한 실행 계획(어떻게)으로 구성되는 개발자들의 실시간 작업 계획. 개발자에 의해, 개발자를 위해 만들어지며 스프린트 내내 갱신된다.",
+      "related": [
+        "sprint-goal",
+        "product-backlog",
+        "daily-scrum"
+      ]
+    },
+    {
+      "id": "sprint-goal",
+      "term": "스프린트 목표 (Sprint Goal)",
+      "aliases": [
+        "Sprint Goal"
+      ],
+      "definition": "스프린트 백로그의 확약(commitment)으로, 해당 스프린트가 존재하는 단일한 목적. 무엇을 만들지에는 유연성을 남기면서 팀이 한 방향으로 집중·협업하게 만드는 장치다.",
+      "related": [
+        "sprint-backlog",
+        "sprint",
+        "sprint-planning"
+      ]
+    },
+    {
+      "id": "sprint-planning",
+      "term": "스프린트 플래닝 (Sprint Planning)",
+      "aliases": [
+        "Sprint Planning",
+        "스프린트 계획 수립"
+      ],
+      "definition": "스프린트를 시작하는 이벤트로, '왜 이 스프린트가 가치 있는가(스프린트 목표)', '무엇을 완료할 수 있는가(아이템 선정)', '어떻게 해낼 것인가(작업 계획)'의 세 주제를 다룬다. 그 결과가 스프린트 백로그가 된다.",
+      "related": [
+        "sprint-goal",
+        "sprint-backlog",
+        "sprint"
+      ]
+    },
+    {
+      "id": "sprint-retrospective",
+      "term": "스프린트 회고 (Sprint Retrospective)",
+      "aliases": [
+        "Sprint Retrospective",
+        "회고"
+      ],
+      "definition": "개인·상호작용·프로세스·도구·완료의 정의 측면에서 지난 스프린트를 점검하고, 품질과 효과성을 높일 개선안을 정하는 이벤트. 스프린트를 마무리하며 제품이 아니라 '일하는 방식'을 검사한다.",
+      "related": [
+        "sprint-review",
+        "three-pillars"
+      ]
+    },
+    {
+      "id": "sprint-review",
+      "term": "스프린트 리뷰 (Sprint Review)",
+      "aliases": [
+        "Sprint Review"
+      ],
+      "definition": "스프린트 결과물을 핵심 이해관계자와 함께 검사하고 제품 목표 대비 진척을 논의하는 작업 세션. 일방적 시연이나 승인 심사가 아니며, 논의 결과에 따라 제품 백로그가 조정될 수 있다.",
+      "related": [
+        "sprint-retrospective",
+        "increment",
+        "product-backlog"
+      ]
+    },
+    {
+      "id": "stakeholder",
+      "term": "이해관계자",
+      "aliases": [
+        "stakeholder",
+        "스테이크홀더"
+      ],
+      "definition": "경영진·영업·마케팅·법무·CS 등 제품 결정에 영향을 주거나 영향을 받는 조직 안팎의 사람들. 달래야 할 대상이 아니라 함께 문제를 푸는 협업 파트너로 대할 때 지속 가능한 관계가 만들어진다.",
+      "related": [
+        "show-your-work",
+        "high-integrity-commitment"
+      ]
+    },
+    {
+      "id": "startup-growth-five-stages",
+      "term": "스타트업 성장 5단계",
+      "aliases": [
+        "린 애널리틱스 5단계",
+        "공감-흡인력-바이럴-매출-확장"
+      ],
+      "definition": "린 애널리틱스가 제시한 스타트업의 성장 경로: 공감(문제 확인) → 흡인력(사용자가 남는가) → 바이럴(스스로 퍼지는가) → 매출(돈이 되는가) → 확장(키울 수 있는가). 현재 단계에 따라 집중할 질문과 지표가 달라지며, 앞 단계를 건너뛰면 뒷 단계 투자가 낭비된다.",
+      "related": [
+        "product-market-fit"
+      ]
+    },
+    {
+      "id": "statistical-significance",
+      "term": "통계적 유의성",
+      "aliases": [
+        "statistical significance",
+        "유의성"
+      ],
+      "definition": "실험에서 관측된 차이가 우연으로 보기 어렵다고 판정되는 상태. 보통 p값이 사전에 정한 유의수준(예: 0.05)보다 작을 때 유의하다고 하며, 효과의 실무적 크기와는 별개의 개념이다.",
+      "related": [
+        "p-value",
+        "ab-test"
+      ]
+    },
+    {
+      "id": "story-based-interview",
+      "term": "스토리 기반 인터뷰",
+      "aliases": [
+        "스토리 기반 질문"
+      ],
+      "definition": "'보통 어떻게 하세요?' 대신 '마지막으로 ~했던 때를 이야기해 주세요'처럼 구체적 과거 경험담을 끌어내는 질문법. 사람들이 자기 행동을 이상화해 보고하는 편향을 우회한다.",
+      "related": [
+        "mom-test",
+        "continuous-interviewing"
+      ]
+    },
+    {
+      "id": "story-splitting",
+      "term": "스토리 분해 (Story Splitting)",
+      "aliases": [
+        "Story Splitting",
+        "점진적 분해"
+      ],
+      "definition": "큰 스토리를 논의 시점마다 필요한 만큼만 작게 나누는 것. 너무 이른 시점에 잘게 쪼개면 전체 맥락을 잃고, 계획이 바뀔 때 재작업 낭비가 커지므로 개발이 임박한 것부터 전달 가능한 크기로 다듬는다.",
+      "related": [
+        "user-story",
+        "user-story-mapping"
+      ]
+    },
+    {
+      "id": "strategic-context",
+      "term": "전략적 콘텍스트",
+      "aliases": [
+        "Strategic Context"
+      ],
+      "definition": "회사 미션·비전·전략·핵심 목표 등 팀이 스스로 좋은 결정을 내리는 데 필요한 상위 맥락. 임파워드 팀 모델에서 리더가 지시 대신 제공해야 하는 핵심 재료다.",
+      "related": [
+        "empowered-team",
+        "product-strategy"
+      ]
+    },
+    {
+      "id": "strategic-intent",
+      "term": "전략적 의도",
+      "aliases": [
+        "Strategic Intent"
+      ],
+      "definition": "회사 비전을 향해 지금 시기에 집중할 전사 차원의 큰 방향. 보통 1년 이상 지속되며 회사 규모에 따라 한두 개로 좁히는 것이 핵심이다 — 개수가 늘어나면 초점이 사라져 전략이 아니라 소원 목록이 된다.",
+      "related": [
+        "product-strategy",
+        "product-vision"
+      ]
+    },
+    {
+      "id": "three-cs",
+      "term": "3C (카드·대화·확인)",
+      "aliases": [
+        "Card Conversation Confirmation",
+        "카드-대화-확인"
+      ],
+      "definition": "좋은 유저 스토리의 세 요소를 정리한 프레임. 카드(대화를 약속하는 짧은 기록), 대화(무엇을 왜 만들지에 대한 관련자 간 논의), 확인(완료를 판정할 인수 기준의 합의)으로 구성된다.",
+      "related": [
+        "user-story"
+      ]
+    },
+    {
+      "id": "three-pillars",
+      "term": "경험주의 세 기둥 (투명성·검사·적응)",
+      "aliases": [
+        "Transparency",
+        "Inspection",
+        "Adaptation",
+        "투명성",
+        "검사",
+        "적응"
+      ],
+      "definition": "작업과 산출물이 모두에게 보이게 하고(투명성), 자주 성실히 점검하며(검사), 벗어난 것을 가능한 한 빨리 조정하는(적응) 경험주의의 실행 원리. 투명성이 무너지면 검사가 왜곡되고 적응의 근거도 사라지는, 서로를 떠받치는 관계다.",
+      "related": [
+        "empiricism",
+        "scrum"
+      ]
+    },
+    {
+      "id": "traction-metric",
+      "term": "트랙션 지표",
+      "aliases": [
+        "traction metric"
+      ],
+      "definition": "특정 기능의 사용량(클릭 수, 기능 사용률 등)을 재는 지표. 이미 정한 해결책의 채택을 측정하므로, 팀 목표로 삼으면 탐색 범위가 그 기능 안으로 좁아지는 한계가 있다.",
+      "related": [
+        "product-outcome"
+      ]
+    },
+    {
+      "id": "usability-test",
+      "term": "사용성 테스트",
+      "aliases": [
+        "UT",
+        "사용성 평가"
+      ],
+      "definition": "사용자에게 실제 과업을 주고 프로토타입이나 제품을 스스로 조작하게 하여, 도움 없이 사용법을 알아내고 목적을 달성할 수 있는지(사용성 리스크)를 확인하는 테스트.",
+      "related": [
+        "value-test",
+        "leading-question"
+      ]
+    },
+    {
+      "id": "user-story",
+      "term": "유저 스토리 (User Story)",
+      "aliases": [
+        "User Story",
+        "사용자 스토리"
+      ],
+      "definition": "사용자 관점에서 원하는 것과 그 이유를 짧게 적어, 상세 문서 대신 관련자들이 '이야기'를 나누도록 촉발하는 도구. 카드에 적힌 문장은 대화의 약속이지 요구사항 명세의 전부가 아니다.",
+      "related": [
+        "three-cs",
+        "user-story-mapping",
+        "story-splitting"
+      ]
+    },
+    {
+      "id": "user-story-mapping",
+      "term": "유저 스토리 매핑",
+      "aliases": [
+        "User Story Mapping",
+        "story map",
+        "스토리 맵"
+      ],
+      "definition": "사용자 여정을 왼쪽에서 오른쪽으로 배열하고 그 아래로 세부 스토리를 쌓아, 전체 그림을 보면서 성과 기준으로 릴리스를 얇게 써는 기법. Jeff Patton이 정리했으며, 백로그를 1차원 목록이 아니라 2차원 지도로 다루게 해 준다.",
+      "related": [
+        "outcome-vs-output",
+        "product-backlog"
+      ]
+    },
+    {
+      "id": "value-exchange-system",
+      "term": "가치 교환 체계",
+      "aliases": [
+        "Value Exchange System"
+      ],
+      "definition": "제품을 '고객의 문제를 해결해 주고 그 대가로 비즈니스 가치를 돌려받는 교환 구조'로 보는 관점. 기능 자체가 아니라 고객에게 실현된 가치가 교환의 기준이며, 조직 구조·정책 같은 내부 제약이 이 교환을 왜곡하면 빌드 트랩으로 이어진다.",
+      "related": [
+        "build-trap"
+      ]
+    },
+    {
+      "id": "value-test",
+      "term": "가치 테스트",
+      "aliases": [
+        "정성적 가치 테스트"
+      ],
+      "definition": "사용자가 이 제품을 실제로 선택해 쓸 만큼 가치를 느끼는지, 왜 그런지를 소수 사용자와의 심층 테스트로 확인하는 기법. '쓸 수 있는가'를 보는 사용성 테스트와 달리 '쓰고 싶은가'를 검증한다.",
+      "related": [
+        "usability-test"
+      ]
+    },
+    {
+      "id": "vanity-metric",
+      "term": "허영 지표",
+      "aliases": [
+        "vanity metric",
+        "허무 지표"
+      ],
+      "definition": "누적 가입자 수처럼 항상 우상향해 기분은 좋게 만들지만, 제품의 현재 상태를 알려주지 못하고 어떤 의사결정도 바꾸지 않는 지표. 좋은 지표는 반대로 비교 가능하고 비율 형태이며 팀의 행동을 바꾼다.",
+      "related": [
+        "north-star-metric"
+      ]
+    },
+    {
+      "id": "viral-coefficient",
+      "term": "바이럴 계수",
+      "aliases": [
+        "viral coefficient",
+        "K값"
+      ],
+      "definition": "기존 사용자 1명이 평균적으로 데려오는 신규 사용자 수(K). 1을 넘어야 자생적인 기하급수 성장이 가능하고, 1 미만이라도 유입을 증폭해 실질 획득 비용을 낮추는 효과가 있다. 성장 속도는 초대가 도는 사이클 타임에도 좌우된다.",
+      "related": [
+        "cac"
+      ]
+    },
+    {
+      "id": "waiter-pm",
+      "term": "웨이터 PM",
+      "aliases": [
+        "waiter",
+        "주문받는 PM",
+        "order taker"
+      ],
+      "definition": "이해관계자의 요청을 '왜'를 묻지 않고 그대로 백로그에 옮기는 PM 안티패턴. 가치 판단을 포기해 목소리 큰 요청자가 제품 방향을 정하게 만들며, 미니 CEO·프로젝트 매니저형 PM과 함께 대표적 안티패턴으로 꼽힌다.",
+      "related": [
+        "feature-team",
+        "stakeholder"
+      ]
+    },
+    {
+      "id": "walking-skeleton",
+      "term": "워킹 스켈레톤 (Walking Skeleton)",
+      "aliases": [
+        "Walking Skeleton",
+        "뼈대 우선 전략"
+      ],
+      "definition": "전체 사용자 흐름을 끝에서 끝까지 관통하는 최소한의 뼈대를 먼저 완성하고, 이후에 살을 붙여가는 개발 전략. 일정이 부족해도 '전부 미완성'이 아니라 '얇지만 동작하는 전체'가 남아 일정 위험을 줄인다.",
+      "related": [
+        "user-story-mapping",
+        "increment"
+      ]
+    },
+    {
+      "id": "wizard-of-oz-test",
+      "term": "오즈의 마법사 테스트",
+      "aliases": [
+        "Wizard of Oz 테스트",
+        "WoZ 테스트",
+        "wizard of oz test"
+      ],
+      "definition": "사용자에게는 자동화된 제품처럼 보이지만 실제로는 뒤에서 사람이 수동으로 처리하는 프로토타입 기법. 자동화를 구현하기 전에 수요와 사용 흐름을 검증한다. 고객이 사람의 개입을 아는 컨시어지 테스트와 구별된다.",
+      "related": [
+        "concierge-test"
+      ]
+    },
+    {
+      "id": "wsjf",
+      "term": "WSJF",
+      "aliases": [
+        "Weighted Shortest Job First",
+        "가중 최단 작업 우선"
+      ],
+      "definition": "지연 비용(Cost of Delay)을 작업 크기(Job Size)로 나눈 값이 큰 순서로 작업을 배치하는 SAFe의 우선순위 기법. 단위 시간당 가치 회수를 극대화하며, 지연 비용이 비슷하다면 작은 작업을 먼저 하게 만든다.",
+      "related": [
+        "cost-of-delay",
+        "rice-framework"
+      ]
+    },
+    {
+      "id": "zombie-lead",
+      "term": "좀비 리드",
+      "aliases": [
+        "zombie lead"
+      ],
+      "definition": "명확한 예스도 노도 없이 미팅만 계속 이어지는 잠재 고객. 커밋먼트 없는 반복 미팅은 완곡한 거절 신호이므로, 구체적 커밋을 요구하거나 파이프라인에서 정리해야 한다.",
+      "related": [
+        "commitment-and-advancement",
+        "mom-test"
+      ]
+    }
+  ]
+}
