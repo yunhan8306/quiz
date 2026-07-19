@@ -1,0 +1,53 @@
+{
+  "name": "marketing-quiz",
+  "title": "마케팅 학습 퀴즈",
+  "domain": "마케팅 (IT 기업 실무 중심, 개인 학습)",
+  "language": "ko",
+  "createdAt": "2026-07-18",
+  "weights": {
+    "frequency": 0.4,
+    "centrality": 0.25,
+    "practicality": 0.2,
+    "discrimination": 0.15
+  },
+  "sectionPrefixes": {
+    "strategy-consumer": {
+      "canonical": "st",
+      "all": ["st"]
+    },
+    "funnel-growth": {
+      "canonical": "gr",
+      "all": ["gr"]
+    },
+    "performance-marketing": {
+      "canonical": "pf",
+      "all": ["pf"]
+    },
+    "product-marketing": {
+      "canonical": "pmm",
+      "all": ["pmm"]
+    },
+    "crm-retention": {
+      "canonical": "crm",
+      "all": ["crm"]
+    }
+  },
+  "matchKeywords": [
+    "마케팅",
+    "marketing",
+    "그로스",
+    "growth",
+    "퍼포먼스",
+    "performance",
+    "퍼널",
+    "funnel",
+    "CRM",
+    "리텐션",
+    "retention",
+    "브랜딩",
+    "광고",
+    "GTM",
+    "PMM",
+    "AARRR"
+  ]
+}

@@ -1,0 +1,982 @@
+{
+  "terms": [
+    {
+      "id": "aarrr",
+      "term": "AARRR(해적 지표)",
+      "aliases": [
+        "AARRR",
+        "해적 지표",
+        "해적 프레임워크",
+        "pirate metrics"
+      ],
+      "definition": "획득(Acquisition)·활성화(Activation)·리텐션(Retention)·추천(Referral)·수익화(Revenue)의 5단계로 유저 여정을 나눠 서비스 성장을 진단하는 프레임워크. 단계별 전환율을 측정해 어디가 병목인지 찾는 그로스 분석의 기본 틀이다.",
+      "related": [
+        "funnel-analysis",
+        "activation",
+        "retention"
+      ]
+    },
+    {
+      "id": "ab-test",
+      "term": "A/B 테스트",
+      "aliases": [
+        "A/B test",
+        "스플릿 테스트",
+        "대조 실험",
+        "실험군",
+        "대조군"
+      ],
+      "definition": "유저를 무작위로 대조군과 실험군에 나눠 같은 기간에 한 가지 변경만 노출하고 지표 차이를 비교하는 실험. 무작위 배정이 교란 변수를 통제해, 단순 상관이 아닌 인과(변경의 효과)를 확인할 수 있게 한다.",
+      "related": [
+        "statistical-significance"
+      ]
+    },
+    {
+      "id": "activation",
+      "term": "활성화(activation)",
+      "aliases": [
+        "activation",
+        "aha moment",
+        "아하 모먼트",
+        "액티베이션"
+      ],
+      "definition": "신규 유저가 가입 후 제품의 핵심 가치를 처음으로 체감하는(aha moment) 단계. 온보딩의 품질이 활성화율을 좌우하며, 활성화 없이는 리텐션도 없다. 신기능의 채택(adoption)을 잴 때도 '대상 유저 중 실제 반복 사용 비율'로 같은 관점을 적용한다.",
+      "related": [
+        "plg",
+        "freemium"
+      ]
+    },
+    {
+      "id": "aida",
+      "term": "AIDA 모델",
+      "aliases": [
+        "AIDA",
+        "구매 의사결정 퍼널"
+      ],
+      "definition": "고객이 구매에 이르는 심리 과정을 주의(Attention)→관심(Interest)→욕구(Desire)→행동(Action)의 4단계로 설명하는 고전 모델. 단계마다 고객 일부가 이탈하는 깔때기 구조라는 통찰이 현대 퍼널 분석의 뿌리가 되었다.",
+      "related": [
+        "stp"
+      ]
+    },
+    {
+      "id": "anchoring",
+      "term": "앵커링 효과(anchoring effect)",
+      "aliases": [
+        "앵커링",
+        "기준점 효과"
+      ],
+      "definition": "처음 접한 숫자나 정보가 기준점(anchor)이 되어 이후의 판단을 끌어당기는 인지 편향. 정가-할인가 병기, 고가 플랜을 먼저 보여주는 요금제 배치 등 가격 설계에 널리 활용된다.",
+      "related": [
+        "loss-aversion",
+        "default-effect"
+      ]
+    },
+    {
+      "id": "arpu",
+      "term": "ARPU(유저당 평균 매출)",
+      "aliases": [
+        "ARPPU",
+        "인당 매출",
+        "객단가"
+      ],
+      "definition": "일정 기간의 매출을 전체 활성 유저 수로 나눈 값. 결제 유저만으로 나눈 ARPPU와 구분해야 하며, ARPU는 전체 수익화 효율을, ARPPU는 결제 유저의 지불 강도를 보여준다. 'ARPU = 결제 전환율 × ARPPU'로 분해된다.",
+      "related": [
+        "aarrr"
+      ]
+    },
+    {
+      "id": "attribution",
+      "term": "어트리뷰션(attribution)",
+      "aliases": [
+        "기여 분석",
+        "기여도 측정"
+      ],
+      "definition": "유저가 전환에 이르기까지 접촉한 여러 광고·채널 접점에 전환 기여를 배분하는 측정 방법론. 배분 규칙에 따라 라스트클릭·퍼스트클릭·선형·시간가중·데이터 기반 모델로 나뉘며, 모델 선택에 따라 채널별 성과가 다르게 보인다.",
+      "related": [
+        "attribution-window",
+        "mmp",
+        "utm-parameter"
+      ]
+    },
+    {
+      "id": "attribution-window",
+      "term": "어트리뷰션 윈도우(attribution window)",
+      "aliases": [
+        "기여 인정 기간",
+        "룩백 윈도우",
+        "lookback window"
+      ],
+      "definition": "광고 접촉(클릭 또는 노출) 후 발생한 전환을 그 광고의 기여로 인정하는 기간. 클릭 기반의 클릭스루 전환과 노출 기반의 뷰스루 전환에 서로 다른 윈도우를 적용하며, 관행상 뷰스루 윈도우를 더 짧게 잡는다.",
+      "related": [
+        "attribution",
+        "skadnetwork"
+      ]
+    },
+    {
+      "id": "brand-equity",
+      "term": "브랜드 자산(brand equity)",
+      "aliases": [
+        "브랜드 에쿼티"
+      ],
+      "definition": "브랜드 이름이 제품·서비스에 얹어주는 추가적인 가치. 인지도(떠올릴 수 있는가) → 선호도(대안보다 좋아하는가) → 충성도(반복 구매·추천하는가)의 층위로 깊어지며, 앞 단계가 뒤 단계의 전제가 되지만 자동으로 이어지지는 않는다.",
+      "related": [
+        "positioning"
+      ]
+    },
+    {
+      "id": "cac",
+      "term": "CAC",
+      "aliases": [
+        "Customer Acquisition Cost",
+        "고객 획득 비용",
+        "CAC"
+      ],
+      "definition": "신규 고객 1명을 획득하는 데 든 총비용. 매체비뿐 아니라 마케팅 인건비·툴 비용 등을 포함해 계산하는 경우가 많아, 특정 행동 1건당 광고비인 CPA보다 포괄적이다. LTV와 비교해 유닛 이코노믹스를 판단하는 데 쓰인다.",
+      "related": [
+        "cpa",
+        "roas"
+      ]
+    },
+    {
+      "id": "cdp",
+      "term": "CDP (고객 데이터 플랫폼)",
+      "aliases": [
+        "CDP",
+        "고객 데이터 플랫폼",
+        "Customer Data Platform"
+      ],
+      "definition": "여러 접점에 흩어진 고객 데이터를 식별 가능한 개인 단위 프로필로 통합하고, 세그먼트를 만들어 발송 툴·광고 플랫폼 등 실행 채널에 제공하는 마테크 기반 시스템. 익명 광고 오디언스를 다루는 DMP와 구분된다.",
+      "related": [
+        "first-party-data"
+      ]
+    },
+    {
+      "id": "chasm",
+      "term": "캐즘(chasm)",
+      "aliases": [
+        "기술수용주기",
+        "크로싱 더 캐즘"
+      ],
+      "definition": "기술수용주기에서 얼리어답터와 전기 다수(early majority) 사이에 존재하는 간극. 얼리어답터는 새로움을 위해 미완성을 감수하지만 전기 다수는 검증된 레퍼런스와 완결된 솔루션을 원해 구매 기준 자체가 달라지기 때문에 생긴다. 니치 세그먼트에서 레퍼런스를 완성해 건너는 것이 정석적 극복 전략이다.",
+      "related": [
+        "product-life-cycle",
+        "positioning"
+      ]
+    },
+    {
+      "id": "churn-rate",
+      "term": "이탈률 (churn rate)",
+      "aliases": [
+        "churn",
+        "이탈률",
+        "해지율"
+      ],
+      "definition": "기간 시작 시점의 고객 중 그 기간에 떠난(해지·비활성화된) 고객의 비율. 리텐션과 '1 − 리텐션' 관계이며, 구독 비즈니스에서는 작은 차이도 복리로 누적되어 LTV를 크게 바꾼다.",
+      "related": [
+        "ltv",
+        "dormant-user"
+      ]
+    },
+    {
+      "id": "cohort-analysis",
+      "term": "코호트 분석(cohort analysis)",
+      "aliases": [
+        "코호트",
+        "cohort"
+      ],
+      "definition": "가입 시점 등 공통 속성으로 유저를 그룹(코호트)으로 묶어 시간 흐름에 따른 행동을 추적하는 분석. 유입 시점이 다른 유저가 섞여 전체 평균이 왜곡되는 것을 막고, 제품 변경의 효과를 시점별로 분리해 볼 수 있게 한다.",
+      "related": [
+        "retention"
+      ]
+    },
+    {
+      "id": "correlation-causation",
+      "term": "상관관계와 인과관계",
+      "aliases": [
+        "상관≠인과"
+      ],
+      "definition": "상관관계는 두 지표가 함께 움직인다는 사실만 보여줄 뿐 원인-결과를 증명하지 않는다. 제3의 변수(교란 요인), 역인과, 자기선택 편향이 대안 설명으로 항상 검토되어야 하며, 인과 확인의 표준 방법은 무작위 배정 실험(A/B 테스트)이다.",
+      "related": [
+        "survivorship-bias"
+      ]
+    },
+    {
+      "id": "cpa",
+      "term": "CPA",
+      "aliases": [
+        "Cost Per Action",
+        "행동당 비용",
+        "전환당 비용"
+      ],
+      "definition": "설치·가입·구매 같은 특정 행동(전환) 1건당 비용. 광고비 ÷ 전환 수로 계산한다. 고객 1명 획득의 총비용인 CAC와 자주 혼동되지만 측정 범위가 다르다.",
+      "related": [
+        "cac",
+        "cvr",
+        "cpc"
+      ]
+    },
+    {
+      "id": "cpc",
+      "term": "CPC",
+      "aliases": [
+        "Cost Per Click",
+        "클릭당 과금",
+        "클릭당 비용"
+      ],
+      "definition": "클릭 1회당 비용, 또는 클릭 기준 과금 방식. 트래픽 유도 캠페인의 기본 효율 지표이며, 검색 광고에서는 경매의 입찰가와 품질 점수에 따라 실제 과금액이 정해진다.",
+      "related": [
+        "cpm",
+        "cpa",
+        "ctr"
+      ]
+    },
+    {
+      "id": "cpm",
+      "term": "CPM",
+      "aliases": [
+        "Cost Per Mille",
+        "노출당 과금",
+        "씨피엠"
+      ],
+      "definition": "광고 노출 1,000회당 비용, 또는 그 기준으로 과금하는 방식. 클릭·전환 여부와 무관하게 노출량 기준이므로 도달·인지 목적 캠페인에서 주로 쓰인다.",
+      "related": [
+        "cpc",
+        "cpa"
+      ]
+    },
+    {
+      "id": "crm-marketing",
+      "term": "CRM 마케팅",
+      "aliases": [
+        "CRM",
+        "관계 마케팅",
+        "리텐션 마케팅"
+      ],
+      "definition": "이미 확보한 고객의 행동·구매 데이터를 바탕으로 관계를 관리해 유지(리텐션)·재구매·LTV를 높이는 마케팅. 신규 고객을 데려오는 획득 마케팅과 대비되는 개념이다.",
+      "related": [
+        "lifecycle-marketing",
+        "ltv"
+      ]
+    },
+    {
+      "id": "ctr",
+      "term": "CTR",
+      "aliases": [
+        "Click-Through Rate",
+        "클릭률"
+      ],
+      "definition": "노출 대비 클릭 비율(클릭 수 ÷ 노출 수). 광고 소재와 타겟이 유저의 주의를 끄는 정도를 보여주는 퍼널 상단 지표로, 랜딩 이후를 반영하는 CVR과 단계가 다르다.",
+      "related": [
+        "cvr",
+        "cpc"
+      ]
+    },
+    {
+      "id": "cvr",
+      "term": "CVR",
+      "aliases": [
+        "Conversion Rate",
+        "전환율"
+      ],
+      "definition": "클릭(또는 방문) 대비 전환 비율(전환 수 ÷ 클릭 수). 랜딩 페이지·오퍼·타겟 적합도를 반영하는 퍼널 하단 지표다. CTR이 높고 CVR이 낮으면 소재는 좋은데 랜딩이 약하다는 식의 진단이 가능하다.",
+      "related": [
+        "ctr",
+        "cpa"
+      ]
+    },
+    {
+      "id": "default-effect",
+      "term": "디폴트 효과(default effect)",
+      "aliases": [
+        "기본 선택 효과",
+        "옵트인/옵트아웃"
+      ],
+      "definition": "기본으로 설정된 선택지가 그대로 유지되는 경향. 현상 유지 편향, 변경에 드는 노력 회피, '기본값=암묵적 추천'이라는 해석이 겹쳐 작동하며, 옵트인/옵트아웃 설계에 따라 동의율이 극적으로 달라진다. 남용하면 다크패턴 규제 대상이 된다.",
+      "related": [
+        "loss-aversion",
+        "anchoring"
+      ]
+    },
+    {
+      "id": "deliverability",
+      "term": "도달성 (deliverability)",
+      "aliases": [
+        "도달성",
+        "도달률"
+      ],
+      "definition": "발송한 이메일이 스팸함이 아닌 받은편지함에 안착하는 정도. 발신 도메인 인증(SPF·DKIM·DMARC), 스팸 신고율, 하드 바운스 비율, 수신자 참여율 등 발신자 평판에 좌우된다.",
+      "related": [
+        "open-rate"
+      ]
+    },
+    {
+      "id": "dormant-user",
+      "term": "휴면 유저",
+      "aliases": [
+        "휴면 고객",
+        "비활성 유저"
+      ],
+      "definition": "일정 기간(예: 30일·90일) 접속·구매 등 핵심 행동이 없는 고객. 휴면의 기준 기간은 서비스의 자연스러운 사용 주기에 맞게 정의하며, 윈백 캠페인의 대상이 된다.",
+      "related": [
+        "win-back",
+        "churn-rate"
+      ]
+    },
+    {
+      "id": "first-party-data",
+      "term": "퍼스트파티 데이터",
+      "aliases": [
+        "1st party data",
+        "자사 데이터"
+      ],
+      "definition": "기업이 자사 웹·앱·구매 접점에서 고객 동의 하에 직접 수집한 데이터. 서드파티 쿠키 축소·앱 추적 제한 이후 외부 추적 차단의 영향을 상대적으로 덜 받아 타겟팅·개인화의 기반으로 중요성이 커졌다.",
+      "related": [
+        "cdp"
+      ]
+    },
+    {
+      "id": "freemium",
+      "term": "프리미엄 모델(freemium)",
+      "aliases": [
+        "부분 유료화",
+        "프리미엄(free+premium)"
+      ],
+      "definition": "핵심 기능을 기간 제한 없이 무료로 제공하고 용량·고급 기능·좌석 등에서 유료 전환을 일으키는 모델. 무료 유저 유지의 한계 비용이 낮고, 무료 단계에서 가치를 충분히 경험시키되 명확한 업그레이드 계기가 설계되어야 성립한다. 기간이 끝나면 결제가 필요한 무료 체험(free trial)과는 다른 개념이다.",
+      "related": [
+        "plg",
+        "value-based-pricing"
+      ]
+    },
+    {
+      "id": "funnel-analysis",
+      "term": "퍼널 분석(funnel analysis)",
+      "aliases": [
+        "퍼널",
+        "전환 퍼널",
+        "funnel",
+        "전환율",
+        "CVR"
+      ],
+      "definition": "방문→가입→구매처럼 목표에 이르는 단계를 정의하고 단계별 전환율(CVR)을 측정해, 유저가 가장 많이 이탈하는 병목 구간을 찾아 개선하는 분석 방법. 병목 개선의 효과는 하위 모든 단계에 곱해진다.",
+      "related": [
+        "aarrr",
+        "growth-loop"
+      ]
+    },
+    {
+      "id": "growth-hacking",
+      "term": "그로스 해킹(growth hacking)",
+      "aliases": [
+        "그로스해킹",
+        "growth hacking",
+        "그로스 실험"
+      ],
+      "definition": "데이터로 퍼널의 병목을 찾고 가설을 세워 A/B 테스트 같은 작은 실험으로 검증·반영을 반복하는 성장 프로세스. 일회성 트릭이 아니라 실험과 학습의 속도를 높이는 운영 체계이며, 성과는 단위 기간당 검증한 가설의 수로 평가되곤 한다.",
+      "related": [
+        "aarrr",
+        "ab-test",
+        "funnel-analysis"
+      ]
+    },
+    {
+      "id": "growth-loop",
+      "term": "그로스 루프(growth loop)",
+      "aliases": [
+        "성장 루프",
+        "바이럴 루프"
+      ],
+      "definition": "기존 유저의 활동 산출물(콘텐츠·초대·데이터)이 다시 신규 유저 유입의 입력이 되는 자기 강화 순환 구조. 위에서 아래로 한 번 흐르고 끝나는 선형 퍼널과 달리 성장이 복리로 쌓이도록 설계하는 관점이다.",
+      "related": [
+        "k-factor",
+        "funnel-analysis"
+      ]
+    },
+    {
+      "id": "gtm",
+      "term": "GTM(Go-to-Market) 전략",
+      "aliases": [
+        "고투마켓",
+        "고투마켓 전략"
+      ],
+      "definition": "제품을 시장에 내놓기 위한 통합 계획. 타겟 고객 정의, 포지셔닝·메시징, 가격·패키징, 판매·유통 채널, 런칭 단계 설계와 성공 지표까지 포함한다. 런칭 이벤트 일정표로 축소해 이해하면 안 된다.",
+      "related": [
+        "pmm",
+        "positioning",
+        "icp"
+      ]
+    },
+    {
+      "id": "icp",
+      "term": "ICP(Ideal Customer Profile)",
+      "aliases": [
+        "이상적 고객 프로필",
+        "아이시피"
+      ],
+      "definition": "우리 제품에 가장 잘 맞는 '기업(계정)'의 조건을 업종·규모·기술 환경 등으로 정의한 것. 그 조직 안의 '개인'(역할·목표·페인포인트)을 그리는 페르소나(persona)와 층위가 다르다 — ICP로 어떤 회사를 노릴지, 페르소나로 그 안의 누구에게 어떤 메시지를 쓸지 정한다.",
+      "related": [
+        "gtm",
+        "jtbd",
+        "positioning"
+      ]
+    },
+    {
+      "id": "incrementality",
+      "term": "증분성(incrementality)",
+      "aliases": [
+        "인크리멘털리티",
+        "증분 효과"
+      ],
+      "definition": "광고가 없었더라도 일어났을 전환을 제외하고, 광고 때문에 추가로 발생한 전환만을 광고의 진짜 효과로 보는 관점. 광고 비노출 홀드아웃 집단과의 비교 실험으로 측정하며, ROAS가 높아 보이는 리타게팅·브랜드 검색 캠페인의 실효를 검증할 때 특히 중요하다.",
+      "related": [
+        "roas",
+        "retargeting"
+      ]
+    },
+    {
+      "id": "jtbd",
+      "term": "JTBD(Jobs to be Done)",
+      "aliases": [
+        "잡스 투 비 던",
+        "할 일 관점"
+      ],
+      "definition": "고객이 제품을 사는 것이 아니라 '해결하고 싶은 과제(job)를 위해 제품을 고용(hire)한다'고 보는 고객 이해 관점. '드릴이 아니라 벽의 구멍을 원한다'는 표현이 대표적이다. 경쟁의 범위를 같은 카테고리 제품이 아닌 '같은 과제를 푸는 모든 대안'으로 확장시킨다.",
+      "related": [
+        "value-proposition",
+        "icp"
+      ]
+    },
+    {
+      "id": "k-factor",
+      "term": "바이럴 계수(K-factor)",
+      "aliases": [
+        "K팩터",
+        "viral coefficient"
+      ],
+      "definition": "기존 유저 1명이 데려오는 신규 유저 수. '1인당 초대 발송 수 × 초대 수락률'로 계산하며, 1을 넘으면 이론상 유저가 자체 증식할 수 있다. 다만 실제 성장 속도는 초대가 도는 사이클 시간과 데려온 유저의 리텐션에 좌우된다.",
+      "related": [
+        "growth-loop",
+        "retention"
+      ]
+    },
+    {
+      "id": "leading-indicator",
+      "term": "선행 지표(leading indicator)",
+      "aliases": [
+        "후행 지표",
+        "lagging indicator"
+      ],
+      "definition": "미래 결과를 미리 예측해 개입할 시간을 주는 지표(예: 첫 주 핵심 기능 사용률). 반대로 매출·이탈처럼 결과가 확정된 뒤에야 움직이는 것은 후행 지표(lagging indicator)다. 관리 지표는 개입 가능한 선행 지표로 잡는 것이 원칙이다.",
+      "related": [
+        "north-star-metric"
+      ]
+    },
+    {
+      "id": "lifecycle-marketing",
+      "term": "라이프사이클 마케팅",
+      "aliases": [
+        "라이프사이클 마케팅",
+        "생애주기 마케팅"
+      ],
+      "definition": "고객을 온보딩→활성→충성→휴면 같은 생애 단계로 나누고, 단계마다 다른 목표·메시지·채널로 개입하는 CRM 접근. 같은 메시지라도 어느 단계의 고객에게 보내는가가 성과를 가른다.",
+      "related": [
+        "crm-marketing",
+        "win-back"
+      ]
+    },
+    {
+      "id": "loss-aversion",
+      "term": "손실 회피(loss aversion)",
+      "aliases": [
+        "손실 프레이밍"
+      ],
+      "definition": "같은 크기라도 이득보다 손실을 훨씬 크게(대략 2배 안팎) 느끼는 심리 성향. 같은 내용을 '얻는 것'보다 '잃는 것'으로 표현하면 반응이 강해지는 프레이밍 효과의 바탕이며, 무료 체험 후 전환이나 현상 유지 편향을 설명하는 핵심 원리다.",
+      "related": [
+        "anchoring",
+        "default-effect",
+        "scarcity-principle"
+      ]
+    },
+    {
+      "id": "ltv",
+      "term": "LTV (고객 생애 가치)",
+      "aliases": [
+        "LTV",
+        "고객 생애 가치",
+        "CLV",
+        "Lifetime Value"
+      ],
+      "definition": "한 고객이 관계를 유지하는 전체 기간 동안 가져다줄 것으로 기대되는 총가치. 구독 모델에서는 'ARPU ÷ 이탈률'로 근사하기도 하며, CAC와 비교해 획득 투자의 건전성을 판단하는 기준이 된다.",
+      "related": [
+        "cac",
+        "churn-rate"
+      ]
+    },
+    {
+      "id": "market-research",
+      "term": "시장 조사(market research)",
+      "aliases": [
+        "정성 조사",
+        "정량 조사",
+        "유저 리서치"
+      ],
+      "definition": "고객과 시장을 이해하기 위한 체계적 조사 활동. 정량 조사(데이터 분석·설문 집계·실험)는 '무엇이 얼마나' 일어나는지를, 정성 조사(심층 인터뷰·사용성 테스트)는 '왜' 일어나는지를 답한다. 유도 질문·표본 편향 같은 설계 결함이 결과를 왜곡할 수 있다.",
+      "related": [
+        "correlation-causation",
+        "survivorship-bias"
+      ]
+    },
+    {
+      "id": "marketing-mix-4p",
+      "term": "마케팅 믹스 4P",
+      "aliases": [
+        "4P",
+        "4C",
+        "마케팅 믹스"
+      ],
+      "definition": "제품(Product)·가격(Price)·유통(Place)·판촉(Promotion)이라는 마케팅 실행의 4대 요소. 이를 고객 관점으로 전환한 것이 4C로, 각각 고객 가치(Customer value)·고객 비용(Cost)·편의성(Convenience)·소통(Communication)에 대응한다.",
+      "related": [
+        "stp"
+      ]
+    },
+    {
+      "id": "messaging-hierarchy",
+      "term": "메시징 계층(messaging hierarchy)",
+      "aliases": [
+        "메시지 하우스",
+        "messaging framework"
+      ],
+      "definition": "핵심 메시지를 맨 위에, 그것을 뒷받침하는 근거 기둥(pillar)을 중간에, 기능·수치·사례 같은 증거를 맨 아래에 배치한 메시지 위계 구조. 채널과 분량이 달라도 상위 메시지의 일관성을 유지하면서 맥락에 맞는 하위 요소를 골라 쓸 수 있게 한다.",
+      "related": [
+        "positioning",
+        "value-proposition"
+      ]
+    },
+    {
+      "id": "mmp",
+      "term": "MMP(Mobile Measurement Partner)",
+      "aliases": [
+        "모바일 측정 파트너",
+        "모바일 어트리뷰션 툴"
+      ],
+      "definition": "여러 광고 매체에 걸친 앱 설치·인앱 이벤트 기여를 제3자 입장에서 통합 측정하는 사업자. 매체별 자체 집계의 중복을 제거(deduplication)해 한 기준으로 매체 성과를 비교하게 해 주며, 광고를 팔지 않는 중립적 측정자라는 점이 핵심이다.",
+      "related": [
+        "attribution",
+        "skadnetwork"
+      ]
+    },
+    {
+      "id": "north-star-metric",
+      "term": "노스스타 지표(North Star Metric)",
+      "aliases": [
+        "NSM",
+        "북극성 지표"
+      ],
+      "definition": "고객이 제품에서 얻는 핵심 가치를 반영하면서 장기 수익 성장과 연결되고, 팀의 활동으로 움직일 수 있는 단 하나의 대표 지표. 매출처럼 결과만 보여주는 후행 지표나 누적 가입자 수 같은 허영 지표는 부적합하다.",
+      "related": [
+        "vanity-metric",
+        "leading-indicator"
+      ]
+    },
+    {
+      "id": "nps",
+      "term": "NPS (순추천지수)",
+      "aliases": [
+        "NPS",
+        "순추천지수",
+        "Net Promoter Score"
+      ],
+      "definition": "추천 의향을 0~10점으로 물어 9~10점(추천자) 비율에서 0~6점(비추천자) 비율을 뺀 값(−100~+100). 간명하지만 표본 편향과 '의향≠실제 행동'이라는 한계가 있어 후속 질문·행동 데이터와 함께 봐야 한다.",
+      "related": []
+    },
+    {
+      "id": "open-rate",
+      "term": "오픈율 (open rate)",
+      "aliases": [
+        "오픈율",
+        "열람률"
+      ],
+      "definition": "도달한 이메일 중 열람된 것으로 집계된 비율. 본문의 추적 픽셀 로드로 측정하기 때문에 이미지 차단 시 과소, 메일 앱의 자동 사전 로드 시 과대 집계될 수 있는 근사치다.",
+      "related": [
+        "deliverability"
+      ]
+    },
+    {
+      "id": "opt-in",
+      "term": "옵트인 (opt-in)",
+      "aliases": [
+        "옵트인",
+        "수신 동의",
+        "사전 동의"
+      ],
+      "definition": "사전에 수신 동의를 받은 사람에게만 광고성 메시지를 보내는 방식. 한국 정보통신망법의 원칙으로, 광고 표시와 수신거부 안내 의무가 함께 따른다. 수신거부 시 중단만 하면 되는 옵트아웃 방식과 대비된다.",
+      "related": [
+        "deliverability"
+      ]
+    },
+    {
+      "id": "plg",
+      "term": "PLG(Product-Led Growth)",
+      "aliases": [
+        "프로덕트 주도 성장",
+        "product led growth",
+        "SLG"
+      ],
+      "definition": "무료 체험·셀프서브 온보딩 등 제품 사용 경험 자체가 고객 획득·전환·확장을 이끄는 성장 방식. 영업 조직의 데모·상담이 전환을 주도하는 SLG(Sales-Led Growth)와 대비된다. B2C 전용이 아니며(Slack·Figma 등 B2B 사례 다수), 영업·광고와 병행할 수 있다.",
+      "related": [
+        "freemium",
+        "activation"
+      ]
+    },
+    {
+      "id": "pmf",
+      "term": "PMF(Product-Market Fit)",
+      "aliases": [
+        "프로덕트 마켓 핏",
+        "제품-시장 적합성",
+        "숀 엘리스 테스트"
+      ],
+      "definition": "제품이 시장의 강한 수요를 충족하고 있는 상태. 리텐션 커브가 일정 수준에서 평평해지는 것, 숀 엘리스 테스트에서 '못 쓰게 되면 매우 실망' 응답이 약 40% 이상인 것 등이 대표적인 신호로 쓰인다.",
+      "related": [
+        "retention"
+      ]
+    },
+    {
+      "id": "pmm",
+      "term": "PMM(프로덕트 마케팅 매니저)",
+      "aliases": [
+        "프로덕트 마케터",
+        "product marketing manager",
+        "프로덕트 마케팅"
+      ],
+      "definition": "제품과 시장의 접점을 담당하는 역할. 타겟 고객 정의, 포지셔닝·메시징 수립, GTM 계획과 런칭 주도, 세일즈 인에이블먼트를 맡는다. '무엇을 만들지'를 정하는 PM과 달리 '어떻게 시장에 알리고 팔리게 할지'를 책임진다.",
+      "related": [
+        "gtm",
+        "positioning",
+        "sales-enablement"
+      ]
+    },
+    {
+      "id": "positioning",
+      "term": "포지셔닝(positioning)",
+      "aliases": [
+        "포지셔닝 전략",
+        "리포지셔닝",
+        "포지셔닝 스테이트먼트",
+        "positioning statement"
+      ],
+      "definition": "고객의 인식 속에서 제품이 차지할 위치를 설계하는 일. 포지셔닝 스테이트먼트는 '누구를 위한(대상 고객), 어떤 카테고리의(준거 틀), 무엇이 다른(차별점과 근거) 제품인가'를 한 문장 틀로 정리한 것이다. 본질은 특정 고객과 차별점을 선택하고 나머지를 포기하는 데 있다.",
+      "related": [
+        "value-proposition",
+        "messaging-hierarchy",
+        "icp"
+      ]
+    },
+    {
+      "id": "price-anchoring",
+      "term": "가격 앵커링(price anchoring)",
+      "aliases": [
+        "앵커 가격",
+        "티어 프라이싱",
+        "good-better-best"
+      ],
+      "definition": "사람이 가격을 기준점(앵커) 대비 상대값으로 판단하는 심리를 활용한 가격 설계. '좋음–더 좋음–최고' 3티어에서 고가 티어를 함께 노출해 중간 티어가 합리적으로 느껴지게 하는 것이 대표적 활용이다. 선택 과부하를 피하기 위해 티어 수는 보통 3개 안팎으로 제한한다.",
+      "related": [
+        "value-based-pricing"
+      ]
+    },
+    {
+      "id": "product-life-cycle",
+      "term": "제품 수명주기(product life cycle)",
+      "aliases": [
+        "PLC",
+        "제품 라이프사이클"
+      ],
+      "definition": "제품이 도입–성장–성숙–쇠퇴 단계를 거친다는 프레임. 단계마다 마케팅 초점이 달라진다 — 도입기는 카테고리 교육, 성장기는 차별화와 점유율 확대, 성숙기는 고객 유지와 효율화, 쇠퇴기는 철수 관리.",
+      "related": [
+        "chasm",
+        "gtm"
+      ]
+    },
+    {
+      "id": "retargeting",
+      "term": "리타게팅(retargeting)",
+      "aliases": [
+        "리마케팅",
+        "remarketing"
+      ],
+      "definition": "방문·설치·장바구니 담기 등 이미 접점이 있던 유저에게 다시 광고를 노출해 끊긴 전환을 완성시키는 기법. 신규 유저를 데려오는 UA와 목적이 다르며, 어차피 전환했을 유저가 섞이기 쉬워 증분성 검증이 특히 필요하다.",
+      "related": [
+        "incrementality",
+        "attribution"
+      ]
+    },
+    {
+      "id": "retention",
+      "term": "리텐션(retention)",
+      "aliases": [
+        "유지율",
+        "재방문율",
+        "N일차 리텐션",
+        "D7 리텐션"
+      ],
+      "definition": "유입된 유저가 시간이 지나도 계속 제품을 사용하는 정도. 가입 코호트 중 정확히 N일째 재방문한 비율(클래식) 또는 N일째 이후 재방문까지 포함(롤링)으로 측정하며, 리텐션 커브가 평평해지면 PMF의 긍정 신호로 본다.",
+      "related": [
+        "cohort-analysis",
+        "pmf",
+        "stickiness"
+      ]
+    },
+    {
+      "id": "rfm-analysis",
+      "term": "RFM 분석",
+      "aliases": [
+        "RFM"
+      ],
+      "definition": "Recency(최근성)·Frequency(구매 빈도)·Monetary(구매 금액) 세 축으로 고객을 점수화해 등급을 나누는 세그멘테이션 기법. 거래 데이터만으로 VIP·이탈 위험군 등을 구분해 그룹별 캠페인을 설계할 수 있다.",
+      "related": [
+        "crm-marketing"
+      ]
+    },
+    {
+      "id": "rice",
+      "term": "RICE 프레임",
+      "aliases": [
+        "RICE",
+        "ICE",
+        "우선순위 프레임"
+      ],
+      "definition": "실험·기능 아이디어의 우선순위를 Reach(도달 규모) × Impact(임팩트) × Confidence(확신도) ÷ Effort(투입 공수)로 점수화하는 프레임. 기대 효과가 같다면 공수가 적은 실험을 먼저 실행하게 하며, 단순 변형으로 ICE(Impact·Confidence·Ease)가 있다.",
+      "related": [
+        "growth-hacking",
+        "ab-test"
+      ]
+    },
+    {
+      "id": "roas",
+      "term": "ROAS",
+      "aliases": [
+        "Return On Ad Spend",
+        "광고 수익률"
+      ],
+      "definition": "광고비 대비 광고 기여 매출의 비율(광고 기여 매출 ÷ 광고비 × 100). 매출 기준이라 마진을 반영하지 않으며, 광고가 없었어도 일어났을 전환까지 포함할 수 있어 증분성을 보장하지 않는다는 한계가 있다.",
+      "related": [
+        "incrementality",
+        "cac"
+      ]
+    },
+    {
+      "id": "sales-enablement",
+      "term": "세일즈 인에이블먼트(sales enablement)",
+      "aliases": [
+        "영업 인에이블먼트",
+        "배틀카드",
+        "battlecard"
+      ],
+      "definition": "영업팀이 제품 가치를 정확하고 일관되게 전달해 잘 팔 수 있도록 제품 교육, 데모 스크립트, 고객 사례, 배틀카드(경쟁 대응용 내부 참조 자료) 등 콘텐츠와 도구를 공급하는 활동. B2B 조직에서 PMM의 핵심 업무 중 하나다.",
+      "related": [
+        "pmm",
+        "gtm"
+      ]
+    },
+    {
+      "id": "scarcity-principle",
+      "term": "희소성 원리(scarcity)",
+      "aliases": [
+        "희소성",
+        "긴급성"
+      ],
+      "definition": "얻기 어렵거나 곧 사라질 것에 더 높은 가치를 부여하는 심리. 한정 수량·마감 시한 표시가 대표적 활용이며 기회를 놓치는 데 대한 손실 회피와 맞닿아 있다. 사실에 근거하지 않은 가짜 희소성은 학습되어 효과가 사라지고 다크패턴 규제 대상이 된다.",
+      "related": [
+        "loss-aversion",
+        "social-proof"
+      ]
+    },
+    {
+      "id": "segmentation",
+      "term": "세그멘테이션(segmentation)",
+      "aliases": [
+        "시장 세분화",
+        "세그먼트"
+      ],
+      "definition": "시장 전체를 인구통계·행동·니즈·심리 같은 기준으로 나눠, 마케팅에 서로 다르게 반응하는 동질적 집단(세그먼트)을 찾는 작업. 좋은 세그먼트는 측정 가능하고, 충분히 크고, 도달 가능하며, 다른 세그먼트와 반응이 구별되어야 한다.",
+      "related": [
+        "stp",
+        "positioning"
+      ]
+    },
+    {
+      "id": "sem",
+      "term": "SEM(Search Engine Marketing)",
+      "aliases": [
+        "검색 엔진 마케팅",
+        "검색 광고"
+      ],
+      "definition": "검색 엔진에서 유저가 검색어로 드러낸 의도에 대응하는 마케팅. 실무에서는 주로 유료 검색 광고(SA) 집행을 가리키며, 오가닉 검색 순위를 높이는 SEO와 구분된다. 광고 집행이 오가닉 순위를 올려 주지는 않는다.",
+      "related": [
+        "cpc",
+        "ctr"
+      ]
+    },
+    {
+      "id": "skadnetwork",
+      "term": "SKAdNetwork",
+      "aliases": [
+        "SKAN",
+        "스카드네트워크"
+      ],
+      "definition": "iOS에서 개별 유저를 식별하지 않고 캠페인 단위로 집계된 전환 신호만 제공하는 애플의 프라이버시 보존형 어트리뷰션 프레임워크. ATT 도입으로 IDFA 기반의 유저 단위 측정이 제한되면서 iOS 앱 광고 측정의 중심으로 부상했다.",
+      "related": [
+        "mmp",
+        "attribution-window"
+      ]
+    },
+    {
+      "id": "social-proof",
+      "term": "사회적 증거(social proof)",
+      "aliases": [
+        "사회적 증명"
+      ],
+      "definition": "판단이 불확실할 때 다수의 행동을 옳은 선택의 근거로 삼는 심리. 사용자 수·리뷰·평점·도입 기업 로고 표시가 대표적 활용이며, 판단이 불확실하고 나와 비슷한 사람들의 행동일수록 효과가 커진다.",
+      "related": [
+        "anchoring",
+        "scarcity-principle"
+      ]
+    },
+    {
+      "id": "statistical-significance",
+      "term": "통계적 유의성(statistical significance)",
+      "aliases": [
+        "유의수준",
+        "p-value",
+        "표본 크기",
+        "거짓 양성"
+      ],
+      "definition": "실험에서 관찰된 차이가 우연으로 보기 어려운 정도. 실험 전에 감지할 효과 크기와 유의수준·검정력을 정해 필요한 표본 크기를 계산하고, 그 표본이 채워질 때까지 기다렸다가 한 번에 판정해야 거짓 양성을 설계된 수준으로 통제할 수 있다.",
+      "related": [
+        "ab-test"
+      ]
+    },
+    {
+      "id": "stickiness",
+      "term": "고착도(stickiness)",
+      "aliases": [
+        "DAU/MAU",
+        "스티키니스"
+      ],
+      "definition": "DAU를 MAU로 나눈 값으로, 월간 활성 유저가 한 달 중 얼마나 자주 접속하는지를 나타내는 사용 빈도·습관성 지표. 25%라면 월 유저가 평균 한 달에 7~8일꼴로 쓰는 셈이다. 서비스의 자연스러운 사용 주기를 감안해 해석해야 한다.",
+      "related": [
+        "retention"
+      ]
+    },
+    {
+      "id": "stp",
+      "term": "STP",
+      "aliases": [
+        "STP 전략",
+        "세그멘테이션-타겟팅-포지셔닝"
+      ],
+      "definition": "시장을 의미 있는 기준으로 나누고(Segmentation), 그중 집중할 시장을 고른 뒤(Targeting), 그 고객의 인식 속에 차별적 위치를 설계하는(Positioning) 마케팅 전략의 기본 프레임워크. '누구에게 무엇으로 인식될 것인가'를 정하는 순서가 핵심이다.",
+      "related": [
+        "segmentation",
+        "positioning"
+      ]
+    },
+    {
+      "id": "survivorship-bias",
+      "term": "생존자 편향(survivorship bias)",
+      "aliases": [
+        "생존 편향"
+      ],
+      "definition": "살아남은(잔존한) 표본만 관찰해 탈락한 쪽의 데이터가 통째로 빠진 채 결론을 내리는 편향. 잔존 유저만 설문해 제품을 평가하거나 성공 사례만 분석하는 실수가 전형이며, 2차대전 귀환 폭격기의 총알 자국 일화가 대표적 사례다.",
+      "related": [
+        "correlation-causation"
+      ]
+    },
+    {
+      "id": "swot",
+      "term": "SWOT 분석",
+      "aliases": [
+        "SWOT"
+      ],
+      "definition": "내부 역량인 강점(S)·약점(W)과 외부 환경인 기회(O)·위협(T)을 구분해 전략적 상황을 정리하는 분석 프레임. 내부/외부 축과 유리/불리 축의 조합이며, 시장 환경 파악에는 고객·경쟁사·자사를 보는 3C 분석이 함께 쓰인다.",
+      "related": [
+        "stp"
+      ]
+    },
+    {
+      "id": "trigger-message",
+      "term": "트리거 메시지",
+      "aliases": [
+        "트리거 기반 발송",
+        "행동 기반 메시지"
+      ],
+      "definition": "장바구니 이탈, 구독 만료 임박처럼 유저의 특정 행동·상태 변화를 조건으로 자동 발송되는 메시지. 수신자의 '지금 상황'과 맞물려, 일정 기반 일괄 발송보다 맥락 적합성과 성과가 일반적으로 높다.",
+      "related": [
+        "lifecycle-marketing"
+      ]
+    },
+    {
+      "id": "utm-parameter",
+      "term": "UTM 파라미터(UTM parameter)",
+      "aliases": [
+        "UTM",
+        "캠페인 파라미터"
+      ],
+      "definition": "URL 뒤에 붙이는 utm_source·utm_medium·utm_campaign 등의 추적 값. 웹 분석 도구가 유입의 출처·매체·캠페인을 구분하게 해 주는 캠페인 추적의 기본 도구다. 표기 규칙을 통일하지 않으면 같은 캠페인이 쪼개져 집계되는 문제가 생긴다.",
+      "related": [
+        "attribution"
+      ]
+    },
+    {
+      "id": "value-based-pricing",
+      "term": "가치 기반 프라이싱(value-based pricing)",
+      "aliases": [
+        "가치 기반 가격 책정",
+        "밸류 베이스드 프라이싱"
+      ],
+      "definition": "우리 비용(원가 기반)이나 경쟁사 가격(경쟁 기반)이 아니라 고객이 얻는 효용의 크기를 기준으로 가격을 정하는 접근. 한계 비용이 낮은 소프트웨어·SaaS에서 특히 권장된다 — 원가 기반으로는 가격을 체계적으로 낮게 매기기 쉽기 때문이다.",
+      "related": [
+        "price-anchoring",
+        "freemium"
+      ]
+    },
+    {
+      "id": "value-proposition",
+      "term": "가치 제안(value proposition)",
+      "aliases": [
+        "밸류 프로포지션",
+        "가치제안"
+      ],
+      "definition": "타겟 고객이 겪는 문제를 우리 제품이 다른 대안보다 어떻게 더 잘 해결하는지를 고객이 얻는 효용 관점으로 정리한 약속. 기능 나열이 아닌 고객 효용 중심이라는 점이 핵심이며, 포지셔닝과 메시징의 출발점이 된다.",
+      "related": [
+        "positioning",
+        "messaging-hierarchy",
+        "jtbd"
+      ]
+    },
+    {
+      "id": "vanity-metric",
+      "term": "허영 지표(vanity metric)",
+      "aliases": [
+        "배니티 메트릭"
+      ],
+      "definition": "누적 다운로드 수·총 페이지뷰처럼 커 보이고 우상향하지만 의사결정이나 다음 행동으로 이어지지 않는 지표. 조작 여부와 무관하게 행동을 가리키지 못하면 허영 지표이며, 실행 가능한(actionable) 지표와 대비된다.",
+      "related": [
+        "north-star-metric"
+      ]
+    },
+    {
+      "id": "win-back",
+      "term": "윈백 캠페인 (win-back)",
+      "aliases": [
+        "윈백",
+        "재활성화 캠페인"
+      ],
+      "definition": "휴면 상태에 들어간 고객을 다시 활성 상태로 되돌리기 위한 재활성화 캠페인. 휴면에 완전히 굳어지기 전 이탈 조짐 단계에서 개입할수록 복귀율이 높다.",
+      "related": [
+        "dormant-user",
+        "lifecycle-marketing"
+      ]
+    }
+  ]
+}
