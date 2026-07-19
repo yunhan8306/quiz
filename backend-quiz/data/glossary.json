@@ -1,0 +1,3423 @@
+{
+  "terms": [
+    {
+      "id": "a-record",
+      "term": "A 레코드",
+      "aliases": [
+        "A record"
+      ],
+      "definition": "호스트명을 IPv4 주소로 직접 매핑하는 DNS 레코드. 같은 이름에 여러 개를 등록하면 DNS 라운드로빈 방식의 부하 분산이 가능하다.",
+      "related": [
+        "cname-record",
+        "dns"
+      ]
+    },
+    {
+      "id": "access-token",
+      "term": "액세스 토큰",
+      "aliases": [
+        "access token"
+      ],
+      "definition": "보호된 자원에 접근할 때 제시하는 단기 자격 증명. 탈취 피해를 줄이기 위해 수명을 짧게 잡고, 만료되면 리프레시 토큰으로 재발급받는 구성이 일반적이다.",
+      "related": [
+        "refresh-token",
+        "oauth2",
+        "jwt"
+      ]
+    },
+    {
+      "id": "acid",
+      "term": "ACID",
+      "aliases": [],
+      "definition": "트랜잭션이 보장하는 네 가지 속성 — 원자성(Atomicity), 일관성(Consistency), 격리성(Isolation), 지속성(Durability)의 약자.",
+      "related": [
+        "transaction",
+        "atomicity",
+        "durability"
+      ]
+    },
+    {
+      "id": "ack",
+      "term": "확인 응답 (Acknowledgement, ack)",
+      "aliases": [
+        "acknowledgement"
+      ],
+      "definition": "소비자가 메시지를 처리했음을 브로커에 알리는 신호. 브로커는 ack을 받아야 메시지를 삭제(또는 완료 처리)하며, ack이 오지 않으면 재전송한다. ack 시점을 처리 전으로 당기면 유실 위험이, 처리 후로 미루면 중복 위험이 생긴다.",
+      "related": [
+        "at-least-once",
+        "message-broker"
+      ]
+    },
+    {
+      "id": "aimd",
+      "term": "AIMD",
+      "aliases": [
+        "가산 증가 승법 감소"
+      ],
+      "definition": "가산 증가·승법 감소(Additive Increase, Multiplicative Decrease). 혼잡이 없으면 윈도우를 RTT당 일정량씩 선형으로 키우고, 손실이 감지되면 절반으로 줄이는 고전 TCP 혼잡 제어의 기본 패턴.",
+      "related": [
+        "congestion-control",
+        "slow-start",
+        "fast-retransmit"
+      ]
+    },
+    {
+      "id": "asymmetric-encryption",
+      "term": "비대칭키 암호화",
+      "aliases": [
+        "공개키 암호화",
+        "비대칭 암호화",
+        "asymmetric encryption"
+      ],
+      "definition": "공개키와 개인키 쌍을 쓰는 방식(예: RSA, 타원곡선). 공개키는 공개해도 되므로 키 분배 문제가 없지만 대칭 방식보다 훨씬 느려, 실무에서는 키 교환·서명에만 쓰고 데이터는 대칭키로 암호화하는 하이브리드 구성이 일반적이다.",
+      "related": [
+        "symmetric-encryption",
+        "digital-signature",
+        "tls-handshake"
+      ]
+    },
+    {
+      "id": "asynchronous-replication",
+      "term": "비동기 복제",
+      "aliases": [
+        "asynchronous replication",
+        "async 복제"
+      ],
+      "definition": "리더가 팔로워의 확인을 기다리지 않고 커밋을 완료하는 복제 방식. 쓰기 지연이 낮고 팔로워 장애에 강하지만, 리더 장애 시 아직 전파되지 않은 커밋이 유실될 수 있다.",
+      "related": [
+        "replication-lag",
+        "leader-follower-replication",
+        "eventual-consistency"
+      ]
+    },
+    {
+      "id": "at-least-once",
+      "term": "최소 한 번 전달 (At-least-once)",
+      "aliases": [
+        "at-least-once delivery",
+        "최소 한 번 전달"
+      ],
+      "definition": "소비자의 확인 응답(ack)이 올 때까지 재전송하는 전달 보장 수준. 유실은 막지만 ack 유실·지연 시 같은 메시지가 중복 전달될 수 있어, 소비자 측 멱등성이 함께 필요하다. 실무에서 가장 널리 쓰이는 수준이다.",
+      "related": [
+        "ack",
+        "at-most-once",
+        "exactly-once",
+        "idempotency",
+        "two-phase-commit"
+      ]
+    },
+    {
+      "id": "at-most-once",
+      "term": "최대 한 번 전달 (At-most-once)",
+      "aliases": [],
+      "definition": "메시지를 재전송하지 않는 전달 보장 수준. 중복은 생기지 않지만 전송 실패 시 메시지가 유실될 수 있다. 유실을 감수해도 되는 메트릭·로그성 데이터에 쓰인다.",
+      "related": [
+        "at-least-once",
+        "exactly-once"
+      ]
+    },
+    {
+      "id": "atomicity",
+      "term": "원자성",
+      "aliases": [
+        "Atomicity"
+      ],
+      "definition": "트랜잭션 안의 작업이 전부 커밋되거나 전부 롤백되어 부분 실패 상태가 남지 않는다는 ACID 속성.",
+      "related": [
+        "acid"
+      ]
+    },
+    {
+      "id": "authentication",
+      "term": "인증 (authentication)",
+      "aliases": [
+        "401",
+        "Authentication",
+        "Unauthorized",
+        "신원 확인"
+      ],
+      "definition": "요청자가 누구인지 신원을 확인하는 절차. 인증 자격 증명이 없거나 유효하지 않으면 401 Unauthorized로 응답하며, WWW-Authenticate 헤더로 인증 방법을 안내한다.",
+      "related": [
+        "authorization",
+        "jwt",
+        "session",
+        "session-auth",
+        "status-code"
+      ]
+    },
+    {
+      "id": "authorization",
+      "term": "인가 (authorization)",
+      "aliases": [
+        "403",
+        "Authorization",
+        "Forbidden",
+        "권한 부여"
+      ],
+      "definition": "확인된 신원에게 특정 자원·행위가 허용되는지 판단하는 절차. 신원은 확인됐지만 권한이 없으면 403 Forbidden으로 응답한다. '누군지 모름'은 401, '누군지 알지만 안 됨'은 403으로 구분한다.",
+      "related": [
+        "authentication",
+        "oauth2",
+        "status-code"
+      ]
+    },
+    {
+      "id": "authorization-code-flow",
+      "term": "인가 코드 플로우",
+      "aliases": [
+        "Authorization Code Grant",
+        "인가 코드 그랜트"
+      ],
+      "definition": "OAuth 2.0의 대표 플로우. 사용자가 인가 서버에서 직접 로그인·동의하면 앱이 일회성 인가 코드를 받고, 이를 백엔드에서 액세스 토큰으로 교환한다. 토큰이 브라우저 앞단에 직접 노출되지 않는 것이 장점이다.",
+      "related": [
+        "oauth2",
+        "access-token"
+      ]
+    },
+    {
+      "id": "availability",
+      "term": "가용성 (availability)",
+      "aliases": [
+        "nines",
+        "고가용성"
+      ],
+      "definition": "시스템이 정상적으로 서비스 가능한 시간의 비율. 99.9%는 연간 약 8.8시간의 다운타임에 해당한다. 직렬 의존 컴포넌트의 전체 가용성은 개별 가용성의 곱으로 낮아지고, 병렬(이중화) 구성은 가용성을 높인다.",
+      "related": [
+        "spof",
+        "redundancy",
+        "reliability"
+      ]
+    },
+    {
+      "id": "b-tree",
+      "term": "B-Tree",
+      "aliases": [
+        "B+Tree",
+        "비트리"
+      ],
+      "definition": "키를 정렬 상태로 유지하는 균형 트리 인덱스 구조. 리프가 연결되어 있어 범위 검색과 정렬 처리에 유리하며 대부분의 RDBMS 기본 인덱스다(실무 구현은 주로 B+Tree).",
+      "related": [
+        "index"
+      ]
+    },
+    {
+      "id": "backpressure",
+      "term": "백프레셔 (Backpressure)",
+      "aliases": [
+        "배압",
+        "flow control"
+      ],
+      "definition": "소비 속도가 생산 속도를 따라가지 못할 때, 하류의 수용 능력에 맞춰 상류(생산자 쪽)로 신호를 전달해 생산·전송 속도를 늦추게 하는 흐름 제어 메커니즘. 무제한 버퍼로 밀린 메시지를 쌓는 안티패턴(메모리 고갈)을 막는 장치이며, 메시지를 버리는 부하 차단(load shedding)과는 구분된다.",
+      "related": [
+        "message-queue"
+      ]
+    },
+    {
+      "id": "base62-encoding",
+      "term": "base62 인코딩",
+      "aliases": [
+        "base62"
+      ],
+      "definition": "숫자(0-9)·소문자(a-z)·대문자(A-Z) 62개 문자로 수를 표현하는 인코딩. URL 단축기에서 유일 ID를 짧은 문자열 키로 바꾸는 데 쓰인다. ID가 유일하면 충돌이 없지만, 순차 ID를 쓰면 키가 추측 가능해지는 약점이 있다.",
+      "related": [
+        "hash-collision"
+      ]
+    },
+    {
+      "id": "base64",
+      "term": "Base64",
+      "aliases": [
+        "Base64URL",
+        "베이스64"
+      ],
+      "definition": "이진 데이터를 64종의 텍스트 문자로 표현하는 인코딩 방식. 키가 없는 가역 변환이라 누구나 디코딩할 수 있으며, 암호화나 해시와는 전혀 다르다. JWT는 URL 안전 변형인 Base64URL을 쓴다.",
+      "related": [
+        "basic-auth",
+        "jwt"
+      ]
+    },
+    {
+      "id": "basic-auth",
+      "term": "Basic 인증",
+      "aliases": [
+        "HTTP Basic Authentication",
+        "기본 인증"
+      ],
+      "definition": "아이디:비밀번호를 Base64로 인코딩해 매 요청의 Authorization 헤더에 싣는 가장 단순한 HTTP 인증 방식. 인코딩은 암호화가 아니므로 TLS 없이는 평문 노출과 같다.",
+      "related": [
+        "base64",
+        "tls",
+        "authentication"
+      ]
+    },
+    {
+      "id": "bcrypt",
+      "term": "bcrypt",
+      "aliases": [
+        "비크립트"
+      ],
+      "definition": "비밀번호 저장 전용으로 설계된 의도적으로 느린 해시 함수. 비용 계수로 연산 난이도를 조절할 수 있고 솔트 사용이 내장되어 있어, 해시 유출 시 무차별 대입 비용을 크게 높인다. scrypt, Argon2도 같은 계열이다.",
+      "related": [
+        "salt",
+        "key-stretching",
+        "hash-function"
+      ]
+    },
+    {
+      "id": "binary-framing",
+      "term": "바이너리 프레이밍 (binary framing)",
+      "aliases": [
+        "프레임",
+        "frame"
+      ],
+      "definition": "HTTP/2가 메시지를 HEADERS·DATA 등 바이너리 프레임 단위로 분해해 전송하는 계층. 각 프레임에 스트림 ID가 붙어 멀티플렉싱을 가능하게 하는 구조적 기반이다.",
+      "related": [
+        "multiplexing"
+      ]
+    },
+    {
+      "id": "blue-green-deployment",
+      "term": "블루-그린 배포 (Blue-Green Deployment)",
+      "aliases": [
+        "블루그린"
+      ],
+      "definition": "기존 환경(블루)과 새 버전 환경(그린)을 모두 준비해 두고 트래픽을 한 번에 전환하는 배포 전략. 문제가 생기면 트래픽을 되돌려 즉시 롤백할 수 있지만 자원이 두 배로 든다.",
+      "related": [
+        "canary-deployment",
+        "rolling-deployment"
+      ]
+    },
+    {
+      "id": "byte-stream",
+      "term": "바이트 스트림",
+      "aliases": [
+        "byte stream"
+      ],
+      "definition": "TCP가 제공하는 전송 모델. 데이터를 메시지 단위가 아닌 연속된 바이트의 흐름으로 전달하므로 write 경계가 보존되지 않으며, 애플리케이션이 길이 필드나 구분자로 직접 메시지 경계(프레이밍)를 정해야 한다.",
+      "related": [
+        "tcp",
+        "sequence-number"
+      ]
+    },
+    {
+      "id": "cache-aside",
+      "term": "Cache-Aside",
+      "aliases": [
+        "Lazy Loading",
+        "레이지 로딩"
+      ],
+      "definition": "애플리케이션이 캐시를 먼저 조회하고, 미스가 나면 DB에서 읽어 캐시에 채운 뒤 응답하는 지연 적재 방식의 읽기 캐싱 패턴. 요청된 데이터만 적재돼 메모리 효율이 좋지만 원본 갱신이 캐시에 자동 반영되지 않는다.",
+      "related": [
+        "ttl",
+        "cache-invalidation"
+      ]
+    },
+    {
+      "id": "cache-invalidation",
+      "term": "캐시 무효화",
+      "aliases": [
+        "cache invalidation"
+      ],
+      "definition": "원본 데이터가 변경됐을 때 캐시에 남은 낡은 사본을 제거하거나 갱신하는 작업. 여러 노드·계층에 흩어진 사본을 정확한 시점에 빠짐없이 처리해야 해서 유명한 난제로 꼽힌다.",
+      "related": [
+        "ttl",
+        "cache-aside"
+      ]
+    },
+    {
+      "id": "cache-key",
+      "term": "캐시 키",
+      "aliases": [
+        "cache key"
+      ],
+      "definition": "캐시가 사본을 저장·조회할 때 쓰는 식별자. HTTP 캐시는 기본적으로 URL(과 메서드)을 쓰고, Vary 헤더에 선언된 요청 헤더 값이 키에 추가된다.",
+      "related": [
+        "vary-header"
+      ]
+    },
+    {
+      "id": "cache-stampede",
+      "term": "캐시 스탬피드",
+      "aliases": [
+        "cache stampede",
+        "thundering herd",
+        "dog-pile"
+      ],
+      "definition": "인기 키의 캐시 만료 순간 다수의 요청이 동시에 미스를 내고 원본(DB)에서 같은 값을 중복 재계산해 원본이 과부하되는 현상. 락 기반 단일 재생성, TTL 지터, 조기 재계산 등으로 완화한다.",
+      "related": [
+        "ttl"
+      ]
+    },
+    {
+      "id": "canary-deployment",
+      "term": "카나리 배포 (Canary Deployment)",
+      "aliases": [
+        "카나리 릴리스"
+      ],
+      "definition": "새 버전을 소수 트래픽에만 먼저 노출해 실제 요청으로 에러율·지연을 검증하고, 이상이 없으면 비율을 점진적으로 늘리는 배포 전략. 문제 발생 시 영향 범위가 일부 사용자로 제한된다.",
+      "related": [
+        "blue-green-deployment",
+        "rolling-deployment"
+      ]
+    },
+    {
+      "id": "cap-theorem",
+      "term": "CAP 정리",
+      "aliases": [
+        "CAP",
+        "CAP theorem"
+      ],
+      "definition": "네트워크 분단이 발생한 동안에는 선형성 수준의 일관성과 완전한 가용성을 동시에 만족할 수 없다는 분산 시스템의 원리. '3개 중 2개 선택'이 아니라 '분단이 일어났을 때 C와 A 중 택일'이 정확한 해석이다.",
+      "related": [
+        "linearizability",
+        "eventual-consistency"
+      ]
+    },
+    {
+      "id": "cdc",
+      "term": "변경 데이터 캡처 (CDC, Change Data Capture)",
+      "aliases": [],
+      "definition": "DB의 변경 로그(리플리케이션 로그 등)를 스트림으로 추출해 검색 색인·캐시 같은 파생 시스템에 공급하는 패턴. 모든 변경이 DB 커밋 순서 하나를 기준으로 흐르므로, 이중 쓰기에서 생기는 순서 경합·부분 실패로 인한 저장소 간 불일치를 피할 수 있다.",
+      "related": [
+        "dual-write",
+        "event-sourcing",
+        "log-based-broker"
+      ]
+    },
+    {
+      "id": "cdn",
+      "term": "CDN (콘텐츠 전송 네트워크)",
+      "aliases": [
+        "Content Delivery Network",
+        "content delivery network",
+        "콘텐츠 전송 네트워크"
+      ],
+      "definition": "지리적으로 분산된 엣지 서버에 콘텐츠 사본을 캐싱해 두고 사용자를 가까운 서버로 유도하는 네트워크. 왕복 지연을 줄이고 원본 서버의 부하를 낮춘다. 주로 정적 콘텐츠에 쓰이며 DNS 기반 리다이렉션으로 트래픽을 유도한다.",
+      "related": [
+        "cache-invalidation",
+        "edge-server",
+        "origin-server"
+      ]
+    },
+    {
+      "id": "chunked-transfer-encoding",
+      "term": "청크 전송 인코딩 (chunked transfer encoding)",
+      "aliases": [
+        "Transfer-Encoding",
+        "chunked"
+      ],
+      "definition": "전체 크기를 모른 채 본문을 '크기 + 데이터' 형태의 청크로 이어 보내고 크기 0인 청크로 끝을 알리는 전송 방식. Content-Length 없이도 지속 연결에서 메시지 경계를 구분할 수 있어 동적 생성 응답의 스트리밍에 쓰인다.",
+      "related": [
+        "content-length",
+        "persistent-connection"
+      ]
+    },
+    {
+      "id": "circular-wait",
+      "term": "순환 대기",
+      "aliases": [
+        "circular wait"
+      ],
+      "definition": "데드락의 네 필요조건 중 하나로, 자원을 기다리는 관계가 원형 고리를 이루는 상태. 모든 스레드가 동일한 전역 순서로 락을 획득하게 하면(lock ordering) 구조적으로 차단된다.",
+      "related": [
+        "deadlock"
+      ]
+    },
+    {
+      "id": "clustered-index",
+      "term": "클러스터드 인덱스",
+      "aliases": [
+        "Clustered Index"
+      ],
+      "definition": "PK 순서대로 데이터 자체를 물리적으로 배치하는 저장 방식. PK 조회가 빠른 대신 PK가 크거나 무작위이면 삽입·보조 인덱스 비용이 커진다.",
+      "related": [
+        "secondary-index",
+        "b-tree"
+      ]
+    },
+    {
+      "id": "cname-record",
+      "term": "CNAME 레코드",
+      "aliases": [
+        "CNAME",
+        "별칭 레코드"
+      ],
+      "definition": "호스트명을 다른 호스트명(정식 이름, canonical name)의 별칭으로 만드는 DNS 레코드. 대상 IP가 바뀌어도 정식 이름의 A 레코드만 고치면 된다. 같은 이름의 다른 레코드와 공존할 수 없어 zone apex에는 쓸 수 없다.",
+      "related": [
+        "a-record",
+        "dns"
+      ]
+    },
+    {
+      "id": "cold-start",
+      "term": "콜드 스타트 (Cold Start)",
+      "aliases": [
+        "cold start latency"
+      ],
+      "definition": "유휴 상태로 회수된 서버리스 실행 환경을 요청 시점에 새로 준비(환경 확보·런타임 기동·코드 초기화)하느라 첫 요청 지연이 커지는 현상. 따뜻한 인스턴스가 없을 때마다 반복 발생한다.",
+      "related": [
+        "serverless"
+      ]
+    },
+    {
+      "id": "compare-and-swap",
+      "term": "CAS",
+      "aliases": [
+        "compare-and-swap",
+        "compare and swap"
+      ],
+      "definition": "메모리 값이 기대값과 같을 때만 새 값으로 교체하는 비교-교체를 하나의 원자적 명령으로 수행하는 하드웨어 연산(compare-and-swap). 락 구현과 락프리 자료구조, 낙관적 갱신 패턴의 기반이다.",
+      "related": [
+        "lock-free",
+        "spinlock",
+        "race-condition"
+      ]
+    },
+    {
+      "id": "composite-index",
+      "term": "복합 인덱스",
+      "aliases": [
+        "다중 칼럼 인덱스",
+        "Composite Index"
+      ],
+      "definition": "여러 컬럼을 묶어 만든 인덱스. 선행 컬럼 기준으로 먼저 정렬되므로 컬럼 순서가 활용 가능 여부를 결정한다.",
+      "related": [
+        "leftmost-prefix",
+        "index"
+      ]
+    },
+    {
+      "id": "condition-variable",
+      "term": "조건 변수",
+      "aliases": [
+        "condition variable"
+      ],
+      "definition": "어떤 조건이 참이 되기를 기다리는 스레드를 잠재우고(wait) 조건 변화 시 깨우는(signal) 동기화 도구. wait는 원자적으로 락을 놓고 잠들며, 깨어나면 락을 재획득한 뒤 조건을 while로 재검사해야 한다.",
+      "related": [
+        "mutex",
+        "spurious-wakeup",
+        "semaphore"
+      ]
+    },
+    {
+      "id": "conditional-request",
+      "term": "조건부 요청",
+      "aliases": [
+        "conditional request",
+        "If-None-Match",
+        "If-Modified-Since",
+        "재검사"
+      ],
+      "definition": "만료된 캐시 사본을 버리는 대신 If-None-Match(ETag)나 If-Modified-Since(수정 시각)로 변경 여부만 서버에 묻는 요청. 변경이 없으면 서버가 본문 없이 304 Not Modified를 반환해 전송 비용을 아낀다.",
+      "related": [
+        "etag"
+      ]
+    },
+    {
+      "id": "congestion-control",
+      "term": "혼잡 제어",
+      "aliases": [
+        "congestion control"
+      ],
+      "definition": "손실·지연 같은 신호로 네트워크 경로의 혼잡을 추정해 송신자가 혼잡 윈도우(cwnd)를 조절하는 메커니즘. 슬로 스타트, 혼잡 회피(AIMD), 빠른 회복 등의 상태로 동작하며 네트워크 전체를 보호한다.",
+      "related": [
+        "slow-start",
+        "aimd",
+        "congestion-window",
+        "flow-control"
+      ]
+    },
+    {
+      "id": "congestion-window",
+      "term": "혼잡 윈도우(cwnd)",
+      "aliases": [
+        "cwnd"
+      ],
+      "definition": "송신자가 네트워크 혼잡 추정에 따라 스스로 유지하는 미확인 전송량 상한. 수신자가 광고하는 수신 윈도우(rwnd)와 달리 송신자 내부 값이며, 실제 전송량은 두 값의 최솟값으로 제한된다.",
+      "related": [
+        "congestion-control",
+        "receive-window",
+        "slow-start"
+      ]
+    },
+    {
+      "id": "connection-pool",
+      "term": "커넥션 풀",
+      "aliases": [
+        "Connection Pool"
+      ],
+      "definition": "생성 비용이 큰 DB 커넥션을 미리 만들어 두고 빌려주고 반납받으며 재사용하는 구조. 커넥션 수 상한으로 DB를 보호하는 역할도 한다.",
+      "related": [
+        "transaction"
+      ]
+    },
+    {
+      "id": "consistent-hashing",
+      "term": "일관된 해싱 (consistent hashing)",
+      "aliases": [
+        "consistent hashing",
+        "안정 해시",
+        "일관된 해싱",
+        "컨시스턴트 해싱",
+        "해시 링"
+      ],
+      "definition": "키와 서버를 같은 해시 링 위에 배치해 각 키를 링에서 시계 방향으로 처음 만나는 서버에 할당하는 분배 기법. 서버가 추가·제거될 때 인접 구간의 키(평균 1/N)만 재배치되어, 나머지 매핑이 유지된다. 부하 균등화를 위해 서버당 여러 가상 노드를 둔다.",
+      "related": [
+        "hash-collision",
+        "partitioning",
+        "scale-out",
+        "virtual-node"
+      ]
+    },
+    {
+      "id": "consumer-group",
+      "term": "소비자 그룹 (Consumer Group)",
+      "aliases": [],
+      "definition": "하나의 토픽을 나눠 소비하는 소비자들의 논리적 묶음. 그룹 안에서 각 파티션은 한 소비자만 담당하므로 소비자를 파티션 수보다 많이 두면 초과분은 유휴 상태가 된다. 그룹별로 오프셋을 따로 관리해 같은 토픽을 여러 용도로 독립 소비할 수 있다.",
+      "related": [
+        "partition",
+        "offset",
+        "topic"
+      ]
+    },
+    {
+      "id": "container",
+      "term": "컨테이너 (Container)",
+      "aliases": [
+        "컨테이너화",
+        "containerization"
+      ],
+      "definition": "호스트 OS 커널을 공유하면서 네임스페이스(가시 범위 분리)와 cgroups(자원 제한) 같은 커널 기능으로 프로세스를 격리하는 실행 단위. 게스트 OS 부팅이 없어 VM보다 가볍고 빠르며, 이미지 기반이라 환경 재현성이 높다.",
+      "related": [
+        "virtual-machine",
+        "hypervisor"
+      ]
+    },
+    {
+      "id": "content-length",
+      "term": "Content-Length",
+      "aliases": [
+        "메시지 프레이밍"
+      ],
+      "definition": "본문의 바이트 길이를 알리는 헤더. 지속 연결에서 메시지 경계를 구분하는 기본 프레이밍 수단이며, 실제 길이와 불일치하면 응답 잘림이나 중개자 간 경계 해석 차이로 인한 요청 스머글링류 보안 문제로 이어질 수 있다.",
+      "related": [
+        "chunked-transfer-encoding",
+        "http-message"
+      ]
+    },
+    {
+      "id": "context-switch",
+      "term": "컨텍스트 스위칭",
+      "aliases": [
+        "context switch",
+        "문맥 교환"
+      ],
+      "definition": "CPU가 실행 대상을 바꿀 때 현재 실행 상태(레지스터, 프로그램 카운터 등)를 저장하고 다음 대상의 상태를 복원하는 작업. 저장·복원의 직접 비용과 캐시·TLB 오염이라는 간접 비용이 있다.",
+      "related": [
+        "pcb",
+        "thread",
+        "tlb"
+      ]
+    },
+    {
+      "id": "continuous-delivery",
+      "term": "지속적 전달 (Continuous Delivery)",
+      "aliases": [
+        "CD (delivery)"
+      ],
+      "definition": "CI를 통과한 산출물을 언제든 배포 가능한 상태로 유지하되, 프로덕션 릴리스 시점은 사람이 결정하는 방식. 배포 버튼만 누르면 나갈 수 있는 상태를 유지한다.",
+      "related": [
+        "continuous-integration",
+        "continuous-deployment"
+      ]
+    },
+    {
+      "id": "continuous-deployment",
+      "term": "지속적 배포 (Continuous Deployment)",
+      "aliases": [
+        "CD (deployment)"
+      ],
+      "definition": "검증 파이프라인을 통과한 변경을 사람 개입 없이 프로덕션까지 자동으로 배포하는 방식. 지속적 전달에서 마지막 수동 승인 단계까지 자동화한 것이다.",
+      "related": [
+        "continuous-delivery",
+        "continuous-integration"
+      ]
+    },
+    {
+      "id": "continuous-integration",
+      "term": "지속적 통합 (CI)",
+      "aliases": [
+        "CI"
+      ],
+      "definition": "변경을 작게 나눠 공유 저장소에 자주 통합하고, 통합할 때마다 자동 빌드·테스트를 실행해 충돌과 회귀를 조기에 발견하는 개발 관행.",
+      "related": [
+        "continuous-delivery",
+        "continuous-deployment"
+      ]
+    },
+    {
+      "id": "cookie",
+      "term": "쿠키 (Cookie)",
+      "aliases": [
+        "Set-Cookie"
+      ],
+      "definition": "서버가 Set-Cookie 헤더로 브라우저에 심는 작은 키-값 데이터. 브라우저는 이후 같은 사이트로 가는 요청에 Cookie 헤더로 자동 첨부한다. 무상태인 HTTP 위에서 세션 식별자 등을 실어 나르는 표준 수단이다.",
+      "related": [
+        "session",
+        "stateless"
+      ]
+    },
+    {
+      "id": "cors",
+      "term": "CORS",
+      "aliases": [
+        "Access-Control-Allow-Origin",
+        "Cross-Origin Resource Sharing",
+        "교차 출처",
+        "교차 출처 자원 공유"
+      ],
+      "definition": "브라우저의 동일 출처 정책을 서버가 선별적으로 완화해 주는 메커니즘(교차 출처 자원 공유). 서버가 Access-Control-Allow-Origin 등의 헤더로 허용 출처를 선언하면 브라우저가 교차 출처 응답 접근을 허용한다. 차단 주체는 브라우저이며 비브라우저 클라이언트에는 적용되지 않는다.",
+      "related": [
+        "preflight",
+        "preflight-request",
+        "same-origin-policy"
+      ]
+    },
+    {
+      "id": "critical-section",
+      "term": "임계 구역",
+      "aliases": [
+        "critical section",
+        "임계 영역"
+      ],
+      "definition": "공유 자원에 접근하는 코드 구간으로, 한 번에 하나의 실행 흐름만 진입해야 안전한 영역. 락 등 상호 배제 메커니즘으로 보호한다.",
+      "related": [
+        "race-condition",
+        "mutex",
+        "spinlock"
+      ]
+    },
+    {
+      "id": "csrf",
+      "term": "CSRF",
+      "aliases": [
+        "크로스 사이트 요청 위조",
+        "Cross-Site Request Forgery"
+      ],
+      "definition": "브라우저가 대상 사이트의 쿠키를 요청에 자동 첨부하는 성질을 악용해, 로그인된 사용자 명의의 요청을 다른 사이트에서 위조하는 공격(크로스 사이트 요청 위조). CSRF 토큰, SameSite 쿠키, Origin 검증으로 방어한다.",
+      "related": [
+        "xss",
+        "samesite",
+        "session-auth"
+      ]
+    },
+    {
+      "id": "cumulative-ack",
+      "term": "누적 확인응답",
+      "aliases": [
+        "cumulative ACK",
+        "누적 ACK"
+      ],
+      "definition": "'이 번호 앞까지는 전부 순서대로 받았다'는 뜻으로 다음에 기대하는 바이트 번호를 알리는 TCP의 확인응답 방식. 중간이 비면 뒤 세그먼트를 받아도 ACK 번호를 올리지 못해 중복 ACK가 발생한다.",
+      "related": [
+        "sequence-number",
+        "duplicate-ack"
+      ]
+    },
+    {
+      "id": "cursor-pagination",
+      "term": "커서 페이지네이션",
+      "aliases": [
+        "키셋 페이지네이션",
+        "Keyset Pagination"
+      ],
+      "definition": "마지막으로 본 행의 키 값을 조건으로 넘겨 인덱스에서 그 지점부터 이어 읽는 방식(키셋 페이지네이션). 페이지 위치와 무관하게 일정한 비용이 들지만 임의 페이지 점프가 어렵다.",
+      "related": [
+        "offset-pagination",
+        "index"
+      ]
+    },
+    {
+      "id": "data-anomaly",
+      "term": "이상 현상",
+      "aliases": [
+        "Anomaly",
+        "갱신 이상"
+      ],
+      "definition": "데이터 중복 때문에 발생하는 삽입·갱신·삭제 시의 부작용. 일부만 갱신되어 데이터가 어긋나는 갱신 이상이 대표적이며 정규화로 방지한다.",
+      "related": [
+        "normalization"
+      ]
+    },
+    {
+      "id": "deadlock",
+      "term": "데드락",
+      "aliases": [
+        "deadlock",
+        "교착 상태"
+      ],
+      "definition": "둘 이상의 실행 흐름이 서로가 점유한 자원을 기다리며 영원히 진행하지 못하는 교착 상태. 상호 배제·점유 대기·비선점·순환 대기 네 조건이 모두 성립할 때만 발생한다.",
+      "related": [
+        "circular-wait",
+        "mutex"
+      ]
+    },
+    {
+      "id": "demultiplexing",
+      "term": "역다중화",
+      "aliases": [
+        "demultiplexing",
+        "디멀티플렉싱"
+      ],
+      "definition": "수신한 세그먼트를 헤더의 포트 정보로 올바른 소켓에 배달하는 전송 계층 동작. UDP는 목적지 IP·포트(2-튜플), TCP는 출발지·목적지 IP·포트(4-튜플)로 소켓을 식별한다는 차이가 있다.",
+      "related": [
+        "socket",
+        "port-number"
+      ]
+    },
+    {
+      "id": "denormalization",
+      "term": "비정규화",
+      "aliases": [
+        "Denormalization",
+        "반정규화"
+      ],
+      "definition": "조인 비용을 줄여 읽기 성능을 높이기 위해 의도적으로 데이터를 중복 저장하는 기법. 쓰기 시 중복 동기화 부담과 정합성 위험이 대가다.",
+      "related": [
+        "normalization"
+      ]
+    },
+    {
+      "id": "dhcp",
+      "term": "DHCP",
+      "aliases": [
+        "Dynamic Host Configuration Protocol"
+      ],
+      "definition": "호스트가 네트워크에 접속할 때 IP 주소·서브넷 마스크·기본 게이트웨이·DNS 서버 주소를 자동으로 받아 오는 프로토콜. Discover-Offer-Request-Ack의 4단계 교환으로 동작한다.",
+      "related": [
+        "dns",
+        "private-ip"
+      ]
+    },
+    {
+      "id": "digital-signature",
+      "term": "디지털 서명",
+      "aliases": [
+        "전자 서명",
+        "digital signature"
+      ],
+      "definition": "개인키로 데이터(의 해시)에 서명하고 대응하는 공개키로 검증하는 기법. 위변조 검증과 서명자 확인, 부인 방지를 제공하지만 내용을 감추지는 않는다 — 서명은 암호화가 아니다.",
+      "related": [
+        "asymmetric-encryption",
+        "hash-function",
+        "jwt"
+      ]
+    },
+    {
+      "id": "dirty-read",
+      "term": "더티 리드",
+      "aliases": [
+        "Dirty Read"
+      ],
+      "definition": "다른 트랜잭션이 아직 커밋하지 않은 변경을 읽는 이상 현상. READ COMMITTED 이상의 격리 수준에서 차단된다.",
+      "related": [
+        "isolation-level",
+        "read-committed"
+      ]
+    },
+    {
+      "id": "distributed-lock",
+      "term": "분산 락",
+      "aliases": [
+        "distributed lock"
+      ],
+      "definition": "여러 프로세스·서버 인스턴스가 공유 자원에 동시 접근하지 못하도록 외부 저장소에 구현하는 상호 배제 메커니즘. 획득과 만료 설정의 원자성, 만료 시간과 작업 시간의 경합 대비(펜싱), 해제 시 소유자 확인이 핵심 설계 포인트다.",
+      "related": [
+        "lease",
+        "fencing-token",
+        "idempotency"
+      ]
+    },
+    {
+      "id": "distributed-tracing",
+      "term": "분산 트레이싱 (Distributed Tracing)",
+      "aliases": [
+        "분산 추적"
+      ],
+      "definition": "요청 진입 시 부여한 트레이스 ID를 서비스 간 호출로 전파해, 여러 서비스에 걸친 한 요청의 경로와 구간별 소요 시간을 하나의 호출 트리로 재구성하는 기법.",
+      "related": [
+        "span",
+        "observability"
+      ]
+    },
+    {
+      "id": "dns",
+      "term": "DNS",
+      "aliases": [
+        "Domain Name System",
+        "도메인 네임 시스템"
+      ],
+      "definition": "도메인 이름을 IP 주소로 변환하는 분산 계층 데이터베이스. 루트 → TLD → 책임(authoritative) 네임서버로 위임되는 구조이며, 규모·장애 격리·지연 때문에 단일 중앙 서버로 만들지 않는다.",
+      "related": [
+        "dns-resolver",
+        "dns-caching",
+        "a-record",
+        "cname-record"
+      ]
+    },
+    {
+      "id": "dns-caching",
+      "term": "DNS 캐싱",
+      "aliases": [],
+      "definition": "조회 결과를 레코드의 TTL 동안 저장해 재사용하는 것. 조회 지연과 상위 네임서버 부하를 줄이지만, 레코드 변경이 TTL 만료 전까지 전파되지 않는 지연의 원인이기도 하다.",
+      "related": [
+        "dns",
+        "dns-resolver"
+      ]
+    },
+    {
+      "id": "dns-resolver",
+      "term": "DNS 리졸버",
+      "aliases": [
+        "로컬 네임서버",
+        "recursive resolver"
+      ],
+      "definition": "클라이언트의 재귀 질의를 대신 처리하는 로컬 네임서버. 루트·TLD·책임 네임서버에 반복(iterative) 질의를 수행해 답을 구하고 TTL 동안 캐싱한다.",
+      "related": [
+        "dns",
+        "dns-caching"
+      ]
+    },
+    {
+      "id": "dual-write",
+      "term": "이중 쓰기 (Dual Write)",
+      "aliases": [],
+      "definition": "애플리케이션이 DB와 검색 색인 등 여러 저장소에 각각 직접 쓰는 방식. 한쪽 쓰기만 실패하는 부분 실패나 동시 쓰기의 순서 경합으로 저장소 간 데이터가 영구히 어긋날 수 있어 안티패턴으로 꼽히며, CDC가 대안이다.",
+      "related": [
+        "cdc"
+      ]
+    },
+    {
+      "id": "duplicate-ack",
+      "term": "중복 ACK",
+      "aliases": [
+        "duplicate ACK"
+      ],
+      "definition": "수신자가 순서가 어긋난 세그먼트를 받을 때마다 같은 확인응답 번호를 반복 전송해 생기는 ACK. 여러 개가 연속되면 중간 세그먼트만 빠지고 뒤 데이터는 도착 중이라는 손실의 간접 증거가 된다.",
+      "related": [
+        "fast-retransmit",
+        "cumulative-ack"
+      ]
+    },
+    {
+      "id": "durability",
+      "term": "지속성",
+      "aliases": [
+        "Durability",
+        "영속성"
+      ],
+      "definition": "커밋이 완료된 변경은 시스템 장애가 발생해도 유실되지 않는다는 ACID 속성. WAL(리두 로그)로 구현되는 것이 일반적이다.",
+      "related": [
+        "acid",
+        "wal"
+      ]
+    },
+    {
+      "id": "edge-server",
+      "term": "엣지 서버",
+      "aliases": [
+        "edge server",
+        "PoP"
+      ],
+      "definition": "CDN에서 사용자와 지리적으로 가까운 위치에 배치되어 캐싱된 콘텐츠를 직접 응답하는 서버. 캐시에 없는 콘텐츠는 원본 서버에서 가져와 저장한 뒤 응답한다.",
+      "related": [
+        "cdn",
+        "origin-server"
+      ]
+    },
+    {
+      "id": "encapsulation",
+      "term": "캡슐화",
+      "aliases": [
+        "encapsulation"
+      ],
+      "definition": "데이터가 프로토콜 계층을 내려갈 때마다 각 계층이 자기 헤더를 덧붙이는 과정. 수신 측은 역순으로 헤더를 벗겨 내는 역캡슐화를 수행한다. 계층별 결과물의 이름이 세그먼트·패킷·프레임으로 달라진다.",
+      "related": [
+        "pdu"
+      ]
+    },
+    {
+      "id": "etag",
+      "term": "ETag",
+      "aliases": [],
+      "definition": "리소스의 특정 버전을 식별하는 HTTP 검증자 토큰. 조건부 요청에서 캐시 사본과 서버 리소스가 같은 버전인지 비교하는 데 쓰이며, Last-Modified의 초 단위 정밀도 한계를 보완한다.",
+      "related": [
+        "conditional-request",
+        "strong-validator",
+        "weak-validator"
+      ]
+    },
+    {
+      "id": "event-loop",
+      "term": "이벤트 루프",
+      "aliases": [
+        "event loop"
+      ],
+      "definition": "단일 스레드가 이벤트 큐에서 이벤트를 하나씩 꺼내 핸들러를 끝까지 실행하는 비선점 동시성 모델. 논블로킹 I/O와 결합해 스레드 없이 많은 연결을 처리하지만, 블로킹 호출 하나가 전체를 멈춘다.",
+      "related": [
+        "nonblocking-io",
+        "thread"
+      ]
+    },
+    {
+      "id": "event-sourcing",
+      "term": "이벤트 소싱 (Event Sourcing)",
+      "aliases": [],
+      "definition": "현재 상태 대신 상태를 바꾼 사건들의 불변 이벤트 로그를 기록 시스템(source of truth)으로 삼는 패턴. 현재 상태는 이벤트를 순서대로 재생(replay)해 재구성하며, 스냅숏으로 재생 비용을 줄인다. 모든 변경의 감사 추적과 과거 시점 상태 재구성이 가능해진다.",
+      "related": [
+        "cdc",
+        "log-based-broker"
+      ]
+    },
+    {
+      "id": "event-time",
+      "term": "이벤트 시간 (Event Time)",
+      "aliases": [],
+      "definition": "이벤트가 실제로 발생한 시각. 처리 시스템에 도착한 시각(처리 시간)과 네트워크 지연·오프라인 버퍼링 때문에 어긋날 수 있으며, 정확한 시계열 집계를 원하면 이벤트 시간 기준으로 윈도를 잡아야 한다.",
+      "related": [
+        "processing-time",
+        "time-window",
+        "watermark",
+        "straggler"
+      ]
+    },
+    {
+      "id": "eventual-consistency",
+      "term": "최종 일관성",
+      "aliases": [
+        "eventual consistency",
+        "결과적 일관성"
+      ],
+      "definition": "새로운 쓰기가 멈추면 모든 복제본이 언젠가 같은 값으로 수렴한다는 약한 일관성 보장. 수렴 시점의 상한이 없고, 수렴 전에는 오래된 값을 읽을 수 있다. 비동기 복제의 자연스러운 귀결이며 DNS가 대표 사례다.",
+      "related": [
+        "linearizability",
+        "asynchronous-replication",
+        "quorum"
+      ]
+    },
+    {
+      "id": "eviction-policy",
+      "term": "축출 정책",
+      "aliases": [
+        "eviction policy",
+        "eviction"
+      ],
+      "definition": "캐시 용량이 가득 찼을 때 공간 확보를 위해 어떤 항목을 버릴지 정하는 규칙(LRU, LFU, FIFO 등). 시간 경과로 데이터가 무효화되는 만료(expiration)와는 다른 메커니즘이다.",
+      "related": [
+        "lru",
+        "lfu"
+      ]
+    },
+    {
+      "id": "exactly-once",
+      "term": "정확히 한 번 (Exactly-once)",
+      "aliases": [
+        "effectively-once"
+      ],
+      "definition": "메시지 처리의 부수 효과가 최종 결과에 정확히 한 번만 반영되게 하는 처리 의미론. 물리적 1회 전송은 불가능하므로, 실제로는 at-least-once 전달 위에 멱등적 쓰기·원자적 커밋(오프셋과 결과를 한 트랜잭션으로)·체크포인트를 결합해 '한 번 처리된 것과 같은' 결과를 만든다. 'effectively once'라고도 한다.",
+      "related": [
+        "at-least-once",
+        "idempotency"
+      ]
+    },
+    {
+      "id": "external-fragmentation",
+      "term": "외부 단편화",
+      "aliases": [
+        "external fragmentation"
+      ],
+      "definition": "가변 크기 할당·해제가 반복되면서 총 여유 공간은 충분한데 연속된 큰 공간이 없어 할당에 실패하는 현상. 세그멘테이션, malloc 힙 할당기 등 가변 크기 연속 할당 어디서나 발생한다.",
+      "related": [
+        "internal-fragmentation",
+        "paging"
+      ]
+    },
+    {
+      "id": "failover",
+      "term": "페일오버",
+      "aliases": [
+        "failover",
+        "장애 조치"
+      ],
+      "definition": "장애가 난 노드의 역할을 다른 노드가 이어받는 전환 절차. 자동 페일오버는 비동기 복제로 인한 쓰기 유실, 스플릿 브레인, 부적절한 타임아웃으로 인한 불필요한 전환 같은 함정을 동반한다.",
+      "related": [
+        "split-brain",
+        "leader-follower-replication",
+        "lease"
+      ]
+    },
+    {
+      "id": "fan-out",
+      "term": "팬아웃 (fan-out)",
+      "aliases": [
+        "fanout"
+      ],
+      "definition": "하나의 이벤트(게시물 작성, 알림 발생 등)를 다수의 대상(팔로워 피드, 구독자 등)에 전파하는 작업. 쓰기 시점에 미리 배포하는 push 모델과 읽기 시점에 모아오는 pull 모델이 있으며, 유명인 계정은 하이브리드로 처리하는 것이 일반적이다.",
+      "related": []
+    },
+    {
+      "id": "fast-retransmit",
+      "term": "빠른 재전송",
+      "aliases": [
+        "fast retransmit"
+      ],
+      "definition": "같은 번호의 중복 ACK를 3개 받으면 재전송 타임아웃을 기다리지 않고 해당 세그먼트를 즉시 재전송하는 TCP 최적화. 이후 cwnd를 절반으로 줄이는 빠른 회복으로 이어진다.",
+      "related": [
+        "duplicate-ack",
+        "cumulative-ack",
+        "aimd"
+      ]
+    },
+    {
+      "id": "fault-tolerance",
+      "term": "내결함성 (fault tolerance)",
+      "aliases": [
+        "결함 허용"
+      ],
+      "definition": "일부 구성 요소에 결함(fault)이 생겨도 시스템 전체의 장애(failure)로 번지지 않고 서비스를 지속하는 능력. 복제·이중화·재시도·격리 등으로 확보하며, 결함 발생 자체를 0으로 만드는 것이 아니라 결함의 영향 확산을 막는 것이 목표다.",
+      "related": [
+        "reliability",
+        "redundancy"
+      ]
+    },
+    {
+      "id": "fencing-token",
+      "term": "펜싱 토큰",
+      "aliases": [
+        "fencing token",
+        "펜싱"
+      ],
+      "definition": "락이나 리스를 발급할 때마다 단조 증가하는 번호를 함께 부여하고, 보호 대상 저장소가 이미 처리한 토큰보다 작은 토큰의 쓰기를 거부하게 하는 기법. GC 중단 등으로 락이 만료된 줄 모르는 낡은 소유자의 쓰기를 저장소 쪽에서 강제로 차단한다.",
+      "related": [
+        "lease",
+        "distributed-lock",
+        "split-brain"
+      ]
+    },
+    {
+      "id": "fixed-window-counter",
+      "term": "고정 윈도 카운터",
+      "aliases": [
+        "fixed window counter"
+      ],
+      "definition": "시간을 고정 길이 윈도로 나누고 윈도별 카운터로 요청 수를 제한하는 처리율 제한 방식. 구현이 단순하고 메모리 효율이 좋지만, 윈도 경계 직전·직후에 요청이 몰리면 짧은 구간 동안 허용 한도의 최대 두 배가 통과할 수 있다.",
+      "related": [
+        "sliding-window",
+        "rate-limiting"
+      ]
+    },
+    {
+      "id": "flow-control",
+      "term": "흐름 제어",
+      "aliases": [
+        "flow control"
+      ],
+      "definition": "수신자가 수신 버퍼의 여유 공간(수신 윈도우)을 광고해 송신 속도를 수신 처리 능력에 맞추는 TCP 메커니즘. 네트워크가 아니라 상대 호스트를 보호한다는 점에서 혼잡 제어와 구분된다.",
+      "related": [
+        "receive-window",
+        "congestion-control"
+      ]
+    },
+    {
+      "id": "forward-proxy",
+      "term": "포워드 프록시 (Forward Proxy)",
+      "aliases": [
+        "정방향 프록시"
+      ],
+      "definition": "클라이언트 측에 위치해 밖으로 나가는 요청을 대리하는 프록시. 접근 제어·콘텐츠 필터링·클라이언트 익명화·캐싱에 쓰이며, 원 서버에는 프록시의 IP만 노출된다.",
+      "related": [
+        "reverse-proxy"
+      ]
+    },
+    {
+      "id": "full-table-scan",
+      "term": "풀 테이블 스캔",
+      "aliases": [
+        "Full Table Scan",
+        "풀 스캔"
+      ],
+      "definition": "인덱스를 쓰지 않고 테이블 전체를 순차적으로 읽는 접근 방식. 읽을 행 비율이 높으면 랜덤 I/O를 유발하는 인덱스 탐색보다 오히려 쌀 수 있다.",
+      "related": [
+        "query-optimizer",
+        "sequential-io"
+      ]
+    },
+    {
+      "id": "hash-collision",
+      "term": "해시 충돌 (hash collision)",
+      "aliases": [],
+      "definition": "서로 다른 입력이 같은 해시 값을 갖는 현상. 해시 출력을 잘라 쓰면 표현 공간이 줄어 충돌 확률이 커지므로, 해시 기반 키 생성에서는 중복 확인과 재시도 로직이 필수다.",
+      "related": [
+        "base62-encoding",
+        "consistent-hashing"
+      ]
+    },
+    {
+      "id": "hash-function",
+      "term": "암호학적 해시 함수",
+      "aliases": [
+        "해시 함수",
+        "cryptographic hash"
+      ],
+      "definition": "임의 길이 입력을 고정 길이 출력으로 압축하는 단방향 함수. 역상 저항성·제2 역상 저항성·충돌 저항성을 갖추어야 하며, 비밀번호 저장·서명·무결성 검증의 기반이 된다.",
+      "related": [
+        "salt",
+        "bcrypt",
+        "digital-signature"
+      ]
+    },
+    {
+      "id": "head-of-line-blocking",
+      "term": "HOL 블로킹 (head-of-line blocking)",
+      "aliases": [
+        "HOL blocking",
+        "head-of-line"
+      ],
+      "definition": "줄 맨 앞의 처리가 늦어지면 뒤의 무관한 작업까지 전부 대기하는 현상. HTTP/1.1에서는 응답 순서 제약(애플리케이션 계층), HTTP/2에서는 TCP의 순서 보장(전송 계층)에서 발생하며, 각각 HTTP/2 멀티플렉싱과 QUIC이 해결했다.",
+      "related": [
+        "pipelining",
+        "multiplexing",
+        "quic"
+      ]
+    },
+    {
+      "id": "health-check",
+      "term": "헬스 체크",
+      "aliases": [
+        "health check",
+        "상태 검사"
+      ],
+      "definition": "로드밸런서나 서비스 디스커버리가 각 서버의 정상 동작 여부를 주기적으로 확인하는 검사. 실패한 서버는 트래픽 분배 대상에서 자동으로 제외되고, 회복되면 다시 편입된다.",
+      "related": [
+        "load-balancer"
+      ]
+    },
+    {
+      "id": "hol-blocking",
+      "term": "HOL 블로킹",
+      "aliases": [
+        "Head-of-Line blocking",
+        "head-of-line 블로킹"
+      ],
+      "definition": "줄 맨 앞의 데이터가 막히면 뒤의 데이터가 함께 기다리는 현상. TCP 기반 HTTP/2에서는 세그먼트 하나의 손실이 무관한 스트림들까지 대기시키는 전송 계층 HOL 블로킹이 발생한다.",
+      "related": [
+        "quic",
+        "byte-stream"
+      ]
+    },
+    {
+      "id": "horizontal-scaling",
+      "term": "수평 확장",
+      "aliases": [
+        "Scale-Out",
+        "스케일 아웃"
+      ],
+      "definition": "서버 사양을 올리는 대신 노드 수를 늘려 처리량을 키우는 확장 방식. 샤딩·복제가 대표 수단이며 NoSQL이 설계상 유리한 영역이다.",
+      "related": [
+        "nosql",
+        "replication"
+      ]
+    },
+    {
+      "id": "hot-spot",
+      "term": "핫스팟",
+      "aliases": [
+        "hotspot",
+        "쏠린 부하"
+      ],
+      "definition": "특정 파티션이나 키에 부하가 집중되어 분산의 이점이 사라지는 지점. 단조 증가 키(타임스탬프)의 범위 파티셔닝, 유명인 계정 같은 인기 키가 대표 원인이며, 키에 접두사·해시를 섞어 분산시키는 식으로 완화한다.",
+      "related": [
+        "partitioning",
+        "virtual-node"
+      ]
+    },
+    {
+      "id": "http-message",
+      "term": "HTTP 메시지 구조",
+      "aliases": [
+        "요청 라인",
+        "상태줄"
+      ],
+      "definition": "시작줄(요청줄/상태줄) → 헤더 블록 → 빈 줄 → 본문 순서로 구성되는 HTTP의 텍스트 프레이밍 형식. 빈 줄이 헤더의 끝과 본문의 시작을 구분한다.",
+      "related": [
+        "content-length"
+      ]
+    },
+    {
+      "id": "http-method",
+      "term": "HTTP 메서드",
+      "aliases": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "definition": "요청이 자원에 대해 수행하려는 행위를 나타내는 동사. GET(조회)·POST(생성/처리)·PUT(전체 교체)·PATCH(부분 수정)·DELETE(삭제) 등이 있으며, 각 메서드는 안전성·멱등성 같은 성질로 분류된다.",
+      "related": [
+        "safe-method",
+        "idempotency",
+        "rest"
+      ]
+    },
+    {
+      "id": "http3",
+      "term": "HTTP/3",
+      "aliases": [],
+      "definition": "TCP+TLS 대신 QUIC 위에서 동작하는 HTTP 버전. QUIC의 스트림 독립 전달과 빠른 연결 수립을 활용해 손실이 있는 네트워크에서의 성능을 개선했다.",
+      "related": [
+        "quic",
+        "hol-blocking"
+      ]
+    },
+    {
+      "id": "httponly",
+      "term": "HttpOnly",
+      "aliases": [
+        "HttpOnly 속성"
+      ],
+      "definition": "자바스크립트에서 해당 쿠키를 읽지 못하게 하는 쿠키 속성. XSS 성공 시에도 쿠키 값 탈취를 차단하지만, 쿠키 자동 첨부를 악용하는 CSRF는 막지 못한다.",
+      "related": [
+        "samesite",
+        "xss",
+        "session-auth"
+      ]
+    },
+    {
+      "id": "hypervisor",
+      "term": "하이퍼바이저 (Hypervisor)",
+      "aliases": [
+        "가상화 계층"
+      ],
+      "definition": "물리 하드웨어 위에서 여러 가상 머신을 만들고 자원을 배분·중재하는 소프트웨어 계층. VM 방식 가상화의 핵심 구성 요소로, 컨테이너에는 필요하지 않다.",
+      "related": [
+        "virtual-machine",
+        "container"
+      ]
+    },
+    {
+      "id": "icmp",
+      "term": "ICMP",
+      "aliases": [
+        "Internet Control Message Protocol"
+      ],
+      "definition": "IP 계층의 오류 보고·진단 메시지를 나르는 프로토콜. 시간 초과, 목적지 도달 불가, 에코 요청/응답 등의 메시지가 있으며 ping과 traceroute가 이를 활용한다.",
+      "related": [
+        "traceroute",
+        "ttl"
+      ]
+    },
+    {
+      "id": "idempotency",
+      "term": "멱등성 (Idempotency)",
+      "aliases": [
+        "idempotent",
+        "멱등",
+        "멱등 키"
+      ],
+      "definition": "같은 연산을 여러 번 수행해도 한 번 수행한 것과 결과가 같은 성질. 메시지 중복 전달이 예정된 at-least-once 환경에서 소비자를 멱등하게(예: 이벤트 고유 ID로 처리 이력을 확인) 만드는 것이 중복 결제 같은 사고를 막는 근본 대책이다.",
+      "related": [
+        "at-least-once",
+        "distributed-lock",
+        "exactly-once",
+        "http-method",
+        "idempotency-key",
+        "safe-method"
+      ]
+    },
+    {
+      "id": "idempotency-key",
+      "term": "멱등성 키 (idempotency key)",
+      "aliases": [
+        "Idempotency-Key 헤더"
+      ],
+      "definition": "결제·예약처럼 비멱등한 API에서 이중 처리를 막는 패턴. 클라이언트가 논리적 작업당 고유 키를 만들어 최초 시도와 재시도에 동일하게 붙이고, 서버는 처리한 키와 결과를 저장해 두었다가 같은 키가 오면 재실행 없이 저장된 결과를 반환한다.",
+      "related": [
+        "idempotency"
+      ]
+    },
+    {
+      "id": "implicit-conversion",
+      "term": "묵시적 형변환",
+      "aliases": [
+        "Implicit Conversion",
+        "암시적 형변환"
+      ],
+      "definition": "타입이 다른 값을 비교할 때 DBMS가 자동으로 타입을 맞추는 동작. 인덱스 컬럼 쪽에 변환이 일어나면 함수를 적용한 것과 같아져 인덱스를 타지 못한다.",
+      "related": [
+        "index"
+      ]
+    },
+    {
+      "id": "index",
+      "term": "인덱스",
+      "aliases": [
+        "Index",
+        "색인"
+      ],
+      "definition": "검색을 빠르게 하기 위해 정렬 상태로 유지하는 별도의 자료구조. 조회 비용을 줄이는 대신 쓰기 시 유지 비용과 저장 공간이 든다.",
+      "related": [
+        "b-tree",
+        "composite-index"
+      ]
+    },
+    {
+      "id": "internal-fragmentation",
+      "term": "내부 단편화",
+      "aliases": [
+        "internal fragmentation"
+      ],
+      "definition": "고정 크기 단위로 할당할 때 할당 단위 내부에 남는 낭비 공간. 페이징에서 요청이 페이지 크기의 배수가 아닐 때 마지막 페이지에 생기는 것이 대표 사례다.",
+      "related": [
+        "external-fragmentation",
+        "paging"
+      ]
+    },
+    {
+      "id": "isolation-level",
+      "term": "격리 수준",
+      "aliases": [
+        "Isolation Level",
+        "트랜잭션 격리 수준"
+      ],
+      "definition": "동시 실행되는 트랜잭션이 서로에게 얼마나 보이는지를 정한 단계. READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, SERIALIZABLE 4단계가 표준이며 수준이 높을수록 이상 현상이 차단되는 대신 동시성이 낮아진다.",
+      "related": [
+        "read-committed",
+        "repeatable-read",
+        "dirty-read"
+      ]
+    },
+    {
+      "id": "jwt",
+      "term": "JWT",
+      "aliases": [
+        "JSON Web Token",
+        "제이더블유티"
+      ],
+      "definition": "헤더·페이로드·서명을 점(.)으로 이은 자가 수용적(self-contained) 토큰. 서버가 상태를 저장하지 않고 서명 검증만으로 신뢰할 수 있어 확장에 유리하지만, 페이로드는 Base64URL 인코딩일 뿐 암호화가 아니며, 만료 전 강제 무효화가 어렵다.",
+      "related": [
+        "session-auth",
+        "digital-signature",
+        "access-token",
+        "refresh-token"
+      ]
+    },
+    {
+      "id": "kernel-mode",
+      "term": "커널 모드",
+      "aliases": [
+        "kernel mode",
+        "커널 모드/사용자 모드"
+      ],
+      "definition": "장치 접근 등 특권 명령을 실행할 수 있는 CPU 실행 모드. 응용 프로그램은 사용자 모드에서 돌며, 시스템 콜·인터럽트·예외를 통해서만 커널 모드로 진입한다. 이 모드 전환에는 비용이 있다.",
+      "related": [
+        "system-call",
+        "context-switch"
+      ]
+    },
+    {
+      "id": "key-stretching",
+      "term": "키 스트레칭",
+      "aliases": [
+        "key stretching",
+        "비용 계수"
+      ],
+      "definition": "해시 연산을 의도적으로 여러 번 반복하거나 메모리를 많이 쓰게 만들어, 비밀번호 하나를 검증하는 비용을 키우는 기법. 공격자의 무차별 대입 시도당 비용을 같은 배율로 높인다.",
+      "related": [
+        "bcrypt",
+        "salt"
+      ]
+    },
+    {
+      "id": "l4-load-balancing",
+      "term": "L4 로드밸런싱",
+      "aliases": [
+        "L4 LB",
+        "전송 계층 부하 분산"
+      ],
+      "definition": "전송 계층 정보(IP 주소·포트)만 보고 트래픽을 분산하는 방식. 내용을 해석하지 않아 빠르고 단순하지만, URL·헤더 같은 애플리케이션 정보 기반 라우팅은 불가능하다.",
+      "related": [
+        "l7-load-balancing",
+        "load-balancer"
+      ]
+    },
+    {
+      "id": "l7-load-balancing",
+      "term": "L7 로드밸런싱",
+      "aliases": [
+        "L7 LB",
+        "애플리케이션 계층 부하 분산"
+      ],
+      "definition": "HTTP 등 애플리케이션 계층 내용을 해석해 URL 경로·헤더·쿠키 기반으로 트래픽을 분산하는 방식. 경로별 라우팅과 세션 고정 등 유연한 제어가 가능하지만 요청 파싱 비용으로 L4보다 무겁다.",
+      "related": [
+        "l4-load-balancing",
+        "load-balancer",
+        "reverse-proxy"
+      ]
+    },
+    {
+      "id": "last-write-wins",
+      "term": "최종 쓰기 승리",
+      "aliases": [
+        "LWW",
+        "last write wins"
+      ],
+      "definition": "충돌한 쓰기 중 타임스탬프가 가장 늦은 것만 남기고 나머지를 버리는 충돌 해소 전략. 성공 응답을 받은 동시 쓰기를 조용히 유실시킬 수 있고, 노드 간 시계 오차 때문에 승자 선택이 실제 발생 순서와 다를 수 있다.",
+      "related": [
+        "version-vector",
+        "quorum"
+      ]
+    },
+    {
+      "id": "leader-follower-replication",
+      "term": "리더-팔로워 복제",
+      "aliases": [
+        "single-leader replication",
+        "마스터-슬레이브 복제",
+        "소스-레플리카 복제"
+      ],
+      "definition": "쓰기를 리더 노드 하나가 받아 변경 로그를 팔로워들에게 전파하는 단일 리더 복제 구조. 팔로워는 읽기 요청을 분담하며, 리더 장애 시 팔로워 하나가 새 리더로 승격된다.",
+      "related": [
+        "replication",
+        "asynchronous-replication",
+        "failover"
+      ]
+    },
+    {
+      "id": "leaky-bucket",
+      "term": "누출 버킷 (leaky bucket)",
+      "aliases": [
+        "leaky bucket",
+        "리키 버킷"
+      ],
+      "definition": "요청을 고정 크기 큐(버킷)에 담고 일정한 속도로만 꺼내 처리하는 처리율 제한 알고리즘. 출력 속도가 고정되어 트래픽이 평탄해지며, 버스트는 큐에 대기하거나 넘치면 버려진다.",
+      "related": [
+        "token-bucket",
+        "rate-limiting"
+      ]
+    },
+    {
+      "id": "lease",
+      "term": "리스",
+      "aliases": [
+        "lease",
+        "임대",
+        "TTL 락"
+      ],
+      "definition": "일정 시간 동안만 유효한 락. 만료되면 자동 해제되어 소유자가 죽어도 락이 영원히 남지 않지만, 소유자가 GC 중단 등으로 멈춰 있는 사이 만료되어 두 노드가 서로 자신이 소유자라고 믿는 문제가 생길 수 있다.",
+      "related": [
+        "fencing-token",
+        "distributed-lock",
+        "failover"
+      ]
+    },
+    {
+      "id": "leftmost-prefix",
+      "term": "좌측 접두 규칙",
+      "aliases": [
+        "Leftmost Prefix"
+      ],
+      "definition": "복합 인덱스는 선행 컬럼부터 연속된 접두 조건이 있어야 탐색에 쓸 수 있다는 규칙. 선행 컬럼 없이 후행 컬럼만으로는 인덱스를 타지 못한다.",
+      "related": [
+        "composite-index"
+      ]
+    },
+    {
+      "id": "lfu",
+      "term": "LFU",
+      "aliases": [
+        "Least Frequently Used"
+      ],
+      "definition": "누적 접근 빈도가 가장 낮은 항목부터 제거하는 축출 정책. 꾸준히 인기 있는 데이터를 보호하지만, 과거에만 인기 있던 항목이 높은 카운트로 오래 남는 캐시 오염 문제가 있다.",
+      "related": [
+        "eviction-policy",
+        "lru"
+      ]
+    },
+    {
+      "id": "linearizability",
+      "term": "선형성",
+      "aliases": [
+        "linearizability",
+        "강한 일관성"
+      ],
+      "definition": "모든 클라이언트에게 데이터 복사본이 단 하나뿐인 것처럼 보이게 하는 최신성 보장. 어떤 쓰기가 완료되면 그 이후의 모든 읽기는 그 값(또는 더 새로운 값)을 본다. 강한 일관성의 대표적 정의로, 트랜잭션 격리의 직렬성과는 다른 개념이다.",
+      "related": [
+        "cap-theorem",
+        "eventual-consistency"
+      ]
+    },
+    {
+      "id": "load-balancer",
+      "term": "로드밸런서",
+      "aliases": [
+        "LB",
+        "load balancer",
+        "부하 분산기"
+      ],
+      "definition": "들어오는 요청을 라운드 로빈·최소 연결 수 등의 알고리즘으로 여러 서버에 분산시키는 컴포넌트. 헬스 체크로 비정상 서버를 트래픽 대상에서 제외해 가용성도 높인다. 그 자체가 1대뿐이면 단일 장애점이 되므로 이중화가 필요하다.",
+      "related": [
+        "health-check",
+        "l4-load-balancing",
+        "l7-load-balancing",
+        "reverse-proxy",
+        "scale-out",
+        "spof"
+      ]
+    },
+    {
+      "id": "locality",
+      "term": "지역성",
+      "aliases": [
+        "locality",
+        "참조 지역성"
+      ],
+      "definition": "프로그램이 최근 접근한 주소 근처(공간 지역성)나 최근 접근한 항목 자체(시간 지역성)를 다시 접근하는 경향. CPU 캐시·TLB·페이지 교체 등 모든 캐싱 계층의 효과가 이 성질에 기댄다.",
+      "related": [
+        "tlb",
+        "working-set"
+      ]
+    },
+    {
+      "id": "lock-free",
+      "term": "락프리",
+      "aliases": [
+        "lock-free",
+        "논블로킹 알고리즘"
+      ],
+      "definition": "락 대신 CAS 같은 원자 연산과 재시도 루프로 공유 자료구조를 갱신하는 기법. 락 대기·데드락이 없고 어떤 스레드가 멈춰도 전체 진행이 보장되지만, 경쟁이 심하면 재시도 비용이 커진다.",
+      "related": [
+        "compare-and-swap",
+        "mutex"
+      ]
+    },
+    {
+      "id": "log-based-broker",
+      "term": "로그 기반 브로커 (Log-based Broker)",
+      "aliases": [
+        "파티셔닝된 로그"
+      ],
+      "definition": "메시지를 디스크의 추가 전용(append-only) 로그에 순서대로 기록하고 소비 후에도 보존하는 브로커 유형(카프카류). 소비자가 오프셋으로 진행 상황을 관리하며 과거 메시지를 재소비할 수 있어, 고처리량 이벤트 스트림과 파생 시스템 구축에 적합하다.",
+      "related": [
+        "message-broker",
+        "offset",
+        "partition"
+      ]
+    },
+    {
+      "id": "long-polling",
+      "term": "롱 폴링",
+      "aliases": [
+        "long polling"
+      ],
+      "definition": "클라이언트 요청에 대해 서버가 보낼 이벤트가 생길 때까지 응답을 보류하는 기법. 주기적 폴링보다 수신 지연과 빈 응답 낭비를 줄이지만, 응답 후 매번 연결을 다시 맺어야 하는 구조는 남는다.",
+      "related": [
+        "websocket",
+        "sse"
+      ]
+    },
+    {
+      "id": "lost-update",
+      "term": "갱신 손실",
+      "aliases": [
+        "Lost Update"
+      ],
+      "definition": "두 트랜잭션이 같은 값을 읽고 각자 계산해 쓰는 경쟁에서 한쪽의 변경이 덮어써져 사라지는 문제. 명시적 잠금, 버전 비교(CAS), 원자적 갱신으로 방지한다.",
+      "related": [
+        "select-for-update",
+        "optimistic-lock"
+      ]
+    },
+    {
+      "id": "lru",
+      "term": "LRU",
+      "aliases": [
+        "Least Recently Used"
+      ],
+      "definition": "마지막 접근 시점이 가장 오래된 항목부터 제거하는 축출 정책. 최근에 쓴 데이터가 다시 쓰일 가능성이 높다는 시간적 지역성에 기반한다.",
+      "related": [
+        "eviction-policy",
+        "lfu"
+      ]
+    },
+    {
+      "id": "memcached",
+      "term": "Memcached",
+      "aliases": [],
+      "definition": "문자열 키-값 캐싱에 집중한 멀티스레드 인메모리 캐시 저장소. 자료구조·영속성·복제 기능은 없지만 단순 캐시 워크로드에서 CPU 코어 활용이 유리하다.",
+      "related": [
+        "redis"
+      ]
+    },
+    {
+      "id": "message-broker",
+      "term": "메시지 브로커 (Message Broker)",
+      "aliases": [
+        "브로커"
+      ],
+      "definition": "생산자와 소비자 사이에서 메시지를 받아 저장하고 전달하는 중개 서버. 수신자 장애를 격리하고 부하를 완충하며, 전통적(개별 ack 후 삭제) 방식과 로그 기반(보존·재소비) 방식으로 나뉜다.",
+      "related": [
+        "message-queue",
+        "log-based-broker"
+      ]
+    },
+    {
+      "id": "message-queue",
+      "term": "메시지 큐 (Message Queue)",
+      "aliases": [
+        "MQ",
+        "큐"
+      ],
+      "definition": "생산자가 넣은 메시지를 보관했다가 소비자가 꺼내 처리하게 하는 비동기 통신 구성 요소. 생산자와 소비자를 시간적으로 분리해 결합도를 낮추고, 트래픽 급증을 완충하며, 각 컴포넌트를 독립적으로 확장할 수 있게 한다.",
+      "related": [
+        "message-broker",
+        "backpressure"
+      ]
+    },
+    {
+      "id": "metrics",
+      "term": "메트릭 (Metrics)",
+      "aliases": [
+        "지표"
+      ],
+      "definition": "요청 수·에러율·지연 백분위처럼 시간에 따라 집계되는 수치 데이터. 추세 파악과 경보에 강하지만 집계 과정에서 개별 요청의 상세 정보는 사라진다.",
+      "related": [
+        "observability",
+        "time-series-database",
+        "pull-based-monitoring"
+      ]
+    },
+    {
+      "id": "microservices",
+      "term": "마이크로서비스",
+      "aliases": [
+        "MSA",
+        "마이크로서비스 아키텍처"
+      ],
+      "definition": "시스템을 독립 배포 가능한 작은 서비스들로 분리하는 아키텍처. 서비스별 독립 배포·확장과 팀 자율성을 얻는 대신, 네트워크 호출로 인한 부분 실패·지연, 서비스 간 데이터 일관성, 운영 복잡도라는 분산 시스템 비용을 떠안는다.",
+      "related": [
+        "monolith"
+      ]
+    },
+    {
+      "id": "monolith",
+      "term": "모놀리스 (monolithic architecture)",
+      "aliases": [
+        "모놀리식"
+      ],
+      "definition": "전체 애플리케이션을 하나의 배포 단위로 만드는 아키텍처. 개발·배포·트랜잭션 처리가 단순하지만, 규모가 커지면 일부 기능만 독립적으로 확장하거나 배포하기 어려워진다.",
+      "related": [
+        "microservices"
+      ]
+    },
+    {
+      "id": "monotonic-reads",
+      "term": "단조 읽기",
+      "aliases": [
+        "monotonic reads"
+      ],
+      "definition": "한 사용자가 어떤 값을 본 뒤에는 그보다 오래된 값을 다시 보지 않게 하는 보장. 요청마다 다른 레플리카를 읽어 시간이 거꾸로 가는 듯 보이는 현상을 막으며, 사용자별로 같은 레플리카를 읽게 해 구현한다.",
+      "related": [
+        "read-your-writes",
+        "replication-lag"
+      ]
+    },
+    {
+      "id": "multiplexing",
+      "term": "멀티플렉싱 (multiplexing)",
+      "aliases": [
+        "스트림 멀티플렉싱",
+        "stream"
+      ],
+      "definition": "HTTP/2에서 하나의 TCP 연결 위에 여러 스트림의 프레임을 교차 전송해 다수의 요청·응답을 동시에 진행하는 기법. 스트림 ID로 프레임을 재조립하며, HTTP/1.1의 응답 순서 제약(애플리케이션 계층 HOL 블로킹)을 없앤다.",
+      "related": [
+        "binary-framing",
+        "head-of-line-blocking",
+        "quic"
+      ]
+    },
+    {
+      "id": "must-revalidate",
+      "term": "must-revalidate",
+      "aliases": [],
+      "definition": "Cache-Control 지시자로, 사본이 신선한 동안에는 자유롭게 쓰되 만료된 뒤에는 원 서버 재검사 없이 스테일 사본을 재사용하지 말라는 의미.",
+      "related": [
+        "no-cache"
+      ]
+    },
+    {
+      "id": "mutex",
+      "term": "뮤텍스",
+      "aliases": [
+        "mutex",
+        "상호 배제 락"
+      ],
+      "definition": "임계 구역에 한 번에 하나의 스레드만 진입하게 하는 상호 배제 락. 소유권 개념이 있어 잠근 스레드가 해제해야 하며, 대기 스레드는 보통 잠들어 CPU를 양보한다.",
+      "related": [
+        "semaphore",
+        "spinlock",
+        "critical-section"
+      ]
+    },
+    {
+      "id": "mvcc",
+      "term": "MVCC",
+      "aliases": [
+        "다중 버전 동시성 제어",
+        "Multi-Version Concurrency Control"
+      ],
+      "definition": "변경 전 데이터를 버전으로 보관해 트랜잭션마다 자신의 시점에 맞는 스냅숏을 읽게 하는 다중 버전 동시성 제어. 읽기와 쓰기가 서로를 차단하지 않게 만든다.",
+      "related": [
+        "undo-log",
+        "snapshot",
+        "isolation-level"
+      ]
+    },
+    {
+      "id": "n-plus-one",
+      "term": "N+1 문제",
+      "aliases": [
+        "N+1 쿼리",
+        "N+1 Query Problem"
+      ],
+      "definition": "목록 조회 1번에 이어 각 행의 연관 데이터를 건건이 N번 조회해 쿼리가 폭증하는 패턴. 조인이나 IN 절 일괄 조회(배치 로딩)로 해결한다.",
+      "related": [
+        "index"
+      ]
+    },
+    {
+      "id": "nat",
+      "term": "NAT",
+      "aliases": [
+        "Network Address Translation",
+        "네트워크 주소 변환"
+      ],
+      "definition": "사설 IP·포트를 공인 IP·포트로 바꿔 주는 주소 변환 기술. 아웃바운드 패킷 통과 시 변환 테이블 엔트리를 만들기 때문에 외부에서 먼저 시작하는 인바운드 연결은 매핑이 없어 실패한다. IPv4 주소 고갈을 완화해 왔다.",
+      "related": [
+        "private-ip",
+        "port-number"
+      ]
+    },
+    {
+      "id": "no-cache",
+      "term": "no-cache",
+      "aliases": [],
+      "definition": "Cache-Control 지시자로, 응답 저장은 허용하되 사본을 사용하기 전마다 원 서버에 재검사하라는 의미. 이름과 달리 캐싱 금지가 아니다.",
+      "related": [
+        "no-store",
+        "must-revalidate"
+      ]
+    },
+    {
+      "id": "no-store",
+      "term": "no-store",
+      "aliases": [],
+      "definition": "Cache-Control 지시자로, 응답을 디스크·메모리 등 어디에도 저장하지 말라는 가장 강한 캐시 금지 지시. 개인정보 등 민감한 응답에 쓴다.",
+      "related": [
+        "no-cache"
+      ]
+    },
+    {
+      "id": "non-repeatable-read",
+      "term": "반복 불가능 읽기",
+      "aliases": [
+        "Non-Repeatable Read"
+      ],
+      "definition": "한 트랜잭션 안에서 같은 행을 두 번 읽었을 때 사이에 커밋된 다른 트랜잭션 때문에 값이 달라지는 이상 현상. REPEATABLE READ 이상에서 차단된다.",
+      "related": [
+        "isolation-level",
+        "repeatable-read"
+      ]
+    },
+    {
+      "id": "nonblocking-io",
+      "term": "논블로킹 I/O",
+      "aliases": [
+        "non-blocking I/O",
+        "비동기 I/O"
+      ],
+      "definition": "I/O 요청 시 완료를 기다리지 않고 즉시 반환하는 방식. 완료 여부는 이벤트 통지나 폴링으로 확인하며, 이벤트 루프 기반 서버가 단일 스레드로 동시성을 얻는 전제 조건이다.",
+      "related": [
+        "event-loop"
+      ]
+    },
+    {
+      "id": "normalization",
+      "term": "정규화",
+      "aliases": [
+        "Normalization"
+      ],
+      "definition": "하나의 사실이 한 곳에만 저장되도록 테이블을 분해해 중복을 제거하는 설계 기법. 삽입·갱신·삭제 이상 현상을 방지하는 것이 목적이다.",
+      "related": [
+        "denormalization",
+        "data-anomaly"
+      ]
+    },
+    {
+      "id": "nosql",
+      "term": "NoSQL",
+      "aliases": [],
+      "definition": "관계형 모델 대신 문서·키-값·와이드 컬럼·그래프 등의 데이터 모델을 쓰는 저장소의 총칭. 스키마 유연성과 수평 확장에 강하고, 복잡한 조인·다중 행 트랜잭션에는 약한 경향이 있다.",
+      "related": [
+        "horizontal-scaling"
+      ]
+    },
+    {
+      "id": "oauth2",
+      "term": "OAuth 2.0",
+      "aliases": [
+        "OAuth",
+        "오오스"
+      ],
+      "definition": "사용자가 비밀번호를 제3자 앱에 넘기지 않고, 자신의 자원에 대한 접근 권한을 범위(scope)를 정해 위임할 수 있게 하는 인가 프레임워크. 인증 프로토콜이 아니며, 신원 확인 계층은 OIDC가 담당한다.",
+      "related": [
+        "authorization-code-flow",
+        "access-token",
+        "authorization"
+      ]
+    },
+    {
+      "id": "object-storage",
+      "term": "객체 스토리지 (Object Storage)",
+      "aliases": [
+        "오브젝트 스토리지"
+      ],
+      "definition": "파일을 계층 디렉터리가 아닌 평평한 네임스페이스의 불변 객체(키-데이터-메타데이터)로 저장하는 스토리지. 대용량 비정형 데이터에 적합하며 HTTP API로 접근한다.",
+      "related": [
+        "presigned-url"
+      ]
+    },
+    {
+      "id": "observability",
+      "term": "관측 가능성 (Observability)",
+      "aliases": [
+        "옵저버빌리티"
+      ],
+      "definition": "시스템 외부로 드러나는 신호(로그·메트릭·트레이스)로 내부 상태와 장애 원인을 추론할 수 있는 성질. 세 신호는 각각 개별 이벤트 기록, 집계 수치, 요청 단위 경로 추적이라는 다른 역할을 맡는다.",
+      "related": [
+        "metrics",
+        "distributed-tracing"
+      ]
+    },
+    {
+      "id": "offset",
+      "term": "오프셋 (Offset)",
+      "aliases": [],
+      "definition": "로그 기반 브로커에서 소비자가 파티션 내 어디까지 읽었는지를 나타내는 위치 값. 브로커가 메시지를 지우는 대신 소비자가 오프셋을 전진시키는 방식이라, 오프셋을 되돌리면 과거 메시지를 다시 읽을 수 있다.",
+      "related": [
+        "log-based-broker",
+        "partition",
+        "consumer-group"
+      ]
+    },
+    {
+      "id": "offset-pagination",
+      "term": "OFFSET 페이지네이션",
+      "aliases": [
+        "오프셋 페이지네이션"
+      ],
+      "definition": "OFFSET/LIMIT으로 페이지를 나누는 방식. 건너뛸 앞쪽 행을 실제로 읽고 버리므로 뒤 페이지로 갈수록 느려진다.",
+      "related": [
+        "cursor-pagination"
+      ]
+    },
+    {
+      "id": "optimistic-lock",
+      "term": "낙관적 락",
+      "aliases": [
+        "Optimistic Lock",
+        "CAS"
+      ],
+      "definition": "잠금 대신 버전 컬럼 등을 갱신 시점에 비교해, 읽은 이후 값이 바뀌었으면 실패시키고 재시도하는 동시성 제어 방식(CAS 계열). 충돌이 드문 워크로드에 적합하다.",
+      "related": [
+        "lost-update",
+        "select-for-update"
+      ]
+    },
+    {
+      "id": "origin-server",
+      "term": "원본 서버 (origin server)",
+      "aliases": [
+        "오리진 서버"
+      ],
+      "definition": "콘텐츠의 원본을 보관·생성하는 서버. CDN 구조에서 엣지 서버가 캐시 미스를 겪으면 원본 서버로부터 콘텐츠를 받아온다.",
+      "related": [
+        "cdn",
+        "edge-server"
+      ]
+    },
+    {
+      "id": "page-fault",
+      "term": "페이지 폴트",
+      "aliases": [
+        "page fault"
+      ],
+      "definition": "접근한 가상 페이지가 물리 메모리에 없을 때(present 비트 꺼짐) 발생하는 예외. 커널이 디스크에서 해당 페이지를 읽어 프레임에 올린 뒤 재개하므로, 일반 메모리 접근보다 수만 배 이상 느리다.",
+      "related": [
+        "virtual-memory",
+        "thrashing",
+        "tlb"
+      ]
+    },
+    {
+      "id": "page-table",
+      "term": "페이지 테이블",
+      "aliases": [
+        "page table"
+      ],
+      "definition": "프로세스별로 가상 페이지 번호(VPN)를 물리 프레임 번호(PFN)로 매핑하는 커널 자료구조. MMU가 주소 변환 시 참조하며, TLB는 이 변환 결과를 캐싱한다.",
+      "related": [
+        "paging",
+        "tlb",
+        "virtual-memory"
+      ]
+    },
+    {
+      "id": "paging",
+      "term": "페이징",
+      "aliases": [
+        "paging"
+      ],
+      "definition": "주소 공간을 고정 크기 페이지로, 물리 메모리를 같은 크기 프레임으로 나누어 관리하는 기법. 외부 단편화를 없애는 대신 마지막 페이지의 내부 단편화를 감수한다.",
+      "related": [
+        "virtual-memory",
+        "page-table",
+        "internal-fragmentation"
+      ]
+    },
+    {
+      "id": "parameter-binding",
+      "term": "파라미터 바인딩",
+      "aliases": [
+        "프리페어드 스테이트먼트",
+        "prepared statement",
+        "바인드 변수"
+      ],
+      "definition": "쿼리 구문(플레이스홀더 포함)을 먼저 확정·파싱하고 입력값은 뒤에 순수 데이터로만 전달하는 기법(프리페어드 스테이트먼트). 입력이 SQL 문법으로 해석될 여지를 구조적으로 없애 인젝션을 막는다.",
+      "related": [
+        "sql-injection"
+      ]
+    },
+    {
+      "id": "partition",
+      "term": "파티션 (Partition)",
+      "aliases": [],
+      "definition": "토픽을 나눈 독립적인 추가 전용 로그 단위. 파티션을 늘리면 병렬 처리량이 커지지만, 메시지 순서는 같은 파티션 안에서만 보장된다. 순서가 중요한 메시지는 같은 키(예: 주문 ID)로 같은 파티션에 보낸다.",
+      "related": [
+        "topic",
+        "offset",
+        "consumer-group"
+      ]
+    },
+    {
+      "id": "partitioning",
+      "term": "파티셔닝",
+      "aliases": [
+        "partitioning",
+        "파티션"
+      ],
+      "definition": "큰 데이터셋을 여러 조각(파티션)으로 나눠 노드별로 분산 저장하는 것. 키 범위 방식은 범위 질의에 유리하지만 핫스팟 위험이 있고, 해시 방식은 부하를 고르게 퍼뜨리지만 효율적인 범위 질의를 잃는다.",
+      "related": [
+        "sharding",
+        "hot-spot",
+        "consistent-hashing"
+      ]
+    },
+    {
+      "id": "pcb",
+      "term": "PCB",
+      "aliases": [
+        "Process Control Block",
+        "프로세스 제어 블록"
+      ],
+      "definition": "프로세스 제어 블록(Process Control Block). 프로세스의 상태, 레지스터 값, 페이지 테이블 위치, 열린 파일 등 커널이 프로세스를 관리·재개하는 데 필요한 정보를 담는 자료구조.",
+      "related": [
+        "process",
+        "context-switch"
+      ]
+    },
+    {
+      "id": "pdu",
+      "term": "PDU(계층별 전송 단위)",
+      "aliases": [
+        "Protocol Data Unit",
+        "세그먼트",
+        "패킷",
+        "프레임"
+      ],
+      "definition": "각 계층이 주고받는 데이터 단위의 명칭. 전송 계층은 세그먼트(UDP는 데이터그램), 네트워크 계층은 패킷(데이터그램), 링크 계층은 프레임이라 부른다.",
+      "related": [
+        "encapsulation"
+      ]
+    },
+    {
+      "id": "percentile",
+      "term": "백분위수 (percentile)",
+      "aliases": [
+        "p95",
+        "p99"
+      ],
+      "definition": "측정값을 정렬했을 때 특정 비율이 그 값 이하가 되는 지점. p99 응답 시간은 요청의 99%가 그 시간 안에 처리됨을 뜻하며, 평균 대신 성능 SLO의 기준으로 널리 쓰인다.",
+      "related": [
+        "tail-latency"
+      ]
+    },
+    {
+      "id": "persistent-connection",
+      "term": "지속 연결 (persistent connection)",
+      "aliases": [
+        "keep-alive",
+        "지속 커넥션"
+      ],
+      "definition": "하나의 TCP 연결로 여러 HTTP 요청·응답을 이어 보내는 방식. HTTP/1.1의 기본 동작이며, 요청마다 반복되는 TCP 핸드셰이크와 슬로 스타트 비용을 제거한다. keep-alive라고도 부른다.",
+      "related": [
+        "tcp-handshake",
+        "pipelining"
+      ]
+    },
+    {
+      "id": "phantom-read",
+      "term": "팬텀 리드",
+      "aliases": [
+        "Phantom Read"
+      ],
+      "definition": "같은 조건으로 두 번 조회했을 때 사이에 삽입·삭제된 행 때문에 결과 집합의 행 수가 달라지는 이상 현상. 표준상 SERIALIZABLE에서 차단된다.",
+      "related": [
+        "isolation-level"
+      ]
+    },
+    {
+      "id": "pipelining",
+      "term": "파이프라이닝 (pipelining)",
+      "aliases": [
+        "HTTP 파이프라이닝"
+      ],
+      "definition": "HTTP/1.1에서 앞 응답을 기다리지 않고 여러 요청을 연속 전송하는 기법. 그러나 응답은 요청 순서대로 반환되어야 해 head-of-line 블로킹이 생기고 중개자 호환성 문제도 있어 브라우저에서 사실상 폐기됐다.",
+      "related": [
+        "head-of-line-blocking",
+        "persistent-connection",
+        "multiplexing"
+      ]
+    },
+    {
+      "id": "port-number",
+      "term": "포트 번호",
+      "aliases": [
+        "port"
+      ],
+      "definition": "한 호스트 안에서 트래픽을 받을 프로세스(소켓)를 식별하는 16비트 번호. IP 주소가 호스트를 찾고 포트가 프로세스를 찾는다. 잘 알려진 포트(0-1023)와 클라이언트가 임시로 쓰는 임시 포트로 나뉜다.",
+      "related": [
+        "socket",
+        "demultiplexing",
+        "nat"
+      ]
+    },
+    {
+      "id": "preflight",
+      "term": "프리플라이트 (preflight)",
+      "aliases": [
+        "OPTIONS",
+        "단순 요청",
+        "simple request"
+      ],
+      "definition": "단순 요청 조건을 벗어나는 교차 출처 요청 전에 브라우저가 OPTIONS 메서드로 서버에 허용 여부를 미리 묻는 요청. Access-Control-Request-Method/Headers를 보내고, 서버의 허용 응답을 받아야 본 요청이 전송된다.",
+      "related": [
+        "cors",
+        "same-origin-policy"
+      ]
+    },
+    {
+      "id": "preflight-request",
+      "term": "프리플라이트 요청",
+      "aliases": [
+        "preflight",
+        "사전 요청"
+      ],
+      "definition": "단순 요청 조건을 벗어나는 교차 출처 요청 전에 브라우저가 OPTIONS 메서드로 허용 여부(메서드·헤더·출처)를 먼저 확인하는 사전 요청. 서버가 허용을 응답해야 본 요청이 전송된다.",
+      "related": [
+        "cors",
+        "same-origin-policy"
+      ]
+    },
+    {
+      "id": "presigned-url",
+      "term": "presigned URL",
+      "aliases": [
+        "서명된 URL",
+        "사전 서명 URL"
+      ],
+      "definition": "스토리지 접근 권한을 가진 서버가 특정 객체·메서드·만료 시간으로 범위를 제한해 서명한 URL. 클라이언트가 이 URL로 객체 스토리지에 직접 업로드/다운로드하게 해 서버의 트래픽 부하를 줄인다.",
+      "related": [
+        "object-storage"
+      ]
+    },
+    {
+      "id": "private-ip",
+      "term": "사설 IP",
+      "aliases": [
+        "private IP",
+        "사설 주소"
+      ],
+      "definition": "조직·가정 내부에서만 유효한 예약 대역의 IP 주소(10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 등). 인터넷에서 라우팅되지 않으며, 외부와 통신하려면 NAT를 거쳐 공인 주소로 변환되어야 한다.",
+      "related": [
+        "nat"
+      ]
+    },
+    {
+      "id": "process",
+      "term": "프로세스",
+      "aliases": [
+        "process"
+      ],
+      "definition": "실행 중인 프로그램의 인스턴스. 독립된 가상 주소 공간, 파일 디스크립터, 하나 이상의 스레드를 가지며 OS의 자원 할당·보호 단위가 된다.",
+      "related": [
+        "thread",
+        "virtual-memory",
+        "pcb"
+      ]
+    },
+    {
+      "id": "processing-time",
+      "term": "처리 시간 (Processing Time)",
+      "aliases": [],
+      "definition": "처리 시스템이 이벤트를 받아 처리하는 시각. 이 기준으로 집계하면 구현이 단순하고 결과 확정이 빠르지만, 늦게 도착한 이벤트가 엉뚱한 윈도에 집계되어 통계가 왜곡될 수 있다.",
+      "related": [
+        "event-time",
+        "time-window",
+        "straggler"
+      ]
+    },
+    {
+      "id": "pull-based-monitoring",
+      "term": "풀 방식 수집 (Pull-based Monitoring)",
+      "aliases": [
+        "pull 모델",
+        "스크레이프"
+      ],
+      "definition": "중앙 수집기가 각 대상이 노출한 지표 엔드포인트를 주기적으로 긁어가는(scrape) 방식. 대상 목록을 알아야 하므로 서비스 디스커버리가 필요하지만, 스크레이프 실패 자체가 명확한 다운 신호가 된다.",
+      "related": [
+        "push-based-monitoring",
+        "metrics"
+      ]
+    },
+    {
+      "id": "push-based-monitoring",
+      "term": "푸시 방식 수집 (Push-based Monitoring)",
+      "aliases": [
+        "push 모델"
+      ],
+      "definition": "대상에 설치된 에이전트가 지표를 수집 서버로 직접 보내는 방식. 짧게 실행되고 사라지는 배치 작업이나 방화벽·NAT 뒤의 대상에 적합하지만, 데이터 부재가 장애인지 아닌지 구분하기 어렵다.",
+      "related": [
+        "pull-based-monitoring",
+        "metrics"
+      ]
+    },
+    {
+      "id": "query-optimizer",
+      "term": "옵티마이저",
+      "aliases": [
+        "Query Optimizer",
+        "비용 기반 옵티마이저",
+        "CBO"
+      ],
+      "definition": "쿼리를 실행하는 여러 방법의 비용을 통계 정보로 추정해 가장 싼 실행 계획을 고르는 DBMS 구성 요소. 통계가 부정확하면 계획도 틀어진다.",
+      "related": [
+        "full-table-scan",
+        "index"
+      ]
+    },
+    {
+      "id": "quic",
+      "term": "QUIC",
+      "aliases": [
+        "HTTP/3"
+      ],
+      "definition": "UDP 위에 신뢰성·혼잡 제어·TLS를 통합 구현한 전송 프로토콜로 HTTP/3의 기반. 손실 복구를 스트림 단위로 분리해 TCP의 전송 계층 HOL 블로킹을 없애고, 핸드셰이크 통합으로 연결 수립 지연을 줄이며, IP 변경에도 연결을 유지하는 커넥션 마이그레이션을 제공한다.",
+      "related": [
+        "head-of-line-blocking",
+        "hol-blocking",
+        "http3",
+        "multiplexing",
+        "udp"
+      ]
+    },
+    {
+      "id": "quorum",
+      "term": "정족수",
+      "aliases": [
+        "quorum",
+        "N/W/R",
+        "정족수 합의"
+      ],
+      "definition": "복제본 N개 중 쓰기는 W개, 읽기는 R개 노드의 확인을 요구하는 방식. W+R > N이면 쓰기 집합과 읽기 집합이 반드시 겹쳐 읽기가 최신 쓰기를 포함하게 되며, W와 R 조절로 일관성-지연 트레이드오프를 튜닝한다.",
+      "related": [
+        "eventual-consistency",
+        "version-vector"
+      ]
+    },
+    {
+      "id": "race-condition",
+      "term": "경쟁 조건",
+      "aliases": [
+        "race condition",
+        "경쟁 상태"
+      ],
+      "definition": "여러 실행 흐름이 공유 데이터에 비원자적으로 접근할 때, 실행 순서(인터리빙)에 따라 결과가 달라지는 상황. 갱신 유실 등 비결정적 버그의 원인이 된다.",
+      "related": [
+        "critical-section",
+        "mutex",
+        "compare-and-swap"
+      ]
+    },
+    {
+      "id": "rainbow-table",
+      "term": "레인보우 테이블",
+      "aliases": [
+        "rainbow table"
+      ],
+      "definition": "자주 쓰이는 비밀번호들의 해시값을 미리 대량 계산해 둔 역조회 테이블. 솔트 없이 저장된 해시를 통째로 대조해 원문을 찾는 데 쓰이며, 사용자별 솔트로 무력화된다.",
+      "related": [
+        "salt",
+        "hash-function"
+      ]
+    },
+    {
+      "id": "random-io",
+      "term": "랜덤 I/O (Random I/O)",
+      "aliases": [
+        "Random I/O",
+        "임의 접근"
+      ],
+      "definition": "디스크의 임의 위치를 오가며 읽고 쓰는 접근 패턴. HDD에서는 요청마다 탐색·회전 지연을 치러 매우 느리고, SSD에서도 랜덤 쓰기는 쓰기 증폭을 키운다.",
+      "related": [
+        "full-table-scan",
+        "sequential-io",
+        "write-amplification"
+      ]
+    },
+    {
+      "id": "rate-limiting",
+      "term": "처리율 제한 (rate limiting)",
+      "aliases": [
+        "레이트 리미팅",
+        "스로틀링",
+        "throttling"
+      ],
+      "definition": "클라이언트나 서비스가 단위 시간에 보낼 수 있는 요청 수를 제한해 과부하와 남용으로부터 시스템을 보호하는 기법. 한도를 초과한 요청에는 관례적으로 429 응답을 반환한다. 토큰 버킷·누출 버킷·고정/이동 윈도 등의 알고리즘이 쓰인다.",
+      "related": [
+        "token-bucket",
+        "leaky-bucket",
+        "fixed-window-counter"
+      ]
+    },
+    {
+      "id": "read-committed",
+      "term": "READ COMMITTED",
+      "aliases": [],
+      "definition": "커밋된 데이터만 읽게 해 더티 리드를 차단하는 격리 수준. 문장마다 새 스냅숏을 읽으므로 반복 불가능 읽기는 허용된다.",
+      "related": [
+        "isolation-level",
+        "repeatable-read",
+        "dirty-read"
+      ]
+    },
+    {
+      "id": "read-your-writes",
+      "term": "자신이 쓴 내용 읽기",
+      "aliases": [
+        "read-your-writes consistency",
+        "읽기 후 쓰기 일관성"
+      ],
+      "definition": "사용자가 직접 갱신한 데이터가 그 사용자의 이후 읽기에 반드시 보이도록 하는 일관성 보장. 본인 데이터는 리더에서 읽거나, 마지막 쓰기 시각 이후로 따라잡은 레플리카에서만 읽는 방식으로 구현한다.",
+      "related": [
+        "replication-lag",
+        "monotonic-reads",
+        "eventual-consistency"
+      ]
+    },
+    {
+      "id": "receive-window",
+      "term": "수신 윈도우(rwnd)",
+      "aliases": [
+        "rwnd",
+        "receive window"
+      ],
+      "definition": "수신자가 TCP 헤더로 광고하는 수신 버퍼의 여유 공간. 송신자는 이 값을 넘겨 보내지 않으며, 실제 전송량은 min(rwnd, cwnd)로 정해진다.",
+      "related": [
+        "flow-control",
+        "congestion-window"
+      ]
+    },
+    {
+      "id": "redirect",
+      "term": "리다이렉트 (redirect)",
+      "aliases": [
+        "301",
+        "302",
+        "Location 헤더"
+      ],
+      "definition": "3xx 상태 코드와 Location 헤더로 클라이언트를 다른 URI로 보내는 메커니즘. 301(영구)은 브라우저가 캐시해 이후 서버를 거치지 않고, 302(임시)는 기본적으로 캐시되지 않아 매번 서버를 거친다. 이 차이가 서버 부하 절감 vs 클릭 집계라는 선택 기준을 만든다.",
+      "related": [
+        "status-code"
+      ]
+    },
+    {
+      "id": "redis",
+      "term": "Redis",
+      "aliases": [],
+      "definition": "리스트·해시·정렬 집합 등 다양한 자료구조와 스냅숏(RDB)/명령 로그(AOF) 영속성, 복제를 지원하는 인메모리 키-값 저장소. 캐시 외에 순위표, 분산 락, 세션 저장 등에 널리 쓰이며 명령 처리는 싱글스레드 이벤트 루프 모델이다.",
+      "related": [
+        "memcached",
+        "sorted-set"
+      ]
+    },
+    {
+      "id": "redo-log",
+      "term": "리두 로그",
+      "aliases": [
+        "Redo Log"
+      ],
+      "definition": "커밋된 변경 내용을 기록해 두었다가 장애 후 재실행(redo)으로 복구하는 데 쓰는 로그. WAL 원칙에 따라 데이터 파일보다 먼저 기록된다.",
+      "related": [
+        "wal",
+        "undo-log"
+      ]
+    },
+    {
+      "id": "redundancy",
+      "term": "이중화 (redundancy)",
+      "aliases": [
+        "다중화"
+      ],
+      "definition": "동일 역할의 컴포넌트를 여러 개 두어 하나가 고장 나도 서비스를 지속하게 하는 설계. 액티브-액티브, 액티브-패시브(장애 시 승격) 등의 구성이 있으며 단일 장애점 제거의 핵심 수단이다.",
+      "related": [
+        "spof",
+        "availability",
+        "fault-tolerance"
+      ]
+    },
+    {
+      "id": "refresh-token",
+      "term": "리프레시 토큰",
+      "aliases": [
+        "refresh token"
+      ],
+      "definition": "만료된 액세스 토큰을 재발급받기 위한 장기 토큰. 서버가 상태를 관리해 로그아웃이나 탈취 시 회수(무효화)할 수 있어, 무상태 액세스 토큰의 '즉시 차단 불가' 약점을 보완한다.",
+      "related": [
+        "access-token",
+        "jwt"
+      ]
+    },
+    {
+      "id": "reliability",
+      "term": "신뢰성 (reliability)",
+      "aliases": [],
+      "definition": "하드웨어 결함·소프트웨어 오류·인적 실수 같은 역경 속에서도 시스템이 기대한 기능을 올바르게 계속 수행하는 성질. 확장성(부하 대응)·유지보수성과 함께 데이터 시스템의 3대 품질 속성으로 꼽힌다.",
+      "related": [
+        "fault-tolerance",
+        "availability"
+      ]
+    },
+    {
+      "id": "repeatable-read",
+      "term": "REPEATABLE READ",
+      "aliases": [],
+      "definition": "트랜잭션 단위 스냅숏을 유지해 같은 행을 반복해서 읽어도 같은 결과를 보장하는 격리 수준.",
+      "related": [
+        "isolation-level",
+        "read-committed",
+        "snapshot"
+      ]
+    },
+    {
+      "id": "replication",
+      "term": "복제",
+      "aliases": [
+        "Replication",
+        "replication",
+        "리더-팔로워 복제",
+        "리플리케이션",
+        "주-부 복제"
+      ],
+      "definition": "같은 데이터 전체를 여러 노드에 유지하는 것. 읽기 부하 분산, 고가용성, 무거운 작업(백업·분석)의 격리를 얻지만, 쓰기 처리량은 늘려주지 못하고 복제 지연이라는 새로운 일관성 문제를 만든다.",
+      "related": [
+        "leader-follower-replication",
+        "replication-lag",
+        "sharding"
+      ]
+    },
+    {
+      "id": "replication-lag",
+      "term": "복제 지연",
+      "aliases": [
+        "Replication Lag",
+        "replication lag"
+      ],
+      "definition": "리더의 변경이 팔로워에 반영되기까지의 시차. 이 동안 팔로워에서 읽으면 오래된 값이 반환될 수 있으며, read-your-writes·단조 읽기 같은 보장으로 사용자 경험 문제를 완화한다.",
+      "related": [
+        "asynchronous-replication",
+        "monotonic-reads",
+        "read-your-writes",
+        "replication"
+      ]
+    },
+    {
+      "id": "rest",
+      "term": "REST",
+      "aliases": [
+        "RESTful",
+        "REST API"
+      ],
+      "definition": "자원을 URI(명사)로 식별하고 행위는 표준 HTTP 메서드로 표현하며, 무상태 통신과 캐시 가능성을 지향하는 API 아키텍처 스타일. URI에 동사를 넣는 설계(/getUser)는 대표적인 안티패턴이다.",
+      "related": [
+        "uri",
+        "http-method",
+        "stateless"
+      ]
+    },
+    {
+      "id": "reverse-proxy",
+      "term": "리버스 프록시 (Reverse Proxy)",
+      "aliases": [
+        "역방향 프록시"
+      ],
+      "definition": "서버 앞단에 위치해 들어오는 요청을 받아 백엔드 서버로 전달하는 프록시. 부하 분산, TLS 종료, 캐싱·압축, 백엔드 구조 은닉 등의 역할을 하며 서버가 1대여도 이점이 있다.",
+      "related": [
+        "forward-proxy",
+        "load-balancer",
+        "tls-termination"
+      ]
+    },
+    {
+      "id": "rolling-deployment",
+      "term": "롤링 배포 (Rolling Deployment)",
+      "aliases": [
+        "롤링 업데이트"
+      ],
+      "definition": "서버 인스턴스를 몇 대씩 순차적으로 새 버전으로 교체하는 배포 전략. 추가 자원이 거의 필요 없지만 배포 중 신·구 버전이 공존하므로 호환성을 고려해야 한다.",
+      "related": [
+        "canary-deployment",
+        "blue-green-deployment"
+      ]
+    },
+    {
+      "id": "safe-method",
+      "term": "안전한 메서드 (safe method)",
+      "aliases": [
+        "safe"
+      ],
+      "definition": "서버의 자원 상태를 변경하지 않는 HTTP 메서드. GET·HEAD가 대표적이다. 안전한 메서드는 모두 멱등하지만, 멱등하다고 모두 안전한 것은 아니다(PUT·DELETE가 반례). 캐싱·프리페치가 가능한 근거가 된다.",
+      "related": [
+        "idempotency",
+        "http-method"
+      ]
+    },
+    {
+      "id": "salt",
+      "term": "솔트",
+      "aliases": [
+        "salt"
+      ],
+      "definition": "비밀번호 해싱 시 사용자마다 다르게 섞는 무작위 값. 같은 비밀번호라도 다른 해시가 나오게 하여 레인보우 테이블 등 사전 계산 공격을 무력화한다. 비밀 값이 아니며 보통 해시와 함께 저장된다.",
+      "related": [
+        "rainbow-table",
+        "bcrypt",
+        "hash-function"
+      ]
+    },
+    {
+      "id": "same-origin-policy",
+      "term": "동일 출처 정책",
+      "aliases": [
+        "SOP",
+        "Same-Origin Policy",
+        "출처"
+      ],
+      "definition": "스킴·호스트·포트가 모두 같아야 같은 출처로 보고, 스크립트가 다른 출처의 응답을 읽지 못하게 하는 브라우저의 기본 보안 정책. CORS는 이 정책을 서버 동의 하에 완화하는 절차다.",
+      "related": [
+        "cors",
+        "preflight",
+        "preflight-request"
+      ]
+    },
+    {
+      "id": "samesite",
+      "term": "SameSite",
+      "aliases": [
+        "SameSite 속성"
+      ],
+      "definition": "교차 사이트에서 시작된 요청에 쿠키를 첨부할지 제어하는 쿠키 속성(Strict/Lax/None). 교차 사이트 요청에 세션 쿠키가 실리는 것을 제한해 CSRF를 완화한다.",
+      "related": [
+        "csrf",
+        "httponly"
+      ]
+    },
+    {
+      "id": "scale-out",
+      "term": "스케일 아웃 (수평 확장)",
+      "aliases": [
+        "수평 확장",
+        "horizontal scaling",
+        "scale-out"
+      ],
+      "definition": "서버 대수를 늘려 부하를 분산하는 확장 방식. 용량과 가용성을 함께 늘릴 수 있고 이론상 계속 확장 가능하지만, 로드밸런싱·데이터 동기화·무상태 설계 등 아키텍처 복잡도가 늘어난다.",
+      "related": [
+        "scale-up",
+        "stateless",
+        "load-balancer"
+      ]
+    },
+    {
+      "id": "scale-up",
+      "term": "스케일 업 (수직 확장)",
+      "aliases": [
+        "수직 확장",
+        "vertical scaling",
+        "scale-up"
+      ],
+      "definition": "단일 서버에 CPU·메모리 등 자원을 증설해 처리 능력을 올리는 확장 방식. 구현이 단순하지만 하드웨어의 물리적 상한이 있고, 서버가 1대라 단일 장애점이 남으며 고사양일수록 비용이 비선형적으로 증가한다.",
+      "related": [
+        "scale-out",
+        "spof"
+      ]
+    },
+    {
+      "id": "secondary-index",
+      "term": "세컨더리 인덱스",
+      "aliases": [
+        "보조 인덱스",
+        "Secondary Index"
+      ],
+      "definition": "PK 인덱스 외에 추가로 만드는 보조 인덱스. 클러스터드 테이블에서는 행 주소 대신 PK 값을 참조로 담아, 조회 시 PK 재탐색이 필요하다.",
+      "related": [
+        "clustered-index"
+      ]
+    },
+    {
+      "id": "select-for-update",
+      "term": "SELECT FOR UPDATE",
+      "aliases": [
+        "비관적 락",
+        "Pessimistic Lock"
+      ],
+      "definition": "조회 시점부터 해당 행에 쓰기 잠금을 걸어 읽기-수정-쓰기 구간을 보호하는 명시적 잠금 구문. 비관적 잠금의 대표 수단이다.",
+      "related": [
+        "lost-update",
+        "optimistic-lock"
+      ]
+    },
+    {
+      "id": "semaphore",
+      "term": "세마포어",
+      "aliases": [
+        "semaphore"
+      ],
+      "definition": "정수 카운터에 대한 원자적 감소(wait/P)·증가(signal/V) 연산으로 동작하는 동기화 도구. 소유권이 없어 상호 배제뿐 아니라 자원 N개의 동시 사용 제한, 스레드 간 순서 신호 전달에도 쓰인다.",
+      "related": [
+        "mutex",
+        "condition-variable"
+      ]
+    },
+    {
+      "id": "sequence-number",
+      "term": "순서 번호",
+      "aliases": [
+        "sequence number",
+        "시퀀스 번호"
+      ],
+      "definition": "TCP가 바이트 스트림의 각 바이트에 매기는 번호. 수신 측이 손실·중복·순서 뒤바뀜을 구별하고 데이터를 올바른 순서로 재조립하는 근거가 된다.",
+      "related": [
+        "cumulative-ack",
+        "tcp-three-way-handshake"
+      ]
+    },
+    {
+      "id": "sequential-io",
+      "term": "순차 I/O (Sequential I/O)",
+      "aliases": [
+        "Sequential I/O",
+        "append 쓰기",
+        "순차 접근"
+      ],
+      "definition": "디스크의 연속된 위치를 이어서 읽고 쓰는 접근 패턴. HDD에서는 탐색·회전 지연을 건너뛰어 랜덤 I/O보다 수십~수백 배 빠르고, SSD에서도 쓰기 증폭을 줄여 유리하다.",
+      "related": [
+        "random-io",
+        "wal",
+        "write-ahead-log",
+        "write-amplification"
+      ]
+    },
+    {
+      "id": "serverless",
+      "term": "서버리스 (Serverless / FaaS)",
+      "aliases": [
+        "FaaS",
+        "함수형 서비스"
+      ],
+      "definition": "서버 관리 없이 함수 단위 코드를 이벤트에 따라 실행하고 사용량만큼 과금하는 모델. 자동 확장이 장점이지만 콜드 스타트와 실행 시간 제한 같은 제약이 있다.",
+      "related": [
+        "cold-start",
+        "container"
+      ]
+    },
+    {
+      "id": "session",
+      "term": "세션 (Session)",
+      "aliases": [
+        "세션 ID"
+      ],
+      "definition": "서버 측에 저장되는 클라이언트별 상태 데이터. 보통 로그인 시 생성되며, 그 식별자(세션 ID)를 쿠키로 주고받아 무상태 HTTP 위에서 사용자 상태를 이어간다.",
+      "related": [
+        "cookie",
+        "stateless"
+      ]
+    },
+    {
+      "id": "session-auth",
+      "term": "세션 기반 인증",
+      "aliases": [
+        "세션 인증",
+        "session-based authentication"
+      ],
+      "definition": "로그인 시 서버가 인증 상태를 서버 측 저장소에 세션으로 보관하고, 클라이언트에는 세션 ID만 쿠키로 주는 방식. 서버에서 즉시 무효화할 수 있지만, 수평 확장 시 세션 공유(스티키 세션·외부 저장소) 문제가 생긴다.",
+      "related": [
+        "jwt",
+        "authentication",
+        "httponly"
+      ]
+    },
+    {
+      "id": "sharding",
+      "term": "샤딩",
+      "aliases": [
+        "sharding",
+        "샤드"
+      ],
+      "definition": "데이터를 여러 서버로 수평 분할해 쓰기 처리량과 저장 용량을 확장하는 기법. 파티셔닝과 본질적으로 같은 개념으로, 특히 데이터베이스의 수평 분할을 가리킬 때 쓰인다. 샤드 키 선택이 부하 분산과 질의 효율을 좌우한다.",
+      "related": [
+        "partitioning",
+        "replication",
+        "hot-spot"
+      ]
+    },
+    {
+      "id": "sliding-window",
+      "term": "이동 윈도 (sliding window)",
+      "aliases": [
+        "슬라이딩 윈도",
+        "이동 윈도 카운터",
+        "이동 윈도 로그"
+      ],
+      "definition": "고정 윈도의 경계 문제를 줄이는 처리율 제한 방식. 카운터 방식은 직전 윈도의 카운트를 시간 겹침 비율로 가중해 합산하고, 로그 방식은 요청 타임스탬프를 보관해 정확히 계산하는 대신 메모리를 더 쓴다.",
+      "related": [
+        "fixed-window-counter",
+        "rate-limiting"
+      ]
+    },
+    {
+      "id": "slow-start",
+      "term": "슬로 스타트",
+      "aliases": [
+        "slow start"
+      ],
+      "definition": "TCP 연결 초기에 혼잡 윈도우를 작게 시작해 ACK마다 키워 RTT당 약 2배로 지수 증가시키는 단계. '느리게 증가'가 아니라 '낮게 시작'한다는 뜻이며, 임계값(ssthresh) 도달 시 혼잡 회피로 전환한다.",
+      "related": [
+        "congestion-control",
+        "aimd",
+        "congestion-window"
+      ]
+    },
+    {
+      "id": "snapshot",
+      "term": "스냅숏",
+      "aliases": [
+        "Snapshot"
+      ],
+      "definition": "특정 시점 기준으로 일관되게 보이는 데이터의 논리적 상태. MVCC에서 격리 수준에 따라 문장 단위 또는 트랜잭션 단위로 유지된다.",
+      "related": [
+        "mvcc",
+        "repeatable-read"
+      ]
+    },
+    {
+      "id": "socket",
+      "term": "소켓",
+      "aliases": [],
+      "definition": "프로세스가 네트워크로 데이터를 보내고 받는 출입구가 되는 OS 수준 인터페이스. TCP에서는 리스닝 소켓과 연결별 소켓이 구분되며, 연결 소켓도 서버 측 로컬 포트는 리스닝 포트와 같다.",
+      "related": [
+        "port-number",
+        "demultiplexing",
+        "websocket"
+      ]
+    },
+    {
+      "id": "sorted-set",
+      "term": "Sorted Set",
+      "aliases": [
+        "ZSET",
+        "정렬 집합"
+      ],
+      "definition": "각 멤버에 점수를 부여해 점수 순 정렬 상태를 유지하는 Redis 자료구조. 스킵 리스트와 해시 테이블을 결합해 점수 갱신, 상위 N 범위 조회, 순위 조회를 O(log n) 수준으로 처리하며 실시간 순위표에 적합하다.",
+      "related": [
+        "redis"
+      ]
+    },
+    {
+      "id": "span",
+      "term": "스팬 (Span)",
+      "aliases": [],
+      "definition": "분산 트레이스를 구성하는 단위 작업 구간. 시작·종료 시각과 메타데이터를 가지며, 부모-자식 관계로 연결되어 요청 전체의 호출 트리를 이룬다.",
+      "related": [
+        "distributed-tracing"
+      ]
+    },
+    {
+      "id": "spinlock",
+      "term": "스핀락",
+      "aliases": [
+        "spinlock",
+        "spin lock"
+      ],
+      "definition": "락이 풀릴 때까지 CPU를 소모하며 반복 확인(바쁜 대기)하는 락. 재우고 깨우는 전환 비용이 없어 멀티코어에서 임계 구역이 매우 짧을 때 유리하지만, 대기가 길어지면 CPU 낭비가 된다.",
+      "related": [
+        "mutex",
+        "compare-and-swap",
+        "critical-section"
+      ]
+    },
+    {
+      "id": "split-brain",
+      "term": "스플릿 브레인",
+      "aliases": [
+        "split brain",
+        "스플릿브레인"
+      ],
+      "definition": "두 노드가 서로 자신이 리더라고 믿고 동시에 쓰기를 받는 상태. 데이터가 양쪽에서 갈라져 충돌·유실로 이어진다. 과반수 승인 요구(정족수), 펜싱, 옛 리더 강제 종료로 방지한다.",
+      "related": [
+        "failover",
+        "fencing-token",
+        "quorum"
+      ]
+    },
+    {
+      "id": "spof",
+      "term": "단일 장애점 (SPOF)",
+      "aliases": [
+        "single point of failure",
+        "단일 장애 지점"
+      ],
+      "definition": "그 하나가 고장 나면 시스템 전체가 중단되는 구성 요소. 로드밸런서·DB 등 어떤 계층이든 1대뿐이면 SPOF가 되며, 이중화로 제거하는 것이 고가용성 설계의 기본이다.",
+      "related": [
+        "redundancy",
+        "availability"
+      ]
+    },
+    {
+      "id": "spurious-wakeup",
+      "term": "가짜 깨어남",
+      "aliases": [
+        "spurious wakeup"
+      ],
+      "definition": "조건 변수에서 signal 없이도 wait 중인 스레드가 깨어날 수 있는 현상. 구현·성능상 이유로 허용되며, 이 때문에 깨어난 뒤 조건을 루프로 재검사하는 것이 필수 패턴이다.",
+      "related": [
+        "condition-variable"
+      ]
+    },
+    {
+      "id": "sql-injection",
+      "term": "SQL 인젝션",
+      "aliases": [
+        "SQL Injection",
+        "인젝션"
+      ],
+      "definition": "사용자 입력이 SQL 쿼리의 구문으로 해석되게 만들어 의도하지 않은 쿼리를 실행시키는 공격. 문자열 연결로 쿼리를 조립할 때 발생하며, 파라미터 바인딩으로 코드와 데이터를 분리하면 원천 차단된다.",
+      "related": [
+        "parameter-binding",
+        "xss"
+      ]
+    },
+    {
+      "id": "sse",
+      "term": "SSE",
+      "aliases": [
+        "Server-Sent Events"
+      ],
+      "definition": "서버에서 클라이언트로의 단방향 이벤트 스트리밍 방식. 일반 HTTP 연결 위에서 동작하고 자동 재연결을 지원해, 알림 피드처럼 단방향 푸시만 필요한 경우 WebSocket보다 단순한 선택이다.",
+      "related": [
+        "websocket",
+        "long-polling"
+      ]
+    },
+    {
+      "id": "stateless",
+      "term": "무상태성 (stateless)",
+      "aliases": [
+        "stateless",
+        "stateless protocol",
+        "무상태"
+      ],
+      "definition": "서버가 요청과 요청 사이에 클라이언트의 문맥을 기억하지 않는 프로토콜 특성. 각 요청은 처리에 필요한 정보를 스스로 담아야 하며, HTTP가 대표적이다. 수평 확장이 쉬워지는 대신 로그인 상태 등은 쿠키·세션·토큰으로 별도 유지해야 한다.",
+      "related": [
+        "cookie",
+        "scale-out",
+        "session",
+        "sticky-session"
+      ]
+    },
+    {
+      "id": "status-code",
+      "term": "HTTP 상태 코드",
+      "aliases": [
+        "2xx",
+        "4xx",
+        "5xx"
+      ],
+      "definition": "응답의 처리 결과를 나타내는 3자리 숫자. 1xx 정보, 2xx 성공, 3xx 리다이렉션, 4xx 클라이언트 오류, 5xx 서버 오류로 분류되며, 4xx와 5xx의 구분은 오류 책임 소재를 가른다.",
+      "related": [
+        "redirect",
+        "authentication",
+        "authorization"
+      ]
+    },
+    {
+      "id": "sticky-session",
+      "term": "고정 세션 (sticky session)",
+      "aliases": [
+        "세션 어피니티",
+        "session affinity"
+      ],
+      "definition": "로드밸런서가 같은 클라이언트의 요청을 항상 같은 서버로 보내는 방식. 서버 메모리 세션을 유지할 수 있지만 부하 분산이 불균형해지고, 해당 서버 장애 시 세션이 유실된다.",
+      "related": [
+        "load-balancer",
+        "stateless"
+      ]
+    },
+    {
+      "id": "straggler",
+      "term": "지연 도착 이벤트 (Straggler)",
+      "aliases": [
+        "late event",
+        "늦은 이벤트"
+      ],
+      "definition": "네트워크 지연이나 단말의 오프라인 버퍼링 때문에 발생 시각보다 한참 늦게 처리 시스템에 도착하는 이벤트. 처리 시간 기준 집계를 왜곡시키는 원인이며, 이벤트 시간 윈도와 워터마크로 대응한다.",
+      "related": [
+        "event-time",
+        "watermark"
+      ]
+    },
+    {
+      "id": "strong-validator",
+      "term": "강한 검증자",
+      "aliases": [
+        "strong validator"
+      ],
+      "definition": "리소스 본문이 1바이트라도 달라지면 반드시 값이 바뀌는 검증자. 바이트 단위 동일성이 필요한 부분 콘텐츠 결합(Range 요청)에도 사용할 수 있다.",
+      "related": [
+        "etag",
+        "weak-validator"
+      ]
+    },
+    {
+      "id": "symmetric-encryption",
+      "term": "대칭키 암호화",
+      "aliases": [
+        "대칭 암호화",
+        "symmetric encryption"
+      ],
+      "definition": "암호화와 복호화에 같은 키를 쓰는 방식(예: AES). 연산이 빨라 대량 데이터에 적합하지만, 양쪽이 같은 키를 안전하게 나눠 가져야 하는 키 분배 문제가 있다.",
+      "related": [
+        "asymmetric-encryption",
+        "tls-handshake"
+      ]
+    },
+    {
+      "id": "system-call",
+      "term": "시스템 콜",
+      "aliases": [
+        "system call"
+      ],
+      "definition": "응용 프로그램이 파일 I/O, 프로세스 생성 등 커널의 기능을 요청하는 공식 통로. 트랩 명령으로 커널 모드로 전환해 커널 코드가 검증·수행한 뒤 사용자 모드로 복귀한다.",
+      "related": [
+        "kernel-mode"
+      ]
+    },
+    {
+      "id": "tail-latency",
+      "term": "꼬리 지연 (tail latency)",
+      "aliases": [
+        "테일 레이턴시"
+      ],
+      "definition": "응답 시간 분포의 상위 백분위(p99 등)에 해당하는 느린 요청의 지연. 평균 지표에 가려지기 쉽지만 사용자 체감 품질을 좌우하며, 여러 백엔드 호출이 조합되는 구조에서는 가장 느린 호출이 전체 응답을 지배해 영향이 증폭된다.",
+      "related": [
+        "percentile"
+      ]
+    },
+    {
+      "id": "tcp",
+      "term": "TCP",
+      "aliases": [
+        "Transmission Control Protocol",
+        "전송 제어 프로토콜"
+      ],
+      "definition": "연결 지향 전송 계층 프로토콜. 3-way handshake로 연결을 수립하고 순서 번호·확인응답·재전송과 흐름/혼잡 제어를 통해 신뢰적인 바이트 스트림 전송을 제공한다.",
+      "related": [
+        "udp",
+        "tcp-three-way-handshake",
+        "byte-stream"
+      ]
+    },
+    {
+      "id": "tcp-connection-termination",
+      "term": "TCP 연결 종료(4-way)",
+      "aliases": [
+        "4-way handshake"
+      ],
+      "definition": "양방향 스트림을 각각 닫기 위해 FIN과 ACK를 두 쌍으로 교환하는 TCP 종료 절차. 한쪽만 먼저 닫는 half-close가 가능하며, 먼저 닫은 쪽은 TIME_WAIT 상태를 거친다.",
+      "related": [
+        "time-wait",
+        "tcp"
+      ]
+    },
+    {
+      "id": "tcp-handshake",
+      "term": "TCP 3-way 핸드셰이크",
+      "aliases": [
+        "3-way handshake",
+        "핸드셰이크"
+      ],
+      "definition": "SYN → SYN-ACK → ACK 세 단계로 TCP 연결을 수립하는 절차. 연결마다 최소 1 RTT의 지연이 추가되므로, 연결을 재사용하는 지속 연결의 성능 근거가 된다.",
+      "related": [
+        "persistent-connection"
+      ]
+    },
+    {
+      "id": "tcp-three-way-handshake",
+      "term": "3-way handshake",
+      "aliases": [
+        "3방향 핸드셰이크",
+        "TCP 핸드셰이크"
+      ],
+      "definition": "TCP 연결 수립 절차. SYN → SYN-ACK → ACK 세 번의 교환으로 양쪽이 초기 순서 번호(ISN)를 서로 알리고 확인해 양방향 전송 준비를 합의한다.",
+      "related": [
+        "tcp",
+        "sequence-number",
+        "time-wait"
+      ]
+    },
+    {
+      "id": "thrashing",
+      "term": "스래싱",
+      "aliases": [
+        "thrashing"
+      ],
+      "definition": "활발히 쓰는 페이지들의 총량이 물리 메모리를 초과해, 페이지를 올리면 곧 필요한 페이지가 쫓겨나는 악순환으로 시스템이 스왑 I/O에 시간을 다 쓰는 상태. CPU는 놀고 디스크만 바쁜 증상을 보인다.",
+      "related": [
+        "working-set",
+        "page-fault",
+        "virtual-memory"
+      ]
+    },
+    {
+      "id": "thread",
+      "term": "스레드",
+      "aliases": [
+        "thread"
+      ],
+      "definition": "프로세스 안의 실행 흐름 단위. 같은 프로세스의 스레드끼리 코드·데이터·힙을 공유하고 스택과 레지스터 상태만 따로 가지므로, 통신은 싸지만 동기화 문제가 따른다.",
+      "related": [
+        "process",
+        "race-condition",
+        "context-switch"
+      ]
+    },
+    {
+      "id": "time-series-database",
+      "term": "시계열 데이터베이스 (Time-series Database)",
+      "aliases": [
+        "TSDB"
+      ],
+      "definition": "타임스탬프가 붙은 지표 데이터를 시간 순으로 저장·압축·집계하는 데 최적화된 데이터베이스. 오래된 데이터는 해상도를 낮춰 보관하는 다운샘플링을 흔히 적용한다.",
+      "related": [
+        "metrics",
+        "pull-based-monitoring"
+      ]
+    },
+    {
+      "id": "time-wait",
+      "term": "TIME_WAIT",
+      "aliases": [],
+      "definition": "TCP 연결을 먼저 종료한 쪽이 마지막 ACK 전송 후 2×MSL 동안 머무는 상태. 상대의 FIN 재전송에 응답하고, 이전 연결의 지연 패킷이 같은 주소·포트의 새 연결에 섞이는 것을 막는다. 빈번한 연결 개폐 시 임시 포트 고갈의 원인이 된다.",
+      "related": [
+        "tcp-connection-termination",
+        "tcp-three-way-handshake"
+      ]
+    },
+    {
+      "id": "time-window",
+      "term": "시간 윈도 (Time Window)",
+      "aliases": [
+        "윈도",
+        "windowing"
+      ],
+      "definition": "스트림 이벤트를 시간 구간 단위로 묶어 집계하는 범위. 고정 길이로 겹치지 않는 텀블링, 일정 간격으로 겹치며 미끄러지는 홉핑(슬라이딩), 활동 간격 기준의 세션 윈도 등이 있다.",
+      "related": [
+        "event-time",
+        "processing-time",
+        "watermark"
+      ]
+    },
+    {
+      "id": "tlb",
+      "term": "TLB",
+      "aliases": [
+        "Translation Lookaside Buffer"
+      ],
+      "definition": "가상 페이지 번호에서 물리 프레임 번호로의 변환 결과를 캐싱하는 하드웨어 캐시(Translation Lookaside Buffer). 데이터가 아니라 주소 변환을 캐싱하며, 미스가 나면 메모리의 페이지 테이블을 추가로 읽어야 한다.",
+      "related": [
+        "page-table",
+        "locality",
+        "paging"
+      ]
+    },
+    {
+      "id": "tls",
+      "term": "TLS",
+      "aliases": [
+        "SSL",
+        "HTTPS"
+      ],
+      "definition": "전송 계층 위에서 통신의 기밀성·무결성과 서버 신원 검증을 제공하는 보안 프로토콜. HTTPS는 HTTP를 TLS 위에서 실행하는 것이다.",
+      "related": [
+        "tls-handshake",
+        "symmetric-encryption",
+        "asymmetric-encryption"
+      ]
+    },
+    {
+      "id": "tls-handshake",
+      "term": "TLS 핸드셰이크",
+      "aliases": [
+        "TLS handshake"
+      ],
+      "definition": "TLS 연결 초기에 암호 스위트를 협상하고 인증서로 서버 신원을 검증한 뒤, 비대칭 연산으로 대칭 세션 키를 합의하는 절차. 이후 데이터는 세션 키로 암호화된다.",
+      "related": [
+        "tls",
+        "symmetric-encryption",
+        "asymmetric-encryption",
+        "digital-signature"
+      ]
+    },
+    {
+      "id": "tls-termination",
+      "term": "TLS 종료 (TLS Termination)",
+      "aliases": [
+        "SSL 종료",
+        "SSL termination"
+      ],
+      "definition": "클라이언트와의 암호화(TLS) 연결을 리버스 프록시나 로드 밸런서가 대신 처리하고, 내부 서버와는 평문 또는 별도 연결로 통신하는 구성. 인증서 관리와 암복호화 부하를 앞단에 집중시킨다.",
+      "related": [
+        "reverse-proxy",
+        "load-balancer"
+      ]
+    },
+    {
+      "id": "token-bucket",
+      "term": "토큰 버킷 (token bucket)",
+      "aliases": [
+        "token bucket"
+      ],
+      "definition": "일정 속도로 토큰을 채우고 요청이 올 때마다 토큰을 소비하는 처리율 제한 알고리즘. 버킷 용량만큼 토큰이 쌓일 수 있어 그만큼의 순간 버스트를 허용하면서 장기 평균 속도를 제한한다.",
+      "related": [
+        "leaky-bucket",
+        "rate-limiting"
+      ]
+    },
+    {
+      "id": "topic",
+      "term": "토픽 (Topic)",
+      "aliases": [],
+      "definition": "메시지를 종류별로 묶는 논리적 채널. 생산자는 토픽으로 발행하고 소비자는 토픽을 구독한다. 로그 기반 시스템에서 토픽은 여러 파티션으로 나뉘어 병렬 처리된다.",
+      "related": [
+        "partition",
+        "consumer-group"
+      ]
+    },
+    {
+      "id": "traceroute",
+      "term": "traceroute",
+      "aliases": [],
+      "definition": "TTL을 1부터 1씩 늘려 가며 패킷을 보내고, TTL 소진 지점의 라우터가 회신하는 ICMP 시간 초과 메시지의 출발지 주소를 모아 경로상의 라우터를 알아내는 진단 도구.",
+      "related": [
+        "icmp",
+        "ttl"
+      ]
+    },
+    {
+      "id": "transaction",
+      "term": "트랜잭션",
+      "aliases": [
+        "Transaction"
+      ],
+      "definition": "전부 반영되거나 전부 취소되어야 하는 데이터베이스 작업의 논리적 단위. ACID 속성으로 그 보장 범위를 설명한다.",
+      "related": [
+        "acid",
+        "isolation-level"
+      ]
+    },
+    {
+      "id": "ttl",
+      "term": "TTL(IP)",
+      "aliases": [
+        "Time To Live",
+        "홉 제한"
+      ],
+      "definition": "IP 헤더의 홉 제한 필드. 라우터를 지날 때마다 1씩 줄고 0이 되면 패킷이 폐기되며 ICMP 시간 초과 메시지가 회신된다. 라우팅 루프로 패킷이 무한 순환하는 것을 막는 장치다.",
+      "related": [
+        "cache-invalidation",
+        "icmp",
+        "traceroute"
+      ]
+    },
+    {
+      "id": "two-phase-commit",
+      "term": "2단계 커밋",
+      "aliases": [
+        "2PC",
+        "two-phase commit"
+      ],
+      "definition": "준비 단계와 커밋 단계로 나눠 여러 노드에 걸친 트랜잭션을 전부 커밋하거나 전부 어보트시키는 원자적 커밋 프로토콜. 준비 완료에 투표한 참여자는 스스로 결정할 수 없어, 코디네이터 장애 시 락을 쥔 채 블로킹되는 근본 약점이 있다.",
+      "related": [
+        "distributed-lock",
+        "at-least-once"
+      ]
+    },
+    {
+      "id": "udp",
+      "term": "UDP",
+      "aliases": [
+        "User Datagram Protocol"
+      ],
+      "definition": "비연결 전송 계층 프로토콜. 연결 설정·재전송·흐름/혼잡 제어가 없어 가볍고 지연이 작지만 전달·순서를 보장하지 않으며, 체크섬으로 비트 오류 탐지만 한다. 실시간 스트리밍·게임·DNS 등에 쓰인다.",
+      "related": [
+        "tcp",
+        "quic"
+      ]
+    },
+    {
+      "id": "undo-log",
+      "term": "언두 로그",
+      "aliases": [
+        "Undo Log",
+        "언두 영역"
+      ],
+      "definition": "변경 이전 값을 보관하는 로그. 롤백과 MVCC의 스냅숏 읽기에 함께 쓰이며, 장기 트랜잭션이 오래 참조하면 비대해진다.",
+      "related": [
+        "mvcc",
+        "redo-log"
+      ]
+    },
+    {
+      "id": "uri",
+      "term": "URI",
+      "aliases": [
+        "URL"
+      ],
+      "definition": "자원을 식별하는 문자열의 총칭. 위치로 식별하는 URL과 이름으로 식별하는 URN을 포괄하는 상위 개념이며, REST에서는 자원 하나하나를 URI로 식별한다.",
+      "related": [
+        "rest"
+      ]
+    },
+    {
+      "id": "vary-header",
+      "term": "Vary 헤더",
+      "aliases": [
+        "Vary"
+      ],
+      "definition": "콘텐츠 협상에 사용한 요청 헤더(예: Accept-Encoding)를 응답에 선언해, 캐시가 그 헤더 값별로 사본을 구분 저장·매칭하게 하는 HTTP 헤더. 누락하면 잘못된 표현(압축본 등)이 다른 클라이언트에게 제공되는 사고가 난다.",
+      "related": [
+        "cache-key"
+      ]
+    },
+    {
+      "id": "version-vector",
+      "term": "버전 벡터",
+      "aliases": [
+        "version vector"
+      ],
+      "definition": "복제본별 버전 번호의 집합으로 두 값의 선후 관계와 동시성(인과 관계 부재)을 판별하는 메커니즘. 동시 쓰기를 충돌로 감지해 형제 값으로 보존하지만, 충돌의 병합 방법은 애플리케이션이 결정해야 한다.",
+      "related": [
+        "last-write-wins",
+        "quorum"
+      ]
+    },
+    {
+      "id": "virtual-machine",
+      "term": "가상 머신 (VM)",
+      "aliases": [
+        "VM",
+        "virtual machine"
+      ],
+      "definition": "하이퍼바이저 위에 게스트 OS(커널 포함)를 통째로 올려 하드웨어를 가상화하는 격리 단위. 컨테이너보다 무겁고 시작이 느리지만 커널까지 분리되어 격리 강도가 높다.",
+      "related": [
+        "container",
+        "hypervisor"
+      ]
+    },
+    {
+      "id": "virtual-memory",
+      "term": "가상 메모리",
+      "aliases": [
+        "virtual memory"
+      ],
+      "definition": "각 프로세스에 독립적인 가상 주소 공간을 제공하는 추상화. MMU와 페이지 테이블이 가상 주소를 물리 주소로 변환하며, 프로세스 격리·물리 메모리 초과 지원·메모리 공유를 가능하게 한다.",
+      "related": [
+        "paging",
+        "page-table",
+        "page-fault"
+      ]
+    },
+    {
+      "id": "virtual-node",
+      "term": "가상 노드",
+      "aliases": [
+        "virtual node",
+        "vnode"
+      ],
+      "definition": "안정 해시에서 물리 노드 하나를 링 위 여러 지점에 배치해 담당 구간을 잘게 쪼개는 기법. 부하 분포를 통계적으로 평균화하고, 노드 증감 시 키 이동을 여러 노드로 분산시키며, 서버 성능에 비례한 배분도 가능하게 한다.",
+      "related": [
+        "consistent-hashing",
+        "hot-spot"
+      ]
+    },
+    {
+      "id": "wal",
+      "term": "WAL",
+      "aliases": [
+        "Write-Ahead Logging",
+        "쓰기 전 로그"
+      ],
+      "definition": "데이터 파일을 변경하기 전에 로그를 먼저 디스크에 기록하는 방식(Write-Ahead Logging). 순차 I/O의 이점을 활용해 커밋의 지속성을 보장하고 장애 복구의 근거가 된다.",
+      "related": [
+        "redo-log",
+        "durability",
+        "sequential-io"
+      ]
+    },
+    {
+      "id": "watermark",
+      "term": "워터마크 (Watermark)",
+      "aliases": [],
+      "definition": "'이벤트 시간 T 이전의 이벤트는 대체로 다 도착했다'고 보는 기준 시각을 스트림에 흘려보내는 신호. 윈도를 언제 닫고 집계를 확정할지 결정하며, 정확성(늦은 이벤트 대기)과 지연(빠른 확정) 사이의 트레이드오프를 조절한다. 워터마크 이후 도착한 이벤트는 버리거나 결과를 정정하는 정책으로 처리한다.",
+      "related": [
+        "event-time",
+        "time-window",
+        "straggler"
+      ]
+    },
+    {
+      "id": "weak-validator",
+      "term": "약한 검증자",
+      "aliases": [
+        "weak validator",
+        "W/ ETag"
+      ],
+      "definition": "의미상 동등한 변경에서는 값을 유지해도 되는 완화된 검증자로, ETag에 W/ 접두사를 붙여 표시한다. 사소한 수정의 불필요한 재전송을 줄이지만 부분 콘텐츠 결합에는 쓸 수 없다.",
+      "related": [
+        "etag",
+        "strong-validator"
+      ]
+    },
+    {
+      "id": "websocket",
+      "term": "WebSocket",
+      "aliases": [
+        "웹소켓"
+      ],
+      "definition": "HTTP Upgrade 핸드셰이크로 수립되어 같은 TCP 연결을 전이중(full-duplex) 채널로 전환하는 프로토콜. 이후 양쪽이 요청-응답 틀 없이 언제든 프레임을 주고받을 수 있어 채팅 등 양방향 실시간 통신에 적합하다.",
+      "related": [
+        "long-polling",
+        "sse",
+        "socket"
+      ]
+    },
+    {
+      "id": "working-set",
+      "term": "워킹 셋",
+      "aliases": [
+        "working set"
+      ],
+      "definition": "프로세스가 최근 일정 기간 동안 활발히 접근하는 페이지들의 집합. 워킹 셋이 물리 메모리에 다 들어가야 페이지 폴트 없이 원활히 실행되며, 초과하면 스래싱으로 이어진다.",
+      "related": [
+        "thrashing",
+        "locality"
+      ]
+    },
+    {
+      "id": "write-ahead-log",
+      "term": "WAL (Write-Ahead Log)",
+      "aliases": [
+        "선행 기록 로그",
+        "WAL"
+      ],
+      "definition": "데이터 변경을 실제 자료구조에 반영하기 전에 로그 파일에 먼저 순차 기록하는 기법. 장애 시 로그를 재생해 복구할 수 있게 하며, 무작위 갱신을 빠른 순차 쓰기로 바꾸는 효과가 있다.",
+      "related": [
+        "sequential-io"
+      ]
+    },
+    {
+      "id": "write-amplification",
+      "term": "쓰기 증폭 (Write Amplification)",
+      "aliases": [
+        "write amplification factor"
+      ],
+      "definition": "SSD에서 실제 기록되는 데이터량이 요청한 쓰기량보다 커지는 현상. 플래시는 덮어쓰기가 불가능하고 블록 단위로만 지울 수 있어, 랜덤 쓰기가 많으면 유효 데이터 이동이 늘어나 성능과 수명이 저하된다.",
+      "related": [
+        "sequential-io",
+        "random-io"
+      ]
+    },
+    {
+      "id": "write-behind",
+      "term": "Write-Behind",
+      "aliases": [
+        "Write-Back"
+      ],
+      "definition": "쓰기를 캐시에만 기록하고 큐에 모아 비동기·배치로 DB에 반영하는 전략. 쓰기 지연이 작고 부하를 흡수하지만, DB 반영 전에 캐시가 유실되면 데이터를 잃을 수 있다.",
+      "related": [
+        "write-through"
+      ]
+    },
+    {
+      "id": "write-through",
+      "term": "Write-Through",
+      "aliases": [],
+      "definition": "쓰기를 캐시에 기록하면서 동기적으로 DB까지 함께 반영하는 캐시 쓰기 전략. 캐시와 DB가 일치해 읽기가 최신 값을 보지만 쓰기 지연이 커진다.",
+      "related": [
+        "write-behind"
+      ]
+    },
+    {
+      "id": "xss",
+      "term": "XSS",
+      "aliases": [
+        "크로스 사이트 스크립팅",
+        "Cross-Site Scripting"
+      ],
+      "definition": "공격자가 주입한 스크립트가 피해자의 브라우저에서 신뢰된 사이트의 컨텍스트로 실행되는 공격(크로스 사이트 스크립팅). 쿠키 탈취·화면 위조 등이 가능하며, 출력 이스케이프·CSP·HttpOnly 쿠키 등으로 방어한다.",
+      "related": [
+        "csrf",
+        "httponly"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "name": "backend-quiz",
+  "title": "백엔드 기술 학습 퀴즈",
+  "domain": "백엔드 공통 지식 (기술 면접 · 직군 전환 대비, 언어/프레임워크 무관)",
+  "language": "ko",
+  "createdAt": "2026-07-17",
+  "weights": {
+    "frequency": 0.4,
+    "centrality": 0.25,
+    "practicality": 0.2,
+    "discrimination": 0.15
+  },
+  "sectionPrefixes": {
+    "network": {
+      "canonical": "net",
+      "all": [
+        "net"
+      ]
+    },
+    "http-api": {
+      "canonical": "http",
+      "all": [
+        "http"
+      ]
+    },
+    "os-concurrency": {
+      "canonical": "os",
+      "all": [
+        "os"
+      ]
+    },
+    "database": {
+      "canonical": "db",
+      "all": [
+        "db"
+      ]
+    },
+    "cache": {
+      "canonical": "cache",
+      "all": [
+        "cache"
+      ]
+    },
+    "async-mq": {
+      "canonical": "mq",
+      "all": [
+        "mq"
+      ]
+    },
+    "auth-security": {
+      "canonical": "sec",
+      "all": [
+        "sec"
+      ]
+    },
+    "distributed": {
+      "canonical": "dist",
+      "all": [
+        "dist"
+      ]
+    },
+    "system-design": {
+      "canonical": "sd",
+      "all": [
+        "sd"
+      ]
+    },
+    "infra": {
+      "canonical": "infra",
+      "all": [
+        "infra"
+      ]
+    }
+  },
+  "matchKeywords": [
+    "백엔드",
+    "backend",
+    "서버",
+    "server",
+    "네트워크",
+    "network",
+    "데이터베이스",
+    "database",
+    "db",
+    "sql",
+    "http",
+    "캐시",
+    "cache",
+    "redis",
+    "kafka",
+    "분산",
+    "distributed",
+    "시스템 설계",
+    "system design",
+    "cs 면접",
+    "운영체제",
+    "os",
+    "인프라",
+    "infra"
+  ]
+}

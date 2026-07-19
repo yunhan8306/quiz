@@ -1,0 +1,14 @@
+{
+  "sections": [
+    "network",
+    "http-api",
+    "os-concurrency",
+    "database",
+    "cache",
+    "async-mq",
+    "auth-security",
+    "distributed",
+    "system-design",
+    "infra"
+  ]
+}
